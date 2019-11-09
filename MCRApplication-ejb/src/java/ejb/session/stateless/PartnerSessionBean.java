@@ -5,9 +5,12 @@
  */
 package ejb.session.stateless;
 
+import entity.Partner;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 /**
  *
@@ -18,6 +21,14 @@ import javax.ejb.Stateless;
 @Remote(PartnerSessionBeanRemote.class)
 public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSessionBeanLocal {
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+    @PersistenceContext(unitName = "MCRApplication-ejbPU")
+    private EntityManager em;
+    
+    @Override
+    public Long createPartner(Partner p) {
+        em.persist(p);
+        em.flush();
+        return p.getPartnerId();
+    }
+    
 }

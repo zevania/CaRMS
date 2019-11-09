@@ -5,7 +5,11 @@
  */
 package ejb.session.stateless;
 
+import entity.Partner;
+
 
 public interface PartnerSessionBeanRemote {
+    
+    public Long createPartner(Partner p);
     
 }

@@ -5,6 +5,13 @@
  */
 package ejb.session.stateless;
 
+import entity.Member;
+import util.exception.InvalidLoginCredentialException;
+
 public interface MemberSessionBeanLocal {
+
+    public Long createMember(Member m);
+
+    public Member memberLogin(String email, String password) throws InvalidLoginCredentialException;
     
 }

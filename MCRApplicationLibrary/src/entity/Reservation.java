@@ -98,7 +98,7 @@ public class Reservation implements Serializable {
         this.customer = customer;
     }
 
-    public Reservation(PaidStatusEnum paymentStatus, Double total, LocalDate pickupDate, LocalDate returnDate, LocalTime pickupTime, LocalTime returnTime, OrderTypeEnum orderType, Outlet pickupLocation, Outlet returnLocation, Customer customer) {
+    public Reservation(PaidStatusEnum paymentStatus, Double total, LocalDate pickupDate, LocalDate returnDate, LocalTime pickupTime, LocalTime returnTime, OrderTypeEnum orderType, Customer customer) {
         this.paymentStatus = paymentStatus;
         this.total = total;
         this.pickupDate = pickupDate;
@@ -106,8 +106,6 @@ public class Reservation implements Serializable {
         this.pickupTime = pickupTime;
         this.returnTime = returnTime;
         this.orderType = orderType;
-        this.pickupLocation = pickupLocation;
-        this.returnLocation = returnLocation;
         this.customer = customer;
         this.resStatus = ResStatusEnum.ORDERED;
     }

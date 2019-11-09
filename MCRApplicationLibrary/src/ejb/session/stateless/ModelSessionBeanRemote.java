@@ -5,7 +5,18 @@
  */
 package ejb.session.stateless;
 
+import entity.Model;
+import java.util.List;
+
 
 public interface ModelSessionBeanRemote {
+    
+    public long createModel(Model m, long categoryId);
+    
+    public List<Model> retrieveModels();
+
+    public void updateModel(Model m, Long categoryId);
+
+    public void deleteModel(Long modelId);
     
 }

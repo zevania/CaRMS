@@ -5,9 +5,15 @@
  */
 package ejb.session.stateless;
 
+import entity.Member;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import util.exception.InvalidLoginCredentialException;
 
 /**
  *
@@ -18,6 +24,34 @@ import javax.ejb.Stateless;
 @Remote(MemberSessionBeanRemote.class)
 public class MemberSessionBean implements MemberSessionBeanRemote, MemberSessionBeanLocal {
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
+    @PersistenceContext(unitName = "MCRApplication-ejbPU")
+    private EntityManager em;
+    
+    @Override
+    public Long createMember(Member m) {
+        em.persist(m);
+        em.flush();
+        return m.getMemberId();
+    }
+    
+    @Override
+    public Member memberLogin(String email, String password) throws InvalidLoginCredentialException  {
+        Query query = em.createQuery("SELECT m FROM Member m WHERE m.email = :inEmail");
+        query.setParameter("inEmail", email);
+        Member m;
+        
+        try {
+            m = (Member)query.getSingleResult();
+            if(m.getPassword().equals(password)) {
+                return m;
+            } else {
+                throw new InvalidLoginCredentialException("Invalid password!");
+            }
+        } catch (NoResultException ex) {
+            throw new InvalidLoginCredentialException("Member does not exist");
+        }
+        
+        
+    }
+    
 }
