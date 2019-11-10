@@ -41,7 +41,7 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     
     @Override
     public List<Model> retrieveModels() {
-        Query query = em.createQuery("SELECT m FROM Model m");
+        Query query = em.createQuery("SELECT m FROM Model m WHERE m.active IS TRUE");
         
         return query.getResultList();
     }

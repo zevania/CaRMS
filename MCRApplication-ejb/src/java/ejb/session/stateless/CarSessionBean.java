@@ -15,6 +15,9 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.CarNotFoundException;
+import util.exception.InvalidModelException;
+import util.exception.OutletNotFoundException;
 
 /**
  *
@@ -30,10 +33,10 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     
     
     @Override
-    public long createCar(Car car, long modelId) throws Exception {
+    public long createCar(Car car, long modelId) throws InvalidModelException {
         Model model = em.find(Model.class, modelId);
         
-        if(!model.isActive()) throw new Exception();
+        if(!model.isActive() || model == null) throw new InvalidModelException();
         em.persist(car);
         
         car.setModel(model);
@@ -44,23 +47,27 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public List<Car> retrieveCars(){
+    public List<Car> retrieveCars() {
         Query query = em.createQuery("SELECT c FROM Car c WHERE c.active IS TRUE");
         
         return query.getResultList();
     }
 
     @Override
-    public void updateCar(Car c, long outletId, long modelId) {
+    public void updateCar(Car c, long outletId, long modelId) throws InvalidModelException, OutletNotFoundException {
         em.merge(c);
         em.flush();
         Model model = em.find(Model.class, modelId);
+        
+        if(!model.isActive() || model == null) throw new InvalidModelException();
+        Outlet newOutlet = em.find(Outlet.class,outletId);
+        if(newOutlet == null) throw new OutletNotFoundException();
+        
         long carId = c.getCarId();
         Car car = em.find(Car.class, carId);
         if(outletId != c.getOutlet().getOutletId()){
             Outlet old = em.find(Outlet.class,c.getOutlet().getOutletId());
             old.getCars().remove(c);
-            Outlet newOutlet = em.find(Outlet.class,outletId);
             newOutlet.getCars().add(car);
             car.setOutlet(newOutlet);
         }
@@ -74,8 +81,9 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public void deleteCar(long carId) {
+    public void deleteCar(long carId) throws CarNotFoundException {
         Car c = em.find(Car.class, carId);
+        if(c==null) throw new CarNotFoundException();
         c.setActive(false);
         em.flush();
     }

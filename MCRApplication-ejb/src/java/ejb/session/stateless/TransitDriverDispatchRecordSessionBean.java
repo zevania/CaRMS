@@ -74,11 +74,10 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
     @Override
     public List<DriverDispatchRecord> retrieveDispatchRecords(long outletId, LocalDate date) {
         Outlet o = em.find(Outlet.class, outletId);
-        String theoutletName = o.getName();
-        //LocalDate theDate = date;
-        Query query = em.createQuery("SELECT ddr FROM DriverDispatchRecord ddr WHERE ddr.outletName LIKE :theOutlet AND ddr.dispatchDate = :theDate")
+        
+        Query query = em.createQuery("SELECT ddr FROM DriverDispatchRecord ddr WHERE ddr.outlet.outletId = :theOutlet AND ddr.dispatchDate = :theDate")
                     .setParameter("theDate", date)
-                    .setParameter("theOutlet",theoutletName);
+                    .setParameter("theOutlet",outletId);
         List<DriverDispatchRecord> theList = query.getResultList();
         return theList;
              

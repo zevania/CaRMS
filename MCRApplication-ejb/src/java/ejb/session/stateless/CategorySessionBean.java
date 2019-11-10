@@ -6,11 +6,13 @@
 package ejb.session.stateless;
 
 import entity.Category;
+import java.util.List;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 /**
  *
@@ -31,8 +33,14 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
         return c.getCategoryId();
     }
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
-    
+    public List<Category> retrieveAllCategories(){
+        Query query = em.createQuery("SELECT c FROM Category c");
+        List<Category> categories = query.getResultList();
+        for(Category c: categories){
+            c.getModel().size();
+        }
+        return categories;
+        
+    }
     
 }

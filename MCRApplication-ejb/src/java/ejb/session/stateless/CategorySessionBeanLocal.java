@@ -6,10 +6,13 @@
 package ejb.session.stateless;
 
 import entity.Category;
+import java.util.List;
 
 
 public interface CategorySessionBeanLocal {
 
     public long createCategory(Category c);
+
+    public List<Category> retrieveAllCategories();
     
 }

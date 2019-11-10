@@ -87,6 +87,7 @@ public class TimerSessionBean {
             for(Reservation r: toRemove){
                 tempReservation.remove(r);
             }
+            
             if(tempReservation.size()==0) continue;
             
             toRemove.clear();
@@ -98,7 +99,7 @@ public class TimerSessionBean {
             LocalTime temptime;
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
-                temptime = temp.getPickupTime().minusHours(2);
+                temptime = temp.getPickupTime();
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
                     if(c.getModel().getModelId() == temp.getCarModel().getModelId() &&
@@ -134,7 +135,7 @@ public class TimerSessionBean {
                         toRemove.add(temp);
                         cars.remove(c);
                         ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), temp.getPickupTime().minusHours(2) , c.getReservation().getReturnLocation().getName());
-                        id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), o.getOutletId());
+                        id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
                     } 
                 }
@@ -163,7 +164,7 @@ public class TimerSessionBean {
                         cars.remove(c);
                         toRemove.add(temp);
                         ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), temp.getPickupTime().minusHours(2) , c.getReservation().getReturnLocation().getName());
-                        id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), o.getOutletId());
+                        id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
                     } 
                 }
@@ -218,7 +219,7 @@ public class TimerSessionBean {
             LocalTime temptime;
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
-                temptime = temp.getPickupTime().minusHours(2);
+                temptime = temp.getPickupTime();
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
                     if(c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
@@ -254,7 +255,7 @@ public class TimerSessionBean {
                         cars.remove(c);
                         toRemove.add(temp);
                         ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), temp.getPickupTime().minusHours(2) , c.getReservation().getReturnLocation().getName());
-                        id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), o.getOutletId());
+                        id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
                     }
                 }
@@ -283,7 +284,7 @@ public class TimerSessionBean {
                         cars.remove(c);
                         toRemove.add(temp);
                         ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), temp.getPickupTime().minusHours(2) , c.getReservation().getReturnLocation().getName());
-                        id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), o.getOutletId());
+                        id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
                     } 
                 }
@@ -297,10 +298,4 @@ public class TimerSessionBean {
         }
     }
 
-    // Add business logic below. (Right-click in editor and choose
-    // "Insert Code > Add Business Method")
-
-    public void persist(Object object) {
-        em.persist(object);
-    }
 }
