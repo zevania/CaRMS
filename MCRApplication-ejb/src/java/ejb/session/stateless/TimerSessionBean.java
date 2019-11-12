@@ -92,7 +92,7 @@ public class TimerSessionBean {
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.active IS TRUE AND c.reservation.returnLocation.outletId = :store")
+            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.active = TRUE AND c.reservation.returnLocation.outletId = :store")
                     .setParameter("store",theStoreId);
             cars = query.getResultList();
             
@@ -121,7 +121,7 @@ public class TimerSessionBean {
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NULL AND c.active IS TRUE");
+            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NULL AND c.active = TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){
@@ -148,7 +148,7 @@ public class TimerSessionBean {
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.active IS TRUE");
+            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.active = TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){
@@ -212,7 +212,7 @@ public class TimerSessionBean {
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.reservation.returnLocation.outletId LIKE :store AND c.active IS TRUE")
+            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.reservation.returnLocation.outletId LIKE :store AND c.active = TRUE")
                     .setParameter("store",theStoreId);
             cars = query.getResultList();
             
@@ -241,7 +241,7 @@ public class TimerSessionBean {
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NULL AND c.active IS TRUE");
+            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NULL AND c.active = TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){
@@ -268,7 +268,7 @@ public class TimerSessionBean {
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.active IS TRUE");
+            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.active = TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){

@@ -150,8 +150,8 @@ public class MainApp {
         }
         
         if(currEmployee==null){
-            throw new InvalidLoginCredentialException("Account not found or wrong password!");
-        }
+           throw new InvalidLoginCredentialException("Account not found or wrong password!");
+       }
     }
     
     private void doLogout(){
@@ -685,6 +685,9 @@ public class MainApp {
         
         m = new Model(modelName, make);
         long id = 0;
+        
+        System.out.println("Please wait for a moment.");
+        
         try{
             id = modelSessionBean.createModel(m, categoryId);
         }catch(CategoryNotFoundException ex){

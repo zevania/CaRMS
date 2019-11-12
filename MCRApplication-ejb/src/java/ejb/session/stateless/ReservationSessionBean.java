@@ -211,7 +211,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         int totalCar = 0;
         
         if(searchType.equals("category")){
-            query = em.createQuery("SELECT c FROM Car c WHERE c.model.category.categoryId = :catId AND c.active IS TRUE")
+            query = em.createQuery("SELECT c FROM Car c WHERE c.model.category.categoryId = :catId AND c.active = TRUE")
                     .setParameter("catId", categoryId);
             totalCar = query.getResultList().size();
             
@@ -269,7 +269,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             if(leftCar>0) return true;
             else return false;
         }else if(searchType.equals("model")){
-           query = em.createQuery("SELECT c FROM Car c WHERE c.model.modelId = :modId AND c.active IS TRUE")
+           query = em.createQuery("SELECT c FROM Car c WHERE c.model.modelId = :modId AND c.active = TRUE")
                     .setParameter("modId", modelId);
             totalCar = query.getResultList().size();
             
