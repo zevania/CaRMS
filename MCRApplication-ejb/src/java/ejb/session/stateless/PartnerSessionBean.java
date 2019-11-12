@@ -10,7 +10,11 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import util.exception.InvalidLoginCredentialException;
+import util.exception.PartnerNotFoundException;
 
 /**
  *
@@ -31,4 +35,20 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         return p.getPartnerId();
     }
     
+    public Partner doPartnerLogin(String email, String password) throws PartnerNotFoundException, InvalidLoginCredentialException{
+        Query query = em.createQuery("SELECT p FROM Partner p WHERE p.email = :inEmail")
+                .setParameter("inEmail",email);
+        Partner partner;
+        try{
+            partner = (Partner) query.getSingleResult();
+        }catch(NoResultException ex){
+            throw new PartnerNotFoundException();
+        }
+        
+        if(!partner.getPassword().equals(password)){
+            throw new InvalidLoginCredentialException();
+        }
+        
+        return partner;
+    }
 }
