@@ -54,7 +54,7 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     @Override
     public List<Car> retrieveCars() {
-        Query query = em.createQuery("SELECT c FROM Car c WHERE c.active IS TRUE ORDER BY c.model.category.categoryId ASC, c.model.make ASC, c.model.modelName ASC, c.plateNumber ASC");        
+        Query query = em.createQuery("SELECT c FROM Car c WHERE c.active = TRUE ORDER BY c.model.category.categoryId ASC, c.model.make ASC, c.model.modelName ASC, c.plateNumber ASC");        
         return query.getResultList();
     }
 

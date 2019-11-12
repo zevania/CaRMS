@@ -41,12 +41,12 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     @Override
     public Employee employeeLogin(String email, String password) {
         Query query = em.createQuery("SELECT e FROM Employee e WHERE e.email LIKE :empEmail")
-                .setParameter("empMail", email);
+                .setParameter("empEmail", email);
         Employee e =  (Employee) query.getSingleResult();
         
         if(e==null) return null;
         
-        if(e.getPassword()!= password) return null;
+        if(!e.getPassword().equals(password)) return null;
         else return e;
     }
     
