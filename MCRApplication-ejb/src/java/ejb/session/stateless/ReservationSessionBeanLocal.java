@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import java.util.List;
 import util.enumeration.ResStatusEnum;
 import util.exception.InvalidReservationException;
+import util.exception.MemberNotFoundException;
 import util.exception.OutletNotFoundException;
 import util.exception.ReservationNotFoundException;
 
@@ -19,7 +20,7 @@ public interface ReservationSessionBeanLocal {
 
     public void updateRes(long resId, ResStatusEnum status)throws ReservationNotFoundException, InvalidReservationException;
 
-    public long createMemberReservation(Reservation r, long memberId, long ccNum, long pickupId, long returnId, long categoryId, long modelId) throws OutletNotFoundException;
+    public long createMemberReservation(Reservation r, long memberId, long ccNum, long pickupId, long returnId, long categoryId, long modelId) throws OutletNotFoundException, MemberNotFoundException;
 
     public String cancelReservation(long resId);
 

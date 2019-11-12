@@ -50,6 +50,8 @@ public class Reservation implements Serializable {
     private ResStatusEnum resStatus;
     @Enumerated(EnumType.STRING)
     private OrderTypeEnum orderType;
+    @Column(nullable = true)
+    private double penalty;
     
     @ManyToOne
     private Category carCategory;
@@ -110,6 +112,14 @@ public class Reservation implements Serializable {
         this.resStatus = ResStatusEnum.ORDERED;
     }
 
+    public double getPenalty() {
+        return penalty;
+    }
+
+    public void setPenalty(double penalty) {
+        this.penalty = penalty;
+    }
+    
     public static long getSerialVersionUID() {
         return serialVersionUID;
     }

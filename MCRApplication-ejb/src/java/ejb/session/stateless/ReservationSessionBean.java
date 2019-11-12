@@ -31,6 +31,7 @@ import util.enumeration.OrderTypeEnum;
 import util.enumeration.PaidStatusEnum;
 import util.enumeration.ResStatusEnum;
 import util.exception.InvalidReservationException;
+import util.exception.MemberNotFoundException;
 import util.exception.OutletNotFoundException;
 import util.exception.ReservationNotFoundException;
 
@@ -77,11 +78,16 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
 
     @Override
-    public long createMemberReservation(Reservation r, long memberId, long ccNum, long pickupId, long returnId, long categoryId, long modelId) {
-        em.persist(r);
+    public long createMemberReservation(Reservation r, long memberId, long ccNum, long pickupId, long returnId, long categoryId, long modelId) throws OutletNotFoundException, MemberNotFoundException{
         Member member = em.find(Member.class, memberId);
         Outlet pickupOutlet = em.find(Outlet.class, pickupId);
         Outlet returnOutlet = em.find(Outlet.class, returnId);
+        
+        if(member==null) throw new MemberNotFoundException();
+        if(pickupOutlet==null) throw new OutletNotFoundException();
+        if(returnOutlet==null) throw new OutletNotFoundException();
+        
+        em.persist(r);
         
         r.setPickupLocation(pickupOutlet);
         pickupOutlet.getPickReservation().add(r);
@@ -164,7 +170,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         } else {
             return "[Action is invalid]\n";
         }
-        
+        r.setPenalty(penalty);
         return reply;
     }
 
