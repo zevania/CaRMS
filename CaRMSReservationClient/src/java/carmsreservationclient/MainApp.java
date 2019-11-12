@@ -29,6 +29,7 @@ import util.exception.MemberEmailExistException;
 import util.exception.OutletNotFoundException;
 import util.exception.RateNotFoundException;
 import util.exception.IncompleteRegistrationDetailsException;
+import util.exception.MemberNotFoundException;
 
 
 public class MainApp {
@@ -79,7 +80,7 @@ public class MainApp {
                 {
                     try {
                         doCreateMember();
-                    } catch (Exception ex) {
+                    } catch (IncompleteRegistrationDetailsException ex) {
                         ex.getMessage();
                     }
                 }
@@ -94,7 +95,7 @@ public class MainApp {
                     }
                     catch(InvalidLoginCredentialException ex) 
                     {
-                        System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
+                        System.out.println("An error has occurred while logging in: " + ex.getMessage() + "\n");
                     }
                 }
                 else if (response == 3)
@@ -131,14 +132,7 @@ public class MainApp {
         
         if(email.length() > 0 && password.length() > 0)
         {
-            try 
-            {
             currentMember = memberSessionBeanRemote.memberLogin(email, password);
-            } 
-            catch(InvalidLoginCredentialException ex) 
-            {
-                System.out.println("An error has occurred while logging in:" + ex.getMessage()+"\n");
-            }
         }
         else
         {
@@ -316,12 +310,12 @@ public class MainApp {
                     } 
                     catch (CategoryNotFoundException ex) 
                     {
-                        System.out.println("An error occurred while creating reservation: Car Category Not Found!");
+                        System.out.println("An error occurred while retrieving rental rate: Car Category Not Found!");
                         return;
                     } 
                     catch (RateNotFoundException ex) 
                     {
-                        System.out.println("An error occurred while creating reservation: Rental Rate Not Found!");
+                        System.out.println("An error occurred while retrieving rental rate: Rental Rate Not Found!");
                         return;
                     }
                 }
@@ -349,7 +343,7 @@ public class MainApp {
         } while(!yesNo.equals("N"));
         
         
-        if(success) 
+        if(success && currentMember != null) 
         {
             System.out.println("------------------------");
             System.out.println("1: Make Reservation");
@@ -375,6 +369,11 @@ public class MainApp {
                     catch(OutletNotFoundException ex)
                     {
                         System.out.println("Invalid input. Outlet not found!");
+                        return;
+                    }
+                    catch(MemberNotFoundException ex) 
+                    {
+                        System.out.println("Member not found!");
                         return;
                     }
                     System.out.println("Reservation successful! The id is "+theId);

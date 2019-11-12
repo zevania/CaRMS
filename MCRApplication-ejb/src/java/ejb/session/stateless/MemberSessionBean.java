@@ -55,7 +55,7 @@ public class MemberSessionBean implements MemberSessionBeanRemote, MemberSession
                 throw new InvalidLoginCredentialException("Invalid password!");
             }
         } catch (NoResultException ex) {
-            throw new InvalidLoginCredentialException("Member does not exist");
+            throw new InvalidLoginCredentialException("Member not found!");
         }
         
         

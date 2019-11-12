@@ -42,11 +42,11 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
         try{
             partner = (Partner) query.getSingleResult();
         }catch(NoResultException ex){
-            throw new PartnerNotFoundException();
+            throw new PartnerNotFoundException("User not found!");
         }
         
         if(!partner.getPassword().equals(password)){
-            throw new InvalidLoginCredentialException();
+            throw new InvalidLoginCredentialException("Invalid Password!");
         }
         
         return partner;
