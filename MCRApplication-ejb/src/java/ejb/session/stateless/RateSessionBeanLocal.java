@@ -13,7 +13,7 @@ import util.exception.RateNotFoundException;
 
 public interface RateSessionBeanLocal {
 
-    public long createRate(Rate r, long categoryId) throws CategoryNotFoundException;
+    public long createRate(Rate r , long categoryId) throws CategoryNotFoundException;
 
     public List retrieveRates();
 

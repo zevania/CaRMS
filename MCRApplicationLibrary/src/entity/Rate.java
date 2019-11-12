@@ -45,21 +45,23 @@ public class Rate implements Serializable {
     public Rate() {
     }
 
-    public Rate(String name, Double rate, Date startPeriod, Date endPriod, Category category) {
+    public Rate(String name, Double rate, Date startPeriod, Date endPeriod, Category category) {
         this.name = name;
         this.rate = rate;
         this.startPeriod = startPeriod;
-        this.endPeriod = endPriod;
+        this.endPeriod = endPeriod;
         this.category = category;
     }
 
-    public Rate(String name, Double rate, Date startPeriod, Date endPriod, Double peakRate) {
+    public Rate(String name, Double rate, Double peakRate, Date startPeriod, Date endPeriod) {
         this.name = name;
         this.rate = rate;
-        this.startPeriod = startPeriod;
-        this.endPeriod = endPriod;
         this.peakRate = peakRate;
+        this.startPeriod = startPeriod;
+        this.endPeriod = endPeriod;
     }
+
+    
 
     
     public Double getPeakRate() {

@@ -96,7 +96,8 @@ public class MainApp {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
-
+                scanner.nextLine();
+                
                 if(response == 1)
                 {
                     try
@@ -183,7 +184,8 @@ public class MainApp {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
-
+                scanner.nextLine();
+                
                 if (response == 1)
                 {
                     doCreateRentalRate();
@@ -272,7 +274,7 @@ public class MainApp {
                 break;
             } else if(yesno.equals("n")) {
                 startDate = new Date(0L);
-                endDate = new Date(Long.MAX_VALUE);
+                endDate = new Date(2100,12,12);
                 break;
             }
         }
@@ -283,11 +285,12 @@ public class MainApp {
         peakRate = scanner.nextDouble();
         System.out.print("Enter category Id> ");
         catId = scanner.nextLong();
+        scanner.nextLine();
         
-        Rate r = new Rate(name, rate, startDate, endDate, peakRate);
+        Rate r = new Rate(name, rate, peakRate,startDate, endDate);
         long id = 0;
         try{
-            id = rateSessionBean.createRate(r, catId);
+            id = rateSessionBean.createRate(r,catId);
             System.out.println("Successfully created a rate.");
             System.out.println("The rate id is "+id+". \n");
         }catch(CategoryNotFoundException ex){
@@ -319,12 +322,14 @@ public class MainApp {
     private void doViewRateDetails(){
         Scanner sc = new Scanner(System.in);
         
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MM yyyy");
         System.out.println("*** CaRMS Management Client :: View Rate Details ***\n");
                
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        
         System.out.print("Enter the rate id: ");
         long rateId;
         rateId = sc.nextLong();
+        sc.nextLine();
         
         if(rateId<0){
             System.out.println("The id is invalid!");
@@ -336,14 +341,17 @@ public class MainApp {
         try{
             rate = rateSessionBean.retrieveRateById(rateId);
             System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", "Rate Id", "Start Date", "End Date", "Name", "Category", "Rate", "Peak Rate");
-            if(rate.getStartPeriod().equals(new Date(0L))){
+            if(rate.getStartPeriod().getYear() == 69  ){
                 System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", rate.getRateId(), "N.A.", "N.A.", rate.getName(), rate.getCategory().getCategoryName(), rate.getRate(), rate.getPeakRate());
             } else {
-                System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", rate.getRateId(), rate.getStartPeriod(), rate.getEndPeriod(), rate.getName(), rate.getCategory().getCategoryName(), rate.getRate(), rate.getPeakRate());
+                System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", rate.getRateId(), formatter.format(rate.getStartPeriod()), formatter.format(rate.getEndPeriod()), rate.getName(), rate.getCategory().getCategoryName(), rate.getRate(), rate.getPeakRate());
             }
         }catch(RateNotFoundException ex){
+            System.out.println();
             System.out.println("Rate is not found!");
             System.out.println("Id is invalid\n");
+            System.out.println("Press enter to continue!");
+            sc.nextLine();
             return;
         
         }
@@ -355,6 +363,7 @@ public class MainApp {
         while(true){
             System.out.print("Enter your choice: ");
             choice = sc.nextInt();
+            sc.nextLine();
             
             if(choice==1){
                 doUpdateRate(rate);
@@ -419,7 +428,7 @@ public class MainApp {
                 break;
             } else if(yesno.equals("n")) {
                 startDate = new Date(0L);
-                endDate = new Date(Long.MAX_VALUE);
+                endDate = new Date(2100,12,12);
                 break;
             }
         }
@@ -481,7 +490,8 @@ public class MainApp {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
-
+                scanner.nextLine();
+                
                 if (response == 1)
                 {
                     doPickUp();
@@ -516,6 +526,7 @@ public class MainApp {
         
         System.out.print("Enter the reservation id: ");
         long resId = sc.nextLong();
+        sc.nextLine();
         
         Reservation r = reservationSessionBean.retrieveReservationById(resId);
         
@@ -574,6 +585,7 @@ public class MainApp {
         
         System.out.print("Enter the reservation id: ");
         long resId = sc.nextLong();
+        sc.nextLine();
         
         Reservation r = reservationSessionBean.retrieveReservationById(resId);
         
@@ -629,7 +641,8 @@ public class MainApp {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
-
+                scanner.nextLine();
+                
                 if (response == 1)
                 {
                     doCreateNewModel();
@@ -696,7 +709,7 @@ public class MainApp {
         String make = sc.nextLine().trim();
         System.out.print("Enter the category Id: ");
         long categoryId = sc.nextLong();
-        
+        sc.nextLine();
         m = new Model(modelName, make);
         long id = 0;
         
@@ -738,6 +751,7 @@ public class MainApp {
         
         System.out.print("Enter the model id: ");
         long modelId = sc.nextLong();
+        sc.nextLine();
         Model model = modelSessionBean.retrieveModelById(modelId);
         
         if(model==null){
@@ -759,6 +773,7 @@ public class MainApp {
         if(yesno.equals("y")){
             System.out.print("Enter the new category id");
             catId = sc.nextLong();
+            sc.nextLine();
         }
         
         model.setMake(make);
@@ -785,6 +800,7 @@ public class MainApp {
         
         System.out.print("Enter the model id: ");
         long modelId = sc.nextLong();
+        sc.nextLine();
         
         try{
             modelSessionBean.deleteModel(modelId);
@@ -811,8 +827,10 @@ public class MainApp {
         String colour = sc.nextLine().trim();
         System.out.print("Enter the outlet id: ");
         long outletId = sc.nextLong();
+        sc.nextLine();
         System.out.print("Enter the model id: ");
         long modelId = sc.nextLong();
+        sc.nextLine();
         
         Car car = new Car(plateNumber, colour, CarStatusEnum.OUTLET);
         long carId = 0;
@@ -854,6 +872,7 @@ public class MainApp {
         System.out.println("*** CaRMS Management Client :: View All Cars ***\n");
         System.out.print("Enter the car id: ");
         long carId = sc.nextLong();
+        sc.nextLine();
         Car car;
         try{
             car = carSessionBean.retrieveCarById(carId);
@@ -875,6 +894,7 @@ public class MainApp {
         while(true){
             System.out.print("Enter your choice: ");
             choice = sc.nextInt();
+            sc.nextLine();
             if(choice==1){
                 doUpdateCar(car);
                 break;
@@ -912,6 +932,7 @@ public class MainApp {
         while(true){
             System.out.print("Choose the new status: ");
             statusNum = sc.nextInt();
+            sc.nextLine();
             if(statusNum == 1){
                 carStatus = CarStatusEnum.OUTLET;
                 break;
@@ -923,18 +944,19 @@ public class MainApp {
             }
         }
         
-        System.out.println("Do you want to update the model? (y/n)");
         String yesno = "";
         
         long modelId = car.getModel().getModelId();
         
         while(true){
+            System.out.println("Do you want to update the model? (y/n)");
             System.out.print("> ");
             yesno = sc.nextLine().trim().toLowerCase();
             
             if(yesno.equals("y")){
                 System.out.print("Enter the new model id: ");
                 modelId = sc.nextLong();
+                sc.nextLine();
                 break;
             }else if (yesno.equals("n")){
                break; 
@@ -943,18 +965,19 @@ public class MainApp {
             }
         }
         
-        System.out.println("Do you want to update the outlet? (y/n)");
         yesno = "";
         
         long outletId = car.getOutlet().getOutletId();
         
         while(true){
+            System.out.println("Do you want to update the outlet? (y/n)");
             System.out.print("> ");
             yesno = sc.nextLine().trim().toLowerCase();
             
             if(yesno.equals("y")){
                 System.out.print("Enter the new outlet id: ");
                 outletId = sc.nextLong();
+                sc.nextLine();
                 break;
             }else if (yesno.equals("n")){
                break; 
@@ -962,6 +985,11 @@ public class MainApp {
                 System.out.println("Invalid input! Please input again!");
             }
         }
+        
+        car.setColour(colour);
+        car.setLocation(location);
+        car.setPlateNumber(newPlateNumber);
+        car.setStatus(carStatus);
         
         try{
             carSessionBean.updateCar(car, outletId, modelId);
@@ -1001,9 +1029,8 @@ public class MainApp {
     
     private void doViewDDR(){
         Scanner sc = new Scanner(System.in);
-        DateTimeFormatter dateformatter = DateTimeFormatter.ofPattern("dd MM yyyy");
-        DateTimeFormatter timeformatter = DateTimeFormatter.ofPattern("HH:mm");
         
+        SimpleDateFormat dateformatter = new SimpleDateFormat("dd/MM/yyyy");
         System.out.println("*** CaRMS Management Client :: View Transit Driver Dispatch Records ***\n");
         
         List<DriverDispatchRecord> ddrs = transitDriverDispatchRecordSessionBean.retrieveDispatchRecords(currEmployee.getOutlet().getOutletId(), Calendar.getInstance().getTime());
@@ -1016,7 +1043,7 @@ public class MainApp {
         System.out.printf("%8s%40s%20s%30s%40s\n", "DDR id", "Origin Outlet", "Date", "Latest Time", "Status");
         
         for(DriverDispatchRecord ddr: ddrs){
-            System.out.printf("%8s%40s%20s%30s%40s\n", ddr.getDispatchId(), ddr.getFromOutlet(), ddr.getDispatchDate(), ddr.getDispatchTime(), ddr.getDispatchStatus().toString());
+            System.out.printf("%8s%40s%20s%30s%40s\n", ddr.getDispatchId(), ddr.getFromOutlet(), dateformatter.format(ddr.getDispatchDate()), ddr.getDispatchTime(), ddr.getDispatchStatus().toString());
         }
         
         System.out.println("");
@@ -1040,8 +1067,10 @@ public class MainApp {
         System.out.println("==============================");
         System.out.print("Enter the DDR id: ");
         long ddrId = sc.nextLong();
+        sc.nextLine();
         System.out.print("Enter the employee id: ");
         long empId = sc.nextLong();
+        sc.nextLine();
         
         try{
             transitDriverDispatchRecordSessionBean.assignDriver(empId, ddrId);
@@ -1068,6 +1097,7 @@ public class MainApp {
         
         System.out.print("Enter the DDR id: ");
         long ddrId = sc.nextLong();
+        sc.nextLine();
         
         try{
             transitDriverDispatchRecordSessionBean.updateDispatchRecordAsCompleted(ddrId);
