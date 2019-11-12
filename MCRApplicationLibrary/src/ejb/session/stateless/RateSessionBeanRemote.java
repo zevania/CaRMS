@@ -6,6 +6,7 @@
 package ejb.session.stateless;
 
 import entity.Rate;
+import java.time.LocalDate;
 import java.util.List;
 import util.enumeration.CategoryNotFoundException;
 import util.exception.RateNotFoundException;
@@ -22,5 +23,7 @@ public interface RateSessionBeanRemote {
     public void deleteRate(Long rateId) throws RateNotFoundException;
     
     public Rate retrieveRateById(long rateId) throws RateNotFoundException;
+    
+    public double retrieveTotalByCategory(long catId, LocalDate startDate, LocalDate endDate) throws CategoryNotFoundException, RateNotFoundException;
     
 }

@@ -18,12 +18,16 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import util.enumeration.CategoryNotFoundException;
 import util.enumeration.CustomerTypeEnum;
 import util.enumeration.OrderTypeEnum;
 import util.enumeration.PaidStatusEnum;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.MemberEmailExistException;
 import util.exception.OutletNotFoundException;
+import util.exception.RateNotFoundException;
 
 
 public class MainApp {
@@ -278,7 +282,8 @@ public class MainApp {
             
             if(response >= 1 && response <= 2)
             {
-                if(response == 1) {
+                if(response == 1) 
+                {
                     searchType = OrderTypeEnum.CATEGORY;
                     System.out.printf("%10s%20s\n", "Category Id", "Category Name");
                     for(Category c : categorySessionBeanRemote.retrieveAllCategories()) {
@@ -287,7 +292,9 @@ public class MainApp {
                     System.out.print("Enter category id: ");
                     categoryId = scanner.nextLong();
                     
-                } else if(response == 2) {
+                } 
+                else if(response == 2) 
+                {
                     searchType = OrderTypeEnum.MODEL;
                     System.out.printf("%10s%10s%20s\n", "Model Id", "Make", "Model");
                     for(Model m : modelSessionBeanRemote.retrieveModels()) {
@@ -297,19 +304,25 @@ public class MainApp {
                     modelId = scanner.nextLong();
                 }
                 
-                try{
-                    success = reservationSessionBeanRemote.searchAvailableCar(searchType.toString(), startDate, endDate, 
-                        startTime, endTime, pickupNo, returnNo, categoryId, modelId);
-                }catch(OutletNotFoundException ex){
+                try
+                {
+                    success = reservationSessionBeanRemote.searchAvailableCar(searchType.toString(), startDate, 
+                            endDate, startTime, endTime, pickupNo, returnNo, categoryId, modelId);
+                }
+                catch(OutletNotFoundException ex)
+                {
                     System.out.println("Invalid input! Outlet not found");
                     return;
                 }
                 
                 
                 
-                if(success) {
+                if(success) 
+                {
                     break;
-                } else {
+                } 
+                else 
+                {
                     System.out.println("No available car matches the searching criteria");
                     System.out.print("Do you want to search again? Y/N > ");
                     yesNo = scanner.nextLine().trim().toUpperCase();
@@ -322,7 +335,8 @@ public class MainApp {
         } while(!yesNo.equals("N"));
         
         
-        if(success) {
+        if(success) 
+        {
             System.out.println("------------------------");
             System.out.println("1: Make Reservation");
             System.out.println("2: Back\n");
@@ -331,25 +345,40 @@ public class MainApp {
 
             if(response == 1)
             {
-                double total = rateSessionBeanRemote.retrieveTotalByCategory(categoryId, startDate, endDate);
-                System.out.println("Total rental rate: $" + total);
+                double total;
+                try 
+                {
+                    total = rateSessionBeanRemote.retrieveTotalByCategory(categoryId, startDate, endDate);
+                    System.out.println("Total rental rate: $" + total);
+                    
+                    System.out.print("Enter credit card number: ");
+                    Long ccNum = scanner.nextLong();
+                    
+                    Customer customer = new Customer(currentMember.getName(), ccNum, currentMember.getEmail(), CustomerTypeEnum.MEMBER);
+                    Reservation r = new Reservation(PaidStatusEnum.PAID, total, startDate, endDate, startTime, endTime, OrderTypeEnum.CATEGORY, customer);
+                    r.setPickupLocation(pickupLocation);
+                    r.setReturnLocation(returnLocation);
                 
-                System.out.print("Enter credit card number: ");
-                Long ccNum = scanner.nextLong();
-                Customer customer = new Customer(currentMember.getName(), ccNum, currentMember.getEmail(), CustomerTypeEnum.MEMBER);
-                Reservation r = new Reservation(PaidStatusEnum.PAID, total, startDate, endDate, startTime, endTime, OrderTypeEnum.CATEGORY, customer);
-                r.setPickupLocation(pickupLocation);
-                r.setReturnLocation(returnLocation);
-                
-                long theId = 0;
-                try{
-                    theId = reservationSessionBeanRemote.createMemberReservation(r, currentMember.getMemberId(), ccNum, pickupNo, returnNo, categoryId, modelId);
-                }catch(OutletNotFoundException ex){
-                    System.out.println("Invalid input. Outlet not found!");
-                    return;
+                    long theId = 0;
+                    try
+                    {
+                        theId = reservationSessionBeanRemote.createMemberReservation(r, currentMember.getMemberId(), ccNum, pickupNo, returnNo, categoryId, modelId);
+                    }
+                    catch(OutletNotFoundException ex)
+                    {
+                        System.out.println("Invalid input. Outlet not found!");
+                        return;
+                    }
+                    System.out.println("Reservation successful! The id is "+theId);
+                } 
+                catch (CategoryNotFoundException ex) 
+                {
+                    System.out.println("An error occurred while creating reservation: Car Category Not Found!");
+                } 
+                catch (RateNotFoundException ex) 
+                {
+                    System.out.println("An error occurred while creating reservation: Rental Rate Not Found!");
                 }
-                
-                System.out.println("Reservation successful! The id is "+theId);
                 
             }
         }

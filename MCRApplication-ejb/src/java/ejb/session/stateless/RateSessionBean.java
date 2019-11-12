@@ -80,6 +80,7 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
         return r;
     }
      
+    @Override
     public double retrieveTotalByCategory(long catId, LocalDate startDate, LocalDate endDate) throws CategoryNotFoundException, RateNotFoundException{
         double total = 0;
         
