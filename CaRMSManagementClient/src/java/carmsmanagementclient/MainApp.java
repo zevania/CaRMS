@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Scanner;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.CategoryNotFoundException;
+import util.enumeration.PaidStatusEnum;
 import util.enumeration.ResStatusEnum;
 import util.enumeration.RoleEnum;
 import util.exception.CarNotFoundException;
@@ -31,6 +32,7 @@ import util.exception.DDRNotFoundException;
 import util.exception.EmployeeNotFoundException;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.InvalidModelException;
+import util.exception.InvalidReservationException;
 import util.exception.ModelNotFoundException;
 import util.exception.OutletNotFoundException;
 import util.exception.RateNotFoundException;
@@ -212,6 +214,7 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
         String name = "";
         Double rate = 0.0;
+        Double peakRate = 0.0;
         long catId = 0;
         String yesno = "";
         String inStartDate = "";
@@ -260,12 +263,14 @@ public class MainApp {
             }
         }
             
-        System.out.print("Enter rate> $ ");
+        System.out.print("Enter rate : $ ");
         rate = scanner.nextDouble();
+        System.out.print("Enter peak rate : $ ");
+        peakRate = scanner.nextDouble();
         System.out.print("Enter category Id> ");
         catId = scanner.nextLong();
         
-        Rate r = new Rate(name, rate, startDate, endDate);
+        Rate r = new Rate(name, rate, startDate, endDate, peakRate);
         long id = 0;
         try{
             id = rateSessionBean.createRate(r, catId);
@@ -286,9 +291,9 @@ public class MainApp {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Management Client :: View All Rental Rates ***\n");
         List<Rate> rates = rateSessionBean.retrieveRates();
-        System.out.printf("%8s%30s%20s%20s\n", "Rate Id", "Name", "Category", "Rate");
+        System.out.printf("%8s%30s%20s%20s%20s\n", "Rate Id", "Name", "Category", "Rate", "Peak Rate");
         for(Rate r : rates) {
-            System.out.printf("%8s%30s%20s%20s\n", r.getRateId(), r.getName(), r.getCategory().getCategoryName(), r.getRate());
+            System.out.printf("%8s%30s%20s%20s%20s\n", r.getRateId(), r.getName(), r.getCategory().getCategoryName(), r.getRate(), r.getPeakRate());
         }
         System.out.println();
         
@@ -316,11 +321,11 @@ public class MainApp {
         
         try{
             rate = rateSessionBean.retrieveRateById(rateId);
-            System.out.printf("%8s%20s%20s%20s%20s%20s\n", "Rate Id", "Start Date", "End Date", "Name", "Category", "Rate");
+            System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", "Rate Id", "Start Date", "End Date", "Name", "Category", "Rate", "Peak Rate");
             if(rate.getStartPeriod().isEqual(LocalDate.MIN)){
-                System.out.printf("%8s%20s%20s%20s%20s%20s\n", rate.getRateId(), "N.A.", "N.A.", rate.getName(), rate.getCategory().getCategoryName(), rate.getRate());
+                System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", rate.getRateId(), "N.A.", "N.A.", rate.getName(), rate.getCategory().getCategoryName(), rate.getRate(), rate.getPeakRate());
             } else {
-                System.out.printf("%8s%20s%20s%20s%20s%20s\n", rate.getRateId(), rate.getStartPeriod().format(formatter), rate.getEndPeriod().format(formatter), rate.getName(), rate.getCategory().getCategoryName(), rate.getRate());
+                System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", rate.getRateId(), rate.getStartPeriod().format(formatter), rate.getEndPeriod().format(formatter), rate.getName(), rate.getCategory().getCategoryName(), rate.getRate(), rate.getPeakRate());
             }
         }catch(RateNotFoundException ex){
             System.out.println("Rate is not found!");
@@ -404,10 +409,14 @@ public class MainApp {
                 break;
             }
         }
-            
-        System.out.print("Enter new rate> $ ");
-        rate = sc.nextDouble();
+        Double peakRate = 0.0;
         
+        System.out.print("Enter new rate: $ ");
+        rate = sc.nextDouble();
+        System.out.print("Enter new peak rate: $ ");
+        peakRate = sc.nextDouble();
+        
+        old.setPeakRate(peakRate);
         old.setName(name);
         old.setStartPeriod(startDate);
         old.setEndPeriod(endDate);
@@ -424,7 +433,14 @@ public class MainApp {
     private void doDeleteRate(long rateId){
         Scanner sc = new Scanner(System.in);
         
-        rateSessionBean.deleteRate(rateId);
+        try{
+            rateSessionBean.deleteRate(rateId);
+        }catch(RateNotFoundException ex){
+            System.out.println("Rate not found!");
+            System.out.println("[Action Denied]");
+            return;
+        }
+        
         System.out.println("The rate is successfully deleted!");
         
         System.out.println("Press enter to continue!");
@@ -489,6 +505,64 @@ public class MainApp {
         
         Reservation r = reservationSessionBean.retrieveReservationById(resId);
         
+        String yesno = "";
+        
+        
+        if(r == null){
+            System.out.println("There is no such reservation!");
+            System.out.println("[Action Denied]");
+            return;
+        }
+        
+        if(r.getPaymentStatus()==PaidStatusEnum.UNPAID){
+            while(true){
+                System.out.println("Has the customer pay on site? (y/n)");
+                System.out.print(">");
+                yesno = sc.nextLine().trim();
+                
+                if(yesno.equals("y")){
+                    break;
+                } else if(yesno.equals("n")){
+                    System.out.println("You need to pay before you can take the car!");
+                    System.out.println("[Action Denied]");
+                    return;
+                } else {
+                    System.out.println("Invalid input! Please input again!");
+                }
+            }
+        }
+        
+        
+        try{
+            reservationSessionBean.updateRes(resId, ResStatusEnum.PICKEDUP);
+        }catch(ReservationNotFoundException ex){
+            System.out.println("There is no such reservation");
+            System.out.println("[Action Denied]");
+            return;
+        }catch(InvalidReservationException ex){
+            System.out.println("The reservation is invalid!");
+            System.out.println("The car could have already been pick-up!");
+            System.out.println("The reservation could have been cancelled or completed!");
+            return;
+        }
+        
+        System.out.println("The car is pick-up by the customer!");
+        System.out.println("Press enter key to continue!");
+        sc.nextLine();
+        
+    }
+    
+    private void doReturnCar(){
+        Scanner sc = new Scanner(System.in);
+        
+        System.out.println("*** CaRMS Management Client :: Return Car ***\n");
+        System.out.println("");
+        
+        System.out.print("Enter the reservation id: ");
+        long resId = sc.nextLong();
+        
+        Reservation r = reservationSessionBean.retrieveReservationById(resId);
+        
         if(r == null){
             System.out.println("There is no such reservation!");
             System.out.println("[Action Denied]");
@@ -496,17 +570,22 @@ public class MainApp {
         }
         
         try{
-            reservationSessionBean.updateRes(resId, ResStatusEnum.PICKEDUP);
+            reservationSessionBean.updateRes(resId, ResStatusEnum.DONE);
         }catch(ReservationNotFoundException ex){
-            
+            System.out.println("There is no such reservation");
+            System.out.println("[Action Denied]");
+            return;
+        }catch(InvalidReservationException ex){
+            System.out.println("The reservation is invalid!");
+            System.out.println("The car could have already been pick-up!");
+            System.out.println("The reservation could have been cancelled or completed!");
+            return;
         }
         
-        
-        
-    }
-    
-    private void doReturnCar(){
-           
+        System.out.println("The car is successfully returned by the customer!");
+        System.out.println("System has successfully record the changes!");
+        System.out.println("Press enter key to continue!");
+        sc.nextLine();
     }
     
     private void operationApp(){

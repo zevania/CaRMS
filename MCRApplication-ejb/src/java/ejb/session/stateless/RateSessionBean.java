@@ -7,6 +7,8 @@ package ejb.session.stateless;
 
 import entity.Category;
 import entity.Rate;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -58,9 +60,11 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
     }
 
     @Override
-    public void deleteRate(Long rateId) {
+    public void deleteRate(Long rateId) throws RateNotFoundException {
         Rate r = em.find(Rate.class, rateId);
-        Category category = r.getCategory();
+        if(r == null) throw new RateNotFoundException();
+        
+        Category category = em.find(Category.class, r.getCategory().getCategoryId());
         category.getRate().remove(r);
         em.remove(r);
         em.flush();
@@ -76,4 +80,37 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
         return r;
     }
      
+    public double retrieveTotalByCategory(long catId, LocalDate startDate, LocalDate endDate) throws CategoryNotFoundException, RateNotFoundException{
+        double total = 0;
+        
+        Category category = em.find(Category.class, catId);
+        if(category == null) throw new CategoryNotFoundException();
+        
+        LocalDate temp = startDate;
+        
+        Query query;
+        
+        while(!temp.isAfter(endDate)){
+            if(temp.getDayOfWeek()==DayOfWeek.FRIDAY || temp.getDayOfWeek()==DayOfWeek.SATURDAY || temp.getDayOfWeek() == DayOfWeek.SUNDAY){
+                query = em.createQuery("SELECT r FROM Rate r WHERE r.category.categoryId = :inCat AND r.startPeriod <= :inStart AND r.endPeriod >= :inEnd ORDER BY r.peakRate ASC")
+                        .setParameter("inCat", catId)
+                        .setParameter("inStart", temp)
+                        .setParameter("inEnd", temp);
+                
+                List<Rate> peakrates = query.getResultList();
+                if(peakrates.size()==0) throw new RateNotFoundException();
+                total += peakrates.get(0).getPeakRate();
+            } else {
+                query = em.createQuery("SELECT r FROM Rate r WHERE r.category.categoryId = :inCat AND r.startPeriod <= :inStart AND r.endPeriod >= :inEnd ORDER BY r.rate ASC")
+                        .setParameter("inCat", catId)
+                        .setParameter("inStart", temp)
+                        .setParameter("inEnd", temp);
+                List<Rate> rates = query.getResultList();
+                if(rates.size()==0) throw new RateNotFoundException();
+                total+= rates.get(0).getRate();
+            }
+            
+        }
+        return total;
+    }
 }

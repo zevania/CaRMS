@@ -19,9 +19,8 @@ public interface RateSessionBeanRemote {
 
     public void updateRate(Rate r);
 
-    public void deleteRate(Long rateId);
+    public void deleteRate(Long rateId) throws RateNotFoundException;
     
     public Rate retrieveRateById(long rateId) throws RateNotFoundException;
-    
     
 }

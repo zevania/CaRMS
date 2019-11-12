@@ -32,6 +32,8 @@ public class Rate implements Serializable {
     @Column(nullable = false)
     private Double rate;
     @Column(nullable = false)
+    private Double peakRate;
+    @Column(nullable = false)
     private LocalDate startPeriod;
     @Column(nullable = false)
     private LocalDate endPeriod;
@@ -51,15 +53,22 @@ public class Rate implements Serializable {
         this.category = category;
     }
 
-    public Rate(String name, Double rate, LocalDate startPeriod, LocalDate endPriod) {
+    public Rate(String name, Double rate, LocalDate startPeriod, LocalDate endPriod, Double peakRate) {
         this.name = name;
         this.rate = rate;
         this.startPeriod = startPeriod;
         this.endPeriod = endPriod;
+        this.peakRate = peakRate;
     }
 
     
-    
+    public Double getPeakRate() {
+        return peakRate;
+    }
+
+    public void setPeakRate(Double peakRate) {
+        this.peakRate = peakRate;
+    }
     public Category getCategory() {
         return category;
     }
