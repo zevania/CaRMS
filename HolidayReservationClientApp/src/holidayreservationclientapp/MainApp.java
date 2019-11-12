@@ -1,110 +1,82 @@
-package carmsreservationclient;
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package holidayreservationclientapp;
 
-import ejb.session.stateless.CategorySessionBeanRemote;
-import ejb.session.stateless.MemberSessionBeanRemote;
-import ejb.session.stateless.ModelSessionBeanRemote;
-import ejb.session.stateless.OutletSessionBeanRemote;
-import ejb.session.stateless.RateSessionBeanRemote;
-import ejb.session.stateless.ReservationSessionBeanRemote;
-import entity.Category;
-import entity.Customer;
-import entity.Member;
-import entity.Model;
-import entity.Outlet;
-import entity.Reservation;
-import java.sql.Time;
+import ws.client.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import util.enumeration.CategoryNotFoundException;
-import util.enumeration.CustomerTypeEnum;
-import util.enumeration.OrderTypeEnum;
-import util.enumeration.PaidStatusEnum;
-import util.exception.InvalidLoginCredentialException;
-import util.exception.MemberEmailExistException;
-import util.exception.OutletNotFoundException;
-import util.exception.RateNotFoundException;
-import util.exception.IncompleteRegistrationDetailsException;
-import util.exception.MemberNotFoundException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import ws.client.Category;
+import ws.client.CategoryNotFoundException_Exception;
+import ws.client.InvalidLoginCredentialException;
+import ws.client.InvalidLoginCredentialException_Exception;
+import ws.client.InvalidRelationIdException_Exception;
+import ws.client.Model;
+import ws.client.OrderTypeEnum;
+import ws.client.Outlet;
+import ws.client.OutletNotFoundException_Exception;
+import ws.client.PaidStatusEnum;
+import ws.client.Partner;
+import ws.client.PartnerNotFoundException_Exception;
+import ws.client.RateNotFoundException_Exception;
+import ws.client.ResStatusEnum;
+import ws.client.Reservation;
+import ws.client.ReservationNotFoundException_Exception;
 
-
+/**
+ *
+ * @author User
+ */
 public class MainApp {
     
-    private ReservationSessionBeanRemote reservationSessionBeanRemote;
-    private MemberSessionBeanRemote memberSessionBeanRemote;
-    private OutletSessionBeanRemote outletSessionBeanRemote;
-    private CategorySessionBeanRemote categorySessionBeanRemote;
-    private ModelSessionBeanRemote modelSessionBeanRemote;
-    private RateSessionBeanRemote rateSessionBeanRemote;
     
-    private Member currentMember;
-
-    public MainApp() {
-    }
-
-    public MainApp(ReservationSessionBeanRemote reservationSessionBeanRemote, MemberSessionBeanRemote memberSessionBeanRemote, 
-            OutletSessionBeanRemote outletSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote, 
-            ModelSessionBeanRemote modelSessionBeanRemote, RateSessionBeanRemote rateSessionBeanRemote) {
-        this.reservationSessionBeanRemote = reservationSessionBeanRemote;
-        this.memberSessionBeanRemote = memberSessionBeanRemote;
-        this.outletSessionBeanRemote = outletSessionBeanRemote;
-        this.categorySessionBeanRemote = categorySessionBeanRemote;
-        this.modelSessionBeanRemote = modelSessionBeanRemote;
-        this.rateSessionBeanRemote = rateSessionBeanRemote;
-    }
-    
-    public void runApp() {
+    Partner curPartner;
+            
+    public void runApp(){
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
         
         while(true)
         {
-            System.out.println("*** Welcome to CaRMS Reservation Client  ***\n");
-            System.out.println("1: Register as Customer");
-            System.out.println("2: Login");
-            System.out.println("3: Search Car");
-            System.out.println("4: Exit\n");
+            System.out.println("*** Welcome to CaRMS Management Client  ***\n");
+            System.out.println("1: Log in");
+            System.out.println("2: Exit\n");
             response = 0;
             
-            while(response < 1 || response > 4)
+            while(response < 1 || response > 2)
             {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
 
-                if(response == 1) 
+                if(response == 1)
                 {
-                    try {
-                        doCreateMember();
-                    } catch (IncompleteRegistrationDetailsException ex) {
-                        ex.getMessage();
-                    }
-                }
-                else if(response == 2)
-                {
-                    try
-                    {
                         doLogin();
+                        if(curPartner==null){
+                            System.out.println("Something is wrong with your login!");
+                            break;
+                        }
+                        
                         System.out.println("Login successful!\n");
                         
-                        menuMain();
-                    }
-                    catch(InvalidLoginCredentialException ex) 
-                    {
-                        System.out.println("An error has occurred while logging in: " + ex.getMessage() + "\n");
-                    }
+                        mainApp();
+                        doLogout();
+                        break;
                 }
-                else if (response == 3)
-                {
-                    doSearchCar();
-                }
-                else if (response == 4)
+                else if (response == 2)
                 {
                     break;
                 }
@@ -112,21 +84,20 @@ public class MainApp {
                 {
                     System.out.println("Invalid option, please try again!\n");                
                 }
-                
             }
-            if(response == 4)
-                {
-                    break;
-                }
+            
+            if(response == 2){
+                break;
+            }
         }
     }
     
-    private void doLogin() throws InvalidLoginCredentialException {
+    private void doLogin(){
         Scanner scanner = new Scanner(System.in);
         String email = "";
         String password = "";
         
-        System.out.println("*** CaRMS Reservation Client :: Login ***\n");
+        System.out.println("*** Holiday Reservation Client :: Login ***\n");
         System.out.print("Enter email> ");
         email = scanner.nextLine().trim();
         System.out.print("Enter password> ");
@@ -134,22 +105,38 @@ public class MainApp {
         
         if(email.length() > 0 && password.length() > 0)
         {
-            currentMember = memberSessionBeanRemote.memberLogin(email, password);
-        }
-        else
-        {
-            throw new InvalidLoginCredentialException("Missing login credential!");
-        }
+            try {
+                curPartner = partnerLogin(email, password);
+            } catch (InvalidLoginCredentialException_Exception ex) {
+                System.out.println("Log in credential is invalid!");
+                System.out.println("[Action denied]");
+                return;
+            } catch (PartnerNotFoundException_Exception ex) {
+                System.out.println("Partner not found!");
+                System.out.println("[Action denied]");
+                return;
+            }
+        } else {
+            System.out.println("Input is invalid!");
+            System.out.println("[Action denied]");
+            return;
+        } 
+          
     }
     
-    private void menuMain() {
+    private void doLogout(){
+        curPartner = null;
+        System.out.println("Logout successfully!");
+    }
+    
+    private void mainApp(){
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
         
         while(true)
         {
-            System.out.println("*** CaRMS Reservation Client ***\n");
-            System.out.println("You are logged in as " + currentMember.getName() + "\n");
+            System.out.println("*** Holiday Reservation Client :: Partner Reservation Manager ***\n");
+            System.out.println("You are logged in as " + curPartner.getCompanyName() + "\n");
             System.out.println("1: Search Car");
             System.out.println("2: View Reservation Details");
             System.out.println("3: View All My Reservations");
@@ -165,14 +152,17 @@ public class MainApp {
                 if (response == 1)
                 {
                     doSearchCar();
+                    break;
                 }
                 else if (response == 2) 
                 {
                     doViewResDetails();
+                    break;
                 }
                 else if (response == 3) 
                 {
                     doViewAllRes();
+                    break;
                 }
                 else if (response == 4)
                 {
@@ -183,55 +173,22 @@ public class MainApp {
                     System.out.println("Invalid option, please try again!\n");                
                 }
                 
-                if(response == 4)
+                
+            }
+            
+            if(response == 4)
                 {
                     break;
                 }
-            }
         }
     }
     
-    private void doCreateMember() throws IncompleteRegistrationDetailsException {
-        Scanner scanner = new Scanner(System.in);
-        String name = "";
-        String email = "";
-        String password = "";
-        
-        System.out.println("*** CaRMS Reservation Client :: Create Member ***\n");
-        System.out.print("Enter name> ");
-        name = scanner.nextLine().trim();
-        System.out.print("Enter email> ");
-        email = scanner.nextLine().trim();
-        System.out.print("Enter password> ");
-        password = scanner.nextLine().trim();
-        
-        if(name.length() > 0 && email.length() > 0 && password.length() > 0)
-        {
-            Member newMember = new Member(name, email, password);
-            try 
-            {
-                Long newMemberId = memberSessionBeanRemote.createMember(newMember);
-                System.out.println("New member created successfully!: " + newMemberId + "\n");
-            }
-            catch(MemberEmailExistException ex) 
-            {
-                System.out.println("An error occured while creating member: " + ex.getMessage() + "\n");
-            }
-        }
-        else
-        {
-            throw new IncompleteRegistrationDetailsException("An error occured while creating member: Incomplete registration details!\n");
-        }
-
-    }
-    
-    private void doSearchCar() {
+    private void doSearchCar(){
+        /*
         Scanner scanner = new Scanner(System.in);
         Integer response;
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
-
-        System.out.println("*** CaRMS Reservation Client :: Search Car ***\n");
+        
+        System.out.println("*** Holiday Reservation Client :: Search Car ***\n");
         
         OrderTypeEnum searchType = OrderTypeEnum.CATEGORY;
         Long categoryId = 0l;
@@ -240,7 +197,7 @@ public class MainApp {
         System.out.print("Enter the start date (yyyy-mm-dd): ");
         String inStartDate = scanner.nextLine().trim();
         
-        Date startDate;
+        Date startDate = new Date(0,0,0);
         
         try{
             startDate = new SimpleDateFormat("yyyy-MM-dd").parse(inStartDate);
@@ -255,12 +212,12 @@ public class MainApp {
         
         System.out.print("Enter pickup hour (0-23) : ");
         int time = scanner.nextInt();
-        Time startTime = new Time(time, 0, 0);
+        Time startTime = new Time(21, 0, 0);
         
         System.out.print("Enter the start date (yyyy-mm-dd): ");
         String inEndDate = scanner.nextLine().trim();
         
-        Date endDate;
+        Date endDate = new Date(0,0,0);
         
         try{
             endDate = new SimpleDateFormat("yyyy-MM-dd").parse(inEndDate);
@@ -277,12 +234,13 @@ public class MainApp {
         time = scanner.nextInt();
         Time endTime = new Time(time,0,0);
         
-        List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
+        
+        List<Outlet> outlets = partnerRetrieveAllOutlets();
         System.out.printf("%5s%20s%20s%15s%15s\n", "No", "Name", "Addres", "Open Hrs", "Close Hrs");
         int i = 1;
         for(Outlet o : outlets) {
-            Time open = o.getOpenHrs();
-            Time close = o.getCloseHrs();
+            ws.client.Time open = o.getOpenHrs();
+            ws.client.Time close = o.getCloseHrs();
             System.out.printf("%10s%20s%20s%15s%15s\n", i, o.getName(), o.getAddress(), open, close);
             i++;
         }
@@ -312,7 +270,7 @@ public class MainApp {
                 {
                     searchType = OrderTypeEnum.CATEGORY;
                     System.out.printf("%10s%20s\n", "Category Id", "Category Name");
-                    for(Category c : categorySessionBeanRemote.retrieveAllCategories()) {
+                    for(Category c : partnerRetrieveAllCategories()) {
                         System.out.printf("%10s%20s\n", c.getCategoryId(), c.getCategoryName());
                     }
                     System.out.print("Enter category id: ");
@@ -323,7 +281,7 @@ public class MainApp {
                 {
                     searchType = OrderTypeEnum.MODEL;
                     System.out.printf("%10s%10s%20s\n", "Model Id", "Make", "Model");
-                    for(Model m : modelSessionBeanRemote.retrieveModels()) {
+                    for(Model m : partnerRetrieveAllModels()) {
                         System.out.printf("%10s%10s%20s\n", m.getModelId(), m.getMake(), m.getModelName());
                     }
                     System.out.print("Enter model id: ");
@@ -332,8 +290,14 @@ public class MainApp {
                 
                 try
                 {
-                    success = reservationSessionBeanRemote.searchAvailableCar(searchType.toString(), startDate, 
-                            endDate, startTime, endTime, pickupNo, returnNo, categoryId, modelId);
+                    GregorianCalendar c = new GregorianCalendar();
+                    c.setTime(startDate);
+                    XMLGregorianCalendar xmlStartDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+                    c.setTime(endDate);
+                    XMLGregorianCalendar xmlEndDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
+                    
+                    
+                    success = partnerSearchCar(searchType.toString(), xmlStartDate, xmlEndDate, startTime, endTime, pickupNo, returnNo, categoryId, modelId);
                     try {
                         total = rateSessionBeanRemote.retrieveTotalByCategory(categoryId, startDate, endDate);
                         System.out.println("Total rental rate: $" + total);
@@ -430,27 +394,40 @@ public class MainApp {
                     }
                     System.out.println("Reservation successful! The id is "+theId);
             }
-        }
+        }*/
     }
     
-    private void doViewResDetails() {
+    private void doViewResDetails(){
         Scanner scanner = new Scanner(System.in);
         Integer response;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy HH:mm");
         
-        System.out.println("*** CaRMS Reservation Client :: View Reservation Details ***\n");
+        System.out.println("*** Holiday Reservation Client :: View Reservation Details ***\n");
         System.out.print("Enter reservation id> ");
         Long id = scanner.nextLong();
         
-        Reservation r = reservationSessionBeanRemote.retrieveReservationById(id);
+        Reservation r;
+        try {
+            r = partnerRetrieveReservationById(curPartner.getPartnerId(), id);
+        } catch (ReservationNotFoundException_Exception ex) {
+                System.out.println("Reservation Not Found!");
+                return;
+        } catch (PartnerNotFoundException_Exception ex) {
+                System.out.println("Partner Not Found!");
+                return;
+        } catch (InvalidRelationIdException_Exception ex) {
+                System.out.println("Reservation Not Found!");
+                return;
+        }
         
         if(r==null){
             System.out.println("There is no such reservationr record!");
             System.out.println("[Action Denied]");
             return;
         }
-        Date startDate = r.getPickupDate();
-        Date endDate = r.getReturnDate();
+        
+        XMLGregorianCalendar startDate = r.getPickupDate();
+        XMLGregorianCalendar endDate = r.getReturnDate();
         
         System.out.printf("%8s%20s%20s%20s%20s\n", "Res Id", "Pick Up Date", "Return Date",
                 "PickUp Location", "Return Location");
@@ -469,22 +446,111 @@ public class MainApp {
         
         if(response == 1)
         {
-            String reply = reservationSessionBeanRemote.cancelReservation(id);
+            String reply = "";
+            try {
+                reply = partnerDoCancelReservation(curPartner.getPartnerId(), id);
+            } catch (ReservationNotFoundException_Exception ex) {
+                System.out.println("Reservation Not Found!");
+                return;
+            } catch (PartnerNotFoundException_Exception ex) {
+                System.out.println("Partner Not Found!");
+                return;
+            } catch (InvalidRelationIdException_Exception ex) {
+                System.out.println("Reservation Not Found!");
+                return;
+            }
             System.out.println(reply);
         }
+        
     }
     
-    private void doViewAllRes() {
+    private void doViewAllRes(){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy HH:mm");
         
-        System.out.println("*** CaRMS Reservation Client :: View All My Reservations ***\n");
-        List<Reservation> res = reservationSessionBeanRemote.retrieveReservations(currentMember.getEmail());
+        
+        
+        System.out.println("*** Holiday Reservation Client :: View All My Reservations ***\n");
+        List<Reservation> res = new ArrayList<>();
+        try {
+            res = partnerRetrieveAllReservations(curPartner.getPartnerId());
+        } catch (PartnerNotFoundException_Exception ex) {
+            System.out.println("Partner not found!");
+            return;
+        }
+        
+        if(res.size()==0){
+            System.out.println("There is no reservation currently!");
+            return;
+        }
+        
         System.out.printf("%8s%20s%20s%20s%20s\n", "Res Id", "PickUp Date", "Return Date", "Reservation Status", "Payment Status");
         for(Reservation r : res) {
-            Date startDate = r.getPickupDate();
-            Date endDate = r.getReturnDate();
+            XMLGregorianCalendar startDate = r.getPickupDate();
+            XMLGregorianCalendar endDate = r.getReturnDate();
             System.out.printf("%8s%20s%20s%20s%20s\n", r.getReservationId(), startDate, endDate, r.getResStatus(), r.getPaymentStatus());
         }
         System.out.println();
     }
+    
+    private static Partner partnerLogin(java.lang.String email, java.lang.String password) throws InvalidLoginCredentialException_Exception, PartnerNotFoundException_Exception {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerLogin(email, password);
+    }
+
+    private static long partnerCreateReservation(ws.client.Reservation reservation, long ccNum, long pickUpId, long returnId, long categoryId, long modelId, java.lang.String custName, java.lang.String custEmail, long partnerId) throws OutletNotFoundException_Exception {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerCreateReservation(reservation, ccNum, pickUpId, returnId, categoryId, modelId, custName, custEmail, partnerId);
+    }
+
+    private static java.util.List<ws.client.Outlet> partnerRetrieveAllOutlets() {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerRetrieveAllOutlets();
+    }
+
+    private static java.util.List<ws.client.Category> partnerRetrieveAllCategories() {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerRetrieveAllCategories();
+    }
+
+    private static java.util.List<ws.client.Model> partnerRetrieveAllModels() {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerRetrieveAllModels();
+    }
+
+    private static boolean partnerSearchCar(java.lang.String searchType, javax.xml.datatype.XMLGregorianCalendar startDate, javax.xml.datatype.XMLGregorianCalendar endDate, ws.client.Time startTime, ws.client.Time endTime, long pickUpId, long returnId, long categoryId, long modelId) throws OutletNotFoundException_Exception {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerSearchCar(searchType, startDate, endDate, startTime, endTime, pickUpId, returnId, categoryId, modelId);
+    }
+
+    private static double partnerRetrieveTotalByCategory(long catId, javax.xml.datatype.XMLGregorianCalendar startDate, javax.xml.datatype.XMLGregorianCalendar endDate) throws CategoryNotFoundException_Exception, RateNotFoundException_Exception {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerRetrieveTotalByCategory(catId, startDate, endDate);
+    }
+
+    private static Reservation partnerRetrieveReservationById(long partnerId, long reservationId) throws ReservationNotFoundException_Exception, InvalidRelationIdException_Exception, PartnerNotFoundException_Exception {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerRetrieveReservationById(partnerId, reservationId);
+    }
+
+    private static String partnerDoCancelReservation(long partnerId, long reservationId) throws ReservationNotFoundException_Exception, PartnerNotFoundException_Exception, InvalidRelationIdException_Exception {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerDoCancelReservation(partnerId, reservationId);
+    }
+
+    private static java.util.List<ws.client.Reservation> partnerRetrieveAllReservations(long partnerId) throws PartnerNotFoundException_Exception {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerRetrieveAllReservations(partnerId);
+    }
+    
+    
 }

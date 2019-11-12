@@ -96,25 +96,9 @@ public class MCRWebService {
     }
     
     @WebMethod(operationName = "partnerCreateReservation")
-    public long doCreateReservation(@WebParam(name = "payRes") Integer payRes, @WebParam(name = "totalAmt") Double totalAmt,
-            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate,
-            @WebParam(name = "startTime") Time startTime, @WebParam(name = "endTime") Time endTime,
-            @WebParam(name = "orderTypeRes") Integer orderTypeRes,
-            @WebParam(name = "pickUpId") long pickupId, @WebParam(name = "returnId")long returnId, 
-            @WebParam(name = "categoryId") long categoryId, @WebParam(name = "modelId") long modelId, 
-            @WebParam(name = "custName") String custName, @WebParam(name = "custEmail")String custEmail, 
-            @WebParam(name = "ccNum") long ccNum) throws OutletNotFoundException {
-        
-        PaidStatusEnum payStatus = PaidStatusEnum.UNPAID;
-        if(payRes == 1) {
-            payStatus = PaidStatusEnum.PAID;
-        }
-        OrderTypeEnum orderType = OrderTypeEnum.CATEGORY;
-        if(orderTypeRes == 2) {
-            orderType = OrderTypeEnum.MODEL;
-        }
-        Customer c = new Customer(custName, ccNum, custEmail, CustomerTypeEnum.PARTNER);
-        Reservation r = new Reservation(payStatus, totalAmt, startDate, endDate, startTime, endTime, orderType, c);
+    public long doCreateReservation(@WebParam(name = "reservation") Reservation r,@WebParam(name = "ccNum") long ccNum, @WebParam(name = "pickUpId") long pickupId,
+            @WebParam(name = "returnId")long returnId, @WebParam(name = "categoryId") long categoryId, @WebParam(name = "modelId") long modelId, @WebParam(name = "custName") String custName
+            ,@WebParam(name = "custEmail")String custEmail,@WebParam(name = "partnerId")long partnerId ) throws OutletNotFoundException {
         
         Outlet pickupOutlet = em.find(Outlet.class, pickupId);
         Outlet returnOutlet = em.find(Outlet.class, returnId);
@@ -122,19 +106,16 @@ public class MCRWebService {
         if(pickupOutlet==null) throw new OutletNotFoundException();
         if(returnOutlet==null) throw new OutletNotFoundException();
         
+        Partner p = em.find(Partner.class, partnerId);
         
         r.setPickupLocation(pickupOutlet);
         pickupOutlet.getPickReservation().add(r);
         r.setReturnLocation(returnOutlet);
         returnOutlet.getReturnReservation().add(r);
-        
-        if(r.getOrderType()== OrderTypeEnum.CATEGORY)
-        {
+        if(r.getOrderType()== OrderTypeEnum.CATEGORY){
             Category category = em.find(Category.class, categoryId);
             r.setCarCategory(category);
-        } 
-        else if(r.getOrderType()== OrderTypeEnum.MODEL)
-        {
+        } else if(r.getOrderType()== OrderTypeEnum.MODEL){
             Model model = em.find(Model.class, modelId);
             r.setCarModel(model);
             Category cat = em.find(Category.class, model.getCategory().getCategoryId());
@@ -147,12 +128,15 @@ public class MCRWebService {
         try{
             cust = (Customer) query.getSingleResult();
         } catch (NoResultException ex) {
-            cust = new Customer(custName, ccNum, custEmail, CustomerTypeEnum.PARTNER); 
+            cust = new Customer(custEmail, ccNum, custEmail, CustomerTypeEnum.PARTNER); 
             em.persist(cust);
         }
         
         r.setCustomer(cust);
         cust.getReservations().add(r);
+        
+        p.getReservations().add(r);
+        r.setPartner(p);
         
         em.persist(r);
         em.flush();
@@ -165,7 +149,7 @@ public class MCRWebService {
         Partner p = em.find(Partner.class, partnerId);
         if(p==null) throw new PartnerNotFoundException();
         
-        Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.customer.customerType = CustomerTypeEnum.PARTNER AND r.partner.partnerId = :inPartner")
+        Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.customer.customerType = util.enumeration.CustomerTypeEnum.PARTNER AND r.partner.partnerId = :inPartner")
                 .setParameter("inPartner", partnerId);
         
         List<Reservation> reservations = query.getResultList();
