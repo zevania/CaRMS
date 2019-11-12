@@ -17,9 +17,9 @@ import entity.Model;
 import entity.Outlet;
 import entity.Partner;
 import entity.Reservation;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.sql.Time;
 import java.time.Month;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
@@ -85,8 +85,8 @@ public class MCRWebService {
     
     @WebMethod(operationName = "partnerSearchCar")
     public boolean doSeacrhCar(@WebParam(name = "searchType") String searchType,@WebParam(name="startDate") 
-            LocalDate startDate,@WebParam(name = "endDate")LocalDate endDate, @WebParam(name = "startTime") LocalTime startTime
-            ,@WebParam(name = "endTime")LocalTime endTime, @WebParam(name = "pickUpId")long pickupid,
+            Date startDate,@WebParam(name = "endDate")Date endDate, @WebParam(name = "startTime") Time startTime
+            ,@WebParam(name = "endTime")Time endTime, @WebParam(name = "pickUpId")long pickupid,
             @WebParam(name = "returnId")long returnid, @WebParam(name = "categoryId")long categoryId, 
             @WebParam(name = "modelId")long modelId) throws OutletNotFoundException {
         
@@ -97,8 +97,8 @@ public class MCRWebService {
     
     @WebMethod(operationName = "partnerCreateReservation")
     public long doCreateReservation(@WebParam(name = "payRes") Integer payRes, @WebParam(name = "totalAmt") Double totalAmt,
-            @WebParam(name = "startDate") LocalDate startDate, @WebParam(name = "endDate") LocalDate endDate,
-            @WebParam(name = "startTime") LocalTime startTime, @WebParam(name = "endTime") LocalTime endTime,
+            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate,
+            @WebParam(name = "startTime") Time startTime, @WebParam(name = "endTime") Time endTime,
             @WebParam(name = "orderTypeRes") Integer orderTypeRes,
             @WebParam(name = "pickUpId") long pickupId, @WebParam(name = "returnId")long returnId, 
             @WebParam(name = "categoryId") long categoryId, @WebParam(name = "modelId") long modelId, 
@@ -197,20 +197,23 @@ public class MCRWebService {
             throw new InvalidRelationIdException();
         }
         
-        LocalDate pickupdate = r.getPickupDate();
+        Date pickupdate = r.getPickupDate();
         boolean proceed = false;
         int numdays = 0;
         double penalty = 0.0;
         String reply = "";
             
         if(r.getResStatus()==ResStatusEnum.ORDERED ){
-            LocalDate today = LocalDate.now();
+            Date today = Calendar.getInstance().getTime();
             
-            if(today.compareTo(pickupdate)<0){
-               if(today.getMonthValue()<pickupdate.getMonthValue()){
+            if(today.before(pickupdate)){
+                
+               if(today.getYear()== pickupdate.getYear() && today.getMonth()<pickupdate.getMonth()){
+                   numdays = 30;
+               } else if(today.getYear()<pickupdate.getYear()){
                    numdays = 30;
                } else {
-                   numdays = pickupdate.getDayOfYear() - today.getDayOfYear();
+                   numdays = pickupdate.getDate()- today.getDate();
                }
                proceed = true;
             } else {
@@ -263,7 +266,7 @@ public class MCRWebService {
     
     @WebMethod(operationName = "partnerRetrieveTotalByCategory")
     public double doRetrieveTotalByCategory(@WebParam(name = "catId") long catId, 
-            @WebParam(name = "startDate") LocalDate startDate, @WebParam(name = "endDate") LocalDate endDate) throws CategoryNotFoundException, RateNotFoundException {
+            @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) throws CategoryNotFoundException, RateNotFoundException {
         return rateSessionBean.retrieveTotalByCategory(catId, startDate, endDate);
     }
 }

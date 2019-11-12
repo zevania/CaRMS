@@ -13,7 +13,7 @@ import entity.Category;
 import entity.Employee;
 import entity.Outlet;
 import entity.Partner;
-import java.time.LocalTime;
+import java.sql.Time;
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
@@ -68,11 +68,11 @@ public class DataInitializerSessionBean {
     private void initializeOutletData()
     {
         Outlet o;
-        o = new Outlet(LocalTime.of(9, 0, 0), LocalTime.of(9, 0, 0), "Outlet 1", "Ang Mo Kio");
+        o = new Outlet(new Time(9, 0, 0), new Time(21,0,0), "Outlet 1", "Ang Mo Kio");
         outletSessionBeanLocal.createOutlet(o);
-        o = new Outlet(LocalTime.of(9, 0, 0), LocalTime.of(9, 0, 0), "Outlet 2", "Orchard");
+        o = new Outlet(new Time(9, 0, 0), new Time(21,0,0), "Outlet 2", "Orchard");
         outletSessionBeanLocal.createOutlet(o);
-        o = new Outlet(LocalTime.of(9, 0, 0), LocalTime.of(9, 0, 0), "Outlet 3", "Bugis");
+        o = new Outlet(new Time(9, 0, 0), new Time(21,0,0), "Outlet 3", "Bugis");
         outletSessionBeanLocal.createOutlet(o);
     }
     

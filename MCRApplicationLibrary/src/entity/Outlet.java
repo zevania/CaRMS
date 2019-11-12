@@ -6,7 +6,7 @@
 package entity;
 
 import java.io.Serializable;
-import java.time.LocalTime;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Column;
@@ -30,9 +30,9 @@ public class Outlet implements Serializable {
     private Long outletId;
     
     @Column(nullable = false)
-    private LocalTime openHrs;
+    private Time openHrs;
     @Column(nullable = false)
-    private LocalTime closeHrs;
+    private Time closeHrs;
     @Column(nullable = false, unique = true)
     private String name;
     @Column(nullable = false)
@@ -56,7 +56,7 @@ public class Outlet implements Serializable {
     public Outlet() {
     }
 
-    public Outlet(LocalTime openHrs, LocalTime closeHrs, String name, String address) {
+    public Outlet(Time openHrs, Time closeHrs, String name, String address) {
         this.openHrs = openHrs;
         this.closeHrs = closeHrs;
         this.name = name;
@@ -87,19 +87,19 @@ public class Outlet implements Serializable {
     
     
     
-    public LocalTime getOpenHrs() {
+    public Time getOpenHrs() {
         return openHrs;
     }
 
-    public void setOpenHrs(LocalTime openHrs) {
+    public void setOpenHrs(Time openHrs) {
         this.openHrs = openHrs;
     }
 
-    public LocalTime getCloseHrs() {
+    public Time getCloseHrs() {
         return closeHrs;
     }
 
-    public void setCloseHrs(LocalTime closeHrs) {
+    public void setCloseHrs(Time closeHrs) {
         this.closeHrs = closeHrs;
     }
 

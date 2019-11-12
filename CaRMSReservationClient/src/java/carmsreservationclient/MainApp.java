@@ -12,10 +12,9 @@ import entity.Member;
 import entity.Model;
 import entity.Outlet;
 import entity.Reservation;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.sql.Time;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -235,25 +234,37 @@ public class MainApp {
         Long categoryId = 0l;
         Long modelId = 0l;
         
-        System.out.print("Enter pickup date (dd/mm/yyyy) > ");
-        LocalDate startDate = LocalDate.parse(scanner.nextLine().trim(), dateFormatter);
-        System.out.print("Enter pickup time (HH:mm) > ");
-        LocalTime startTime = LocalTime.parse(scanner.nextLine().trim(), timeFormatter);
-
-        System.out.print("Enter return date (dd/mm/yyyy) > ");
-        LocalDate endDate = LocalDate.parse(scanner.nextLine().trim(), dateFormatter);
-        System.out.print("Enter return time (HH:mm) > ");
-        LocalTime endTime = LocalTime.parse(scanner.nextLine().trim(), timeFormatter);
+        System.out.print("Enter the pickup day (0-31):");
+        int dd = scanner.nextInt();
+        System.out.print("Enter the pickup month (0-11): ");
+        int mm = scanner.nextInt();
+        System.out.print("Enter the return year (yyyy): ");
+        int yyyy = scanner.nextInt();
+        Date startDate = new Date(yyyy-1990,mm,dd);
+        
+        System.out.print("Enter pickup hour (0-23) : ");
+        int time = scanner.nextInt();
+        Time startTime = new Time(21, 0, 0);
+        
+        System.out.print("Enter the return day (0-31):");
+        dd = scanner.nextInt();
+        System.out.print("Enter the return month (0-11): ");
+        mm = scanner.nextInt();
+        System.out.print("Enter the return year (yyyy): ");
+        yyyy = scanner.nextInt();
+        Date endDate = new Date(yyyy-1990, mm, dd);
+        
+        System.out.print("Enter return hour (0-23) > ");
+        time = scanner.nextInt();
+        Time endTime = new Time(time,0,0);
         
         List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
         System.out.printf("%5s%20s%20s%15s%15s\n", "No", "Name", "Addres", "Open Hrs", "Close Hrs");
         int i = 1;
         for(Outlet o : outlets) {
-            LocalTime open = o.getOpenHrs();
-            String openTime = open.format(timeFormatter);
-            LocalTime close = o.getCloseHrs();
-            String closeTime = close.format(timeFormatter);
-            System.out.printf("%10s%20s%20s%15s%15s\n", i, o.getName(), o.getAddress(), openTime, closeTime);
+            Time open = o.getOpenHrs();
+            Time close = o.getCloseHrs();
+            System.out.printf("%10s%20s%20s%15s%15s\n", i, o.getName(), o.getAddress(), open, close);
             i++;
         }
         System.out.println();
@@ -413,14 +424,18 @@ public class MainApp {
         Long id = scanner.nextLong();
         
         Reservation r = reservationSessionBeanRemote.retrieveReservationById(id);
-        LocalDateTime a = LocalDateTime.of(r.getPickupDate(), r.getPickupTime());
-        String startDateTime = a.format(formatter);
-        LocalDateTime b = LocalDateTime.of(r.getReturnDate(), r.getReturnTime());
-        String endDateTime = b.format(formatter);
-            
-        System.out.printf("%8s%20s%20s%20s%20s%20s\n", "Res Id", "PickUp Date/Time", "Return Date/Time", "Car",
+        
+        if(r==null){
+            System.out.println("There is no such reservationr record!");
+            System.out.println("[Action Denied]");
+            return;
+        }
+        Date startDate = r.getPickupDate();
+        Date endDate = r.getReturnDate();
+        
+        System.out.printf("%8s%20s%20s%20s%20s\n", "Res Id", "Pick Up Date", "Return Date",
                 "PickUp Location", "Return Location");
-        System.out.printf("%8s%20s%20s%20s%20s%20s\n", id, startDateTime, endDateTime, r.getCarModel().getModelName(),
+        System.out.printf("%8s%20s%20s%20s%20s\n", id, startDate, endDate, 
                 r.getPickupLocation().getName(), r.getReturnLocation().getName());
         System.out.println("Reservation Status: " + r.getResStatus());
         System.out.println("Total Amount: " + r.getTotal());
@@ -445,13 +460,11 @@ public class MainApp {
         
         System.out.println("*** CaRMS Reservation Client :: View All My Reservations ***\n");
         List<Reservation> res = reservationSessionBeanRemote.retrieveReservations(currentMember.getEmail());
-        System.out.printf("%8s%20s%20s%20s%20s\n", "Res Id", "PickUp Date/Time", "Return Date/Time", "Reservation Status", "Payment Status");
+        System.out.printf("%8s%20s%20s%20s%20s\n", "Res Id", "PickUp Date", "Return Date", "Reservation Status", "Payment Status");
         for(Reservation r : res) {
-            LocalDateTime a = LocalDateTime.of(r.getPickupDate(), r.getPickupTime());
-            String startDateTime = a.format(formatter);
-            LocalDateTime b = LocalDateTime.of(r.getReturnDate(), r.getReturnTime());
-            String endDateTime = b.format(formatter);
-            System.out.printf("%8s%20s%20s%20s%20s\n", r.getReservationId(), startDateTime, endDateTime, r.getResStatus(), r.getPaymentStatus());
+            Date startDate = r.getPickupDate();
+            Date endDate = r.getReturnDate();
+            System.out.printf("%8s%20s%20s%20s%20s\n", r.getReservationId(), startDate, endDate, r.getResStatus(), r.getPaymentStatus());
         }
         System.out.println();
     }

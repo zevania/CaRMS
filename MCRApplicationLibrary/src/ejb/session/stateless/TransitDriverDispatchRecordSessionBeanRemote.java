@@ -6,7 +6,7 @@
 package ejb.session.stateless;
 
 import entity.DriverDispatchRecord;
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import util.exception.DDRCompletedException;
 import util.exception.DDRNotFoundException;
@@ -21,6 +21,6 @@ public interface TransitDriverDispatchRecordSessionBeanRemote {
 
     public void updateDispatchRecordAsCompleted(long dispatchId)throws DDRNotFoundException, DDRCompletedException;
 
-    public List<DriverDispatchRecord> retrieveDispatchRecords(long outletId, LocalDate date);
+    public List<DriverDispatchRecord> retrieveDispatchRecords(long outletId, Date date);
     
 }

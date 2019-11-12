@@ -16,11 +16,16 @@ import entity.Employee;
 import entity.Model;
 import entity.Rate;
 import entity.Reservation;
-import java.time.LocalDate;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.CategoryNotFoundException;
 import util.enumeration.PaidStatusEnum;
@@ -210,7 +215,7 @@ public class MainApp {
         }
     }
     
-    private void doCreateRentalRate(){
+    private void doCreateRentalRate() {
         Scanner scanner = new Scanner(System.in);
         String name = "";
         Double rate = 0.0;
@@ -220,8 +225,8 @@ public class MainApp {
         String inStartDate = "";
         String inEndDate = "";
         
-        LocalDate startDate;
-        LocalDate endDate;
+        Date startDate;
+        Date endDate;
         
         System.out.println("*** CaRMS Management Client :: Create Rental Rate ***\n");
         System.out.print("Enter name> ");
@@ -237,28 +242,37 @@ public class MainApp {
                 System.out.print("Enter the end date (yyyy-mm-dd): ");
                 inEndDate = scanner.nextLine().trim();
                 
+                
                 try{
-                    startDate = LocalDate.parse(inStartDate);
+                    startDate = new SimpleDateFormat("yyyy-MM-dd").parse(inStartDate);
                 } catch (DateTimeParseException ex){
                     System.out.println("Invalid start date!");
+                    return;
+                } catch (ParseException ex) {
+                    System.out.println("Date input is invalid!");
+                    System.out.println("[Access Denied]");
                     return;
                 }
                 
                 try{
-                    endDate = LocalDate.parse(inEndDate);
+                    endDate = new SimpleDateFormat("yyyy-MM-dd").parse(inEndDate);
+                } catch (ParseException ex) {
+                    System.out.println("Date input is invalid!");
+                    System.out.println("[Access Denied]");
+                    return;
                 } catch (DateTimeParseException ex){
                     System.out.println("Invalid end date!");
                     return;
                 }
                 
-                if(startDate.isAfter(endDate)){
+                if(startDate.after(endDate)){
                     System.out.println("Invalid start date: start date is after end date!");
                     return;
                 }
                 break;
             } else if(yesno.equals("n")) {
-                startDate = LocalDate.MIN;
-                endDate = LocalDate.MAX;
+                startDate = new Date(0L);
+                endDate = new Date(Long.MAX_VALUE);
                 break;
             }
         }
@@ -322,10 +336,10 @@ public class MainApp {
         try{
             rate = rateSessionBean.retrieveRateById(rateId);
             System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", "Rate Id", "Start Date", "End Date", "Name", "Category", "Rate", "Peak Rate");
-            if(rate.getStartPeriod().isEqual(LocalDate.MIN)){
+            if(rate.getStartPeriod().equals(new Date(0L))){
                 System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", rate.getRateId(), "N.A.", "N.A.", rate.getName(), rate.getCategory().getCategoryName(), rate.getRate(), rate.getPeakRate());
             } else {
-                System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", rate.getRateId(), rate.getStartPeriod().format(formatter), rate.getEndPeriod().format(formatter), rate.getName(), rate.getCategory().getCategoryName(), rate.getRate(), rate.getPeakRate());
+                System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", rate.getRateId(), rate.getStartPeriod(), rate.getEndPeriod(), rate.getName(), rate.getCategory().getCategoryName(), rate.getRate(), rate.getPeakRate());
             }
         }catch(RateNotFoundException ex){
             System.out.println("Rate is not found!");
@@ -368,8 +382,8 @@ public class MainApp {
         String inStartDate = "";
         String inEndDate = "";
         
-        LocalDate startDate;
-        LocalDate endDate;
+        Date startDate;
+        Date endDate;
         
         System.out.print("Enter new name> ");
         name = sc.nextLine().trim();
@@ -385,27 +399,27 @@ public class MainApp {
                 inEndDate = sc.nextLine().trim();
                 
                 try{
-                    startDate = LocalDate.parse(inStartDate);
-                } catch (DateTimeParseException ex){
+                    startDate = new SimpleDateFormat("yyyy-MM-dd").parse(inStartDate);
+                } catch (ParseException ex){
                     System.out.println("Invalid start date!");
                     return;
-                }
+                } 
                 
                 try{
-                    endDate = LocalDate.parse(inEndDate);
-                } catch (DateTimeParseException ex){
+                    endDate = new SimpleDateFormat("yyyy-MM-dd").parse(inStartDate);
+                } catch (ParseException ex){
                     System.out.println("Invalid end date!");
                     return;
                 }
                 
-                if(startDate.isAfter(endDate)){
+                if(startDate.after(endDate)){
                     System.out.println("Invalid start date: start date is after end date!");
                     return;
                 }
                 break;
             } else if(yesno.equals("n")) {
-                startDate = LocalDate.MIN;
-                endDate = LocalDate.MAX;
+                startDate = new Date(0L);
+                endDate = new Date(Long.MAX_VALUE);
                 break;
             }
         }
@@ -992,7 +1006,7 @@ public class MainApp {
         
         System.out.println("*** CaRMS Management Client :: View Transit Driver Dispatch Records ***\n");
         
-        List<DriverDispatchRecord> ddrs = transitDriverDispatchRecordSessionBean.retrieveDispatchRecords(currEmployee.getOutlet().getOutletId(), LocalDate.now());
+        List<DriverDispatchRecord> ddrs = transitDriverDispatchRecordSessionBean.retrieveDispatchRecords(currEmployee.getOutlet().getOutletId(), Calendar.getInstance().getTime());
         
         if(ddrs.size() == 0){
             System.out.println("There is no driver dispatch record for today!");
@@ -1002,7 +1016,7 @@ public class MainApp {
         System.out.printf("%8s%40s%20s%30s%40s\n", "DDR id", "Origin Outlet", "Date", "Latest Time", "Status");
         
         for(DriverDispatchRecord ddr: ddrs){
-            System.out.printf("%8s%40s%20s%30s%40s\n", ddr.getDispatchId(), ddr.getFromOutlet(), ddr.getDispatchDate().format(dateformatter), ddr.getDispatchTime().format(timeformatter), ddr.getDispatchStatus().toString());
+            System.out.printf("%8s%40s%20s%30s%40s\n", ddr.getDispatchId(), ddr.getFromOutlet(), ddr.getDispatchDate(), ddr.getDispatchTime(), ddr.getDispatchStatus().toString());
         }
         
         System.out.println("");

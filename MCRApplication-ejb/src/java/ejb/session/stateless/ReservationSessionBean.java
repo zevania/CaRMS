@@ -12,8 +12,9 @@ import entity.Member;
 import entity.Model;
 import entity.Outlet;
 import entity.Reservation;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.sql.Time;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -125,20 +126,23 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     @Override
     public String cancelReservation(long resId) {
         Reservation r = em.find(Reservation.class, resId);
-        LocalDate pickupdate = r.getPickupDate();
+        Date pickupdate = r.getPickupDate();
         boolean proceed = false;
         int numdays = 0;
         double penalty = 0.0;
         String reply = "";
             
         if(r.getResStatus()==ResStatusEnum.ORDERED ){
-            LocalDate today = LocalDate.now();
+            Date today = Calendar.getInstance().getTime();
             
-            if(today.compareTo(pickupdate)<0){
-               if(today.getMonthValue()<pickupdate.getMonthValue()){
+            if(today.before(pickupdate)){
+                
+               if(today.getYear()== pickupdate.getYear() && today.getMonth()<pickupdate.getMonth()){
+                   numdays = 30;
+               } else if(today.getYear()<pickupdate.getYear()){
                    numdays = 30;
                } else {
-                   numdays = pickupdate.getDayOfYear() - today.getDayOfYear();
+                   numdays = pickupdate.getDate()- today.getDate();
                }
                proceed = true;
             } else {
@@ -190,22 +194,21 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
 
     @Override
-    public boolean searchAvailableCar(String searchType, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime, long pickupid, long returnid, long categoryId, long modelId) throws OutletNotFoundException {
+    public boolean searchAvailableCar(String searchType, Date startDate, Date endDate, Time startTime, Time endTime, long pickupid, long returnid, long categoryId, long modelId) throws OutletNotFoundException {
         Outlet pickupLoc = em.find(Outlet.class, pickupid);
         Outlet returnLoc = em.find(Outlet.class, returnid);
         
         if(pickupLoc==null || returnLoc == null) throw new OutletNotFoundException();
         
-        if(pickupLoc.getOpenHrs().isAfter(startTime)) return false;
-        if(returnLoc.getCloseHrs().isBefore(endTime)) return false;
+        if(pickupLoc.getOpenHrs().after(startTime)) return false;
+        if(returnLoc.getCloseHrs().before(endTime)) return false;
         
         Set<Reservation> clashingRes = new HashSet<>();
         List<Reservation> temp = new LinkedList<>();
         List<Reservation> toRemove = new LinkedList<>();
         
-        LocalTime dStartTime = startTime.minusHours(2);
-        LocalTime dEndTime = endTime.plusHours(2);
-        
+        Time dStartTime = new Time(startTime.getHours()-2,startTime.getMinutes(),startTime.getSeconds());
+        Time dEndTime = new Time(endTime.getHours()-2,endTime.getMinutes(),endTime.getSeconds());
         Query query;
         searchType = searchType.toLowerCase();
         int totalCar = 0;
@@ -230,29 +233,29 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             }
             
             for(Reservation theR: clashingRes){
-                if(theR.getReturnDate().isEqual(startDate)){
+                if(theR.getReturnDate().equals(startDate)){
                     if(theR.getReturnLocation().equals(pickupLoc)){
-                        if(theR.getReturnTime().isAfter(startTime)){
+                        if(theR.getReturnTime().after(startTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
                         }
                     }else{
-                        if(theR.getReturnTime().isAfter(dStartTime)){
+                        if(theR.getReturnTime().after(dStartTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
                         }
                     }
-                } else if(theR.getPickupDate().isEqual(endDate)){
+                } else if(theR.getPickupDate().equals(endDate)){
                     if(theR.getPickupLocation().equals(returnLoc)){
-                        if(theR.getPickupTime().isBefore(endTime)){
+                        if(theR.getPickupTime().before(endTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
                         }
                     }else{
-                        if(theR.getPickupTime().isBefore(dEndTime)){
+                        if(theR.getPickupTime().before(dEndTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
@@ -288,29 +291,29 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             }
             
             for(Reservation theR: clashingRes){
-                if(theR.getReturnDate().isEqual(startDate)){
+                if(theR.getReturnDate().equals(startDate)){
                     if(theR.getReturnLocation().equals(pickupLoc)){
-                        if(theR.getReturnTime().isAfter(startTime)){
+                        if(theR.getReturnTime().after(startTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
                         }
                     }else{
-                        if(theR.getReturnTime().isAfter(dStartTime)){
+                        if(theR.getReturnTime().after(dStartTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
                         }
                     }
-                } else if(theR.getPickupDate().isEqual(endDate)){
+                } else if(theR.getPickupDate().equals(endDate)){
                     if(theR.getPickupLocation().equals(returnLoc)){
-                        if(theR.getPickupTime().isBefore(endTime)){
+                        if(theR.getPickupTime().before(endTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
                         }
                     }else{
-                        if(theR.getPickupTime().isBefore(dEndTime)){
+                        if(theR.getPickupTime().before(dEndTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
@@ -357,23 +360,23 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 //            
 //            for(Reservation r: wholeres){
 //                /*
-//                if(r.getPickupDate().isBefore(endDate) && r.getPickupDate().isAfter(startDate) ){
+//                if(r.getPickupDate().before(endDate) && r.getPickupDate().after(startDate) ){
 //                    pickedres.add(r);
-//                } else if (r.getReturnDate().isAfter(startDate)&& r.getReturnDate().isBefore(endDate)) {
+//                } else if (r.getReturnDate().after(startDate)&& r.getReturnDate().before(endDate)) {
 //                    pickedres.add(r);
-//                } else if(r.getReturnDate().equals(startDate) && r.getReturnTime().isAfter(startTime)){
+//                } else if(r.getReturnDate().equals(startDate) && r.getReturnTime().after(startTime)){
 //                    pickedres.add(r);
-//                } else if (r.getPickupDate().equals(endDate) && r.getPickupTime().isBefore(endTime)) {
+//                } else if (r.getPickupDate().equals(endDate) && r.getPickupTime().before(endTime)) {
 //                    pickedres.add(r);
-//                } else if (r.getReturnDate().isAfter(endDate) && r.getPickupDate().isBefore(startDate)){
+//                } else if (r.getReturnDate().after(endDate) && r.getPickupDate().before(startDate)){
 //                    pickedres.add(r);
 //                } else if(r.getPickupDate().equals(startDate) && r.getPickupTime().equals(startTime))
 //                */
 //                
-//                if(r.getReturnDate().isBefore(startDate)){
-//                } else if(r.getPickupDate().isAfter(endDate)){
-//                } else if(r.getReturnDate().equals(startDate) && (r.getReturnTime().isBefore(startTime) || r.getReturnTime().equals(startTime))){        
-//                } else if(r.getPickupDate().equals(endDate) && (r.getPickupTime().isAfter(endTime)||r.getPickupTime().equals(endTime))){
+//                if(r.getReturnDate().before(startDate)){
+//                } else if(r.getPickupDate().after(endDate)){
+//                } else if(r.getReturnDate().equals(startDate) && (r.getReturnTime().before(startTime) || r.getReturnTime().equals(startTime))){        
+//                } else if(r.getPickupDate().equals(endDate) && (r.getPickupTime().after(endTime)||r.getPickupTime().equals(endTime))){
 //                } else {
 //                    if(r.getOrderType() == OrderTypeEnum.CATEGORY && r.getCarCategory().getCategoryId() == category.getCategoryId())
 //                        pickedres.add(r);

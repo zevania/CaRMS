@@ -6,8 +6,10 @@
 package entity;
 
 import java.io.Serializable;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -35,9 +37,9 @@ public class DriverDispatchRecord implements Serializable {
     @Enumerated(EnumType.STRING)
     private DispatchStatusEnum dispatchStatus;
     @Column(nullable = false)
-    private LocalDate dispatchDate;
+    private Date dispatchDate;
     @Column(nullable = false)
-    private LocalTime dispatchTime;
+    private Time dispatchTime;
     @Column(nullable = false)
     private String fromOutlet;
     @Column(length = 50)
@@ -61,7 +63,7 @@ public class DriverDispatchRecord implements Serializable {
 
 
 
-    public DriverDispatchRecord(DispatchStatusEnum dispatchStatus, LocalDate dispatchDate, LocalTime dispatchTime, String fromOutlet) {
+    public DriverDispatchRecord(DispatchStatusEnum dispatchStatus, Date dispatchDate, Time dispatchTime, String fromOutlet) {
         this.dispatchStatus = dispatchStatus;
         this.dispatchDate = dispatchDate;
         this.dispatchTime = dispatchTime;
@@ -85,19 +87,19 @@ public class DriverDispatchRecord implements Serializable {
         this.dispatchStatus = dispatchStatus;
     }
 
-    public LocalDate getDispatchDate() {
+    public Date getDispatchDate() {
         return dispatchDate;
     }
 
-    public void setDispatchDate(LocalDate dispatchDate) {
+    public void setDispatchDate(Date dispatchDate) {
         this.dispatchDate = dispatchDate;
     }
 
-    public LocalTime getDispatchTime() {
+    public Time getDispatchTime() {
         return dispatchTime;
     }
 
-    public void setDispatchTime(LocalTime dispatchTime) {
+    public void setDispatchTime(Time dispatchTime) {
         this.dispatchTime = dispatchTime;
     }
 
@@ -126,10 +128,6 @@ public class DriverDispatchRecord implements Serializable {
         this.employee = employee;
     }
     
-    
-    
-    
-
     public Long getDispatchId() {
         return dispatchId;
     }

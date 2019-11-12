@@ -6,7 +6,7 @@
 package entity;
 
 import java.io.Serializable;
-import java.time.LocalDate;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -34,9 +34,9 @@ public class Rate implements Serializable {
     @Column(nullable = false)
     private Double peakRate;
     @Column(nullable = false)
-    private LocalDate startPeriod;
+    private Date startPeriod;
     @Column(nullable = false)
-    private LocalDate endPeriod;
+    private Date endPeriod;
     
     @ManyToOne
     @JoinColumn(nullable = false)
@@ -45,7 +45,7 @@ public class Rate implements Serializable {
     public Rate() {
     }
 
-    public Rate(String name, Double rate, LocalDate startPeriod, LocalDate endPriod, Category category) {
+    public Rate(String name, Double rate, Date startPeriod, Date endPriod, Category category) {
         this.name = name;
         this.rate = rate;
         this.startPeriod = startPeriod;
@@ -53,7 +53,7 @@ public class Rate implements Serializable {
         this.category = category;
     }
 
-    public Rate(String name, Double rate, LocalDate startPeriod, LocalDate endPriod, Double peakRate) {
+    public Rate(String name, Double rate, Date startPeriod, Date endPriod, Double peakRate) {
         this.name = name;
         this.rate = rate;
         this.startPeriod = startPeriod;
@@ -95,19 +95,19 @@ public class Rate implements Serializable {
         this.rate = rate;
     }
 
-    public LocalDate getStartPeriod() {
+    public Date getStartPeriod() {
         return startPeriod;
     }
 
-    public void setStartPeriod(LocalDate startPeriod) {
+    public void setStartPeriod(Date startPeriod) {
         this.startPeriod = startPeriod;
     }
 
-    public LocalDate getEndPeriod() {
+    public Date getEndPeriod() {
         return endPeriod;
     }
 
-    public void setEndPeriod(LocalDate endPeriod) {
+    public void setEndPeriod(Date endPeriod) {
         this.endPeriod = endPeriod;
     }
     

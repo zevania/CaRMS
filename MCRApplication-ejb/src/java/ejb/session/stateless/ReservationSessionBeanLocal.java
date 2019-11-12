@@ -6,8 +6,8 @@
 package ejb.session.stateless;
 
 import entity.Reservation;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.sql.Time;
+import java.util.Date;
 import java.util.List;
 import util.enumeration.ResStatusEnum;
 import util.exception.InvalidReservationException;
@@ -26,7 +26,7 @@ public interface ReservationSessionBeanLocal {
 
     public List<Reservation> retrieveReservations(String email);
 
-    public boolean searchAvailableCar(String searchType, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime, long pickupid, long returnid, long categoryId, long modelId) throws OutletNotFoundException;
+    public boolean searchAvailableCar(String searchType, Date startDate, Date endDate, Time startTime, Time endTime, long pickupid, long returnid, long categoryId, long modelId) throws OutletNotFoundException;
 
     public Reservation retrieveReservationById(long resId);
 

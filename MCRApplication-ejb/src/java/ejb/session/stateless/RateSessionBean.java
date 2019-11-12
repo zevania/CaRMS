@@ -8,7 +8,8 @@ package ejb.session.stateless;
 import entity.Category;
 import entity.Rate;
 import java.time.DayOfWeek;
-import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -81,18 +82,20 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
     }
      
     @Override
-    public double retrieveTotalByCategory(long catId, LocalDate startDate, LocalDate endDate) throws CategoryNotFoundException, RateNotFoundException{
+    public double retrieveTotalByCategory(long catId, Date startDate, Date endDate) throws CategoryNotFoundException, RateNotFoundException{
         double total = 0;
         
         Category category = em.find(Category.class, catId);
         if(category == null) throw new CategoryNotFoundException();
         
-        LocalDate temp = startDate;
+        Date temp = startDate;
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(temp);
         
         Query query;
         
-        while(!temp.isAfter(endDate)){
-            if(temp.getDayOfWeek()==DayOfWeek.FRIDAY || temp.getDayOfWeek()==DayOfWeek.SATURDAY || temp.getDayOfWeek() == DayOfWeek.SUNDAY){
+        while(!temp.after(endDate)){
+            if(temp.getDay()==5 || temp.getDay()==6 || temp.getDay()==0){
                 query = em.createQuery("SELECT r FROM Rate r WHERE r.category.categoryId = :inCat AND r.startPeriod <= :inStart AND r.endPeriod >= :inEnd ORDER BY r.peakRate ASC")
                         .setParameter("inCat", catId)
                         .setParameter("inStart", temp)
@@ -110,7 +113,8 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
                 if(rates.size()==0) throw new RateNotFoundException();
                 total+= rates.get(0).getRate();
             }
-            
+            calendar.add(Calendar.DATE,1);
+            temp = calendar.getTime();
         }
         return total;
     }

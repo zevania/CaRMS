@@ -10,7 +10,7 @@ import entity.DriverDispatchRecord;
 import entity.Employee;
 import entity.Outlet;
 import entity.Reservation;
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.Local;
 import javax.ejb.Remote;
@@ -81,7 +81,7 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
     }
 
     @Override
-    public List<DriverDispatchRecord> retrieveDispatchRecords(long outletId, LocalDate date) {
+    public List<DriverDispatchRecord> retrieveDispatchRecords(long outletId, Date date) {
         Outlet o = em.find(Outlet.class, outletId);
         
         Query query = em.createQuery("SELECT ddr FROM DriverDispatchRecord ddr WHERE ddr.outlet.outletId = :theOutlet AND ddr.dispatchDate = :theDate")
