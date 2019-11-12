@@ -5,7 +5,7 @@
  */
 package ejb.session.stateless;
 
-import entity.Member;
+import entity.OurMember;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -29,26 +29,32 @@ public class MemberSessionBean implements MemberSessionBeanRemote, MemberSession
     private EntityManager em;
     
     @Override
-    public Long createMember(Member m) throws MemberEmailExistException {
-        Query query = em.createQuery("SELECT m FROM Member m WHERE m.email = :inEmail");
+    public Long createMember(OurMember m) throws MemberEmailExistException {
+        Query query = em.createQuery("SELECT m FROM OurMember m WHERE m.email = :inEmail");
         query.setParameter("inEmail", m.getEmail());
-        if(query.getSingleResult() == null) {
+        
+        OurMember member;
+            
+        try{
+            member = (OurMember) query.getSingleResult();
+        }catch(NoResultException ex){
             em.persist(m);
-        } else {
-            throw new MemberEmailExistException("Email already exist!");
+            em.flush();
+            return m.getOurMemberId();
         }
-        em.flush();
-        return m.getMemberId();
+            
+            throw new MemberEmailExistException("Email already exist!");
+        
     }
     
     @Override
-    public Member memberLogin(String email, String password) throws InvalidLoginCredentialException  {
-        Query query = em.createQuery("SELECT m FROM Member m WHERE m.email = :inEmail");
+    public OurMember memberLogin(String email, String password) throws InvalidLoginCredentialException  {
+        Query query = em.createQuery("SELECT m FROM OurMember m WHERE m.email = :inEmail");
         query.setParameter("inEmail", email);
-        Member m;
+        OurMember m;
         
         try {
-            m = (Member)query.getSingleResult();
+            m = (OurMember)query.getSingleResult();
             if(m.getPassword().equals(password)) {
                 return m;
             } else {

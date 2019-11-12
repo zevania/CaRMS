@@ -8,7 +8,7 @@ package ejb.session.stateless;
 import entity.Car;
 import entity.Category;
 import entity.Customer;
-import entity.Member;
+import entity.OurMember;
 import entity.Model;
 import entity.Outlet;
 import entity.Reservation;
@@ -80,7 +80,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
     @Override
     public long createMemberReservation(Reservation r, long memberId, long ccNum, long pickupId, long returnId, long categoryId, long modelId) throws OutletNotFoundException, MemberNotFoundException{
-        Member member = em.find(Member.class, memberId);
+        OurMember member = em.find(OurMember.class, memberId);
         Outlet pickupOutlet = em.find(Outlet.class, pickupId);
         Outlet returnOutlet = em.find(Outlet.class, returnId);
         
@@ -180,17 +180,12 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
     @Override
     public List<Reservation> retrieveReservations(String email) {
-        Query query = em.createQuery("SELECT c FROM CUSTOMER c WHERE c.email LIKE :theEmail")
+        Query query = em.createQuery("SELECT c FROM Customer c WHERE c.email LIKE :theEmail")
                 .setParameter("theEmail", email);
-        Customer cust = new Customer();
-        try {
-            cust = (Customer) query.getSingleResult();
-        } catch( Exception ex){
-            System.out.println("Something went wrong");
-            return null;
-        }
         
-        return cust.getReservations() ;
+        
+        
+        return query.getResultList() ;
     }
 
     @Override

@@ -7,15 +7,16 @@
     <class>entity.Customer</class>
     <class>entity.DriverDispatchRecord</class>
     <class>entity.Employee</class>
-    <class>entity.Member</class>
     <class>entity.Model</class>
     <class>entity.Outlet</class>
     <class>entity.Partner</class>
     <class>entity.Reservation</class>
     <class>entity.Rate</class>
+    <class>entity.OurMember</class>
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     <properties>
       <property name="javax.persistence.schema-generation.database.action" value="create"/>
+      <property name="eclipselink.deploy-on-startup" value="true"/>
     </properties>
   </persistence-unit>
 </persistence>

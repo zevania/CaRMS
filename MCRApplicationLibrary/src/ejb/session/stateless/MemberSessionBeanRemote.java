@@ -5,15 +5,15 @@
  */
 package ejb.session.stateless;
 
-import entity.Member;
+import entity.OurMember;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.MemberEmailExistException;
 
 
 public interface MemberSessionBeanRemote {
     
-    public Long createMember(Member m) throws MemberEmailExistException;
+    public Long createMember(OurMember m) throws MemberEmailExistException;
 
-    public Member memberLogin(String email, String password) throws InvalidLoginCredentialException;
+    public OurMember memberLogin(String email, String password) throws InvalidLoginCredentialException;
     
 }

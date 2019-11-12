@@ -8,7 +8,7 @@ import ejb.session.stateless.RateSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import entity.Category;
 import entity.Customer;
-import entity.Member;
+import entity.OurMember;
 import entity.Model;
 import entity.Outlet;
 import entity.Reservation;
@@ -43,7 +43,7 @@ public class MainApp {
     private ModelSessionBeanRemote modelSessionBeanRemote;
     private RateSessionBeanRemote rateSessionBeanRemote;
     
-    private Member currentMember;
+    private OurMember currentMember;
 
     public MainApp() {
     }
@@ -77,7 +77,8 @@ public class MainApp {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
-
+                scanner.nextLine();
+                
                 if(response == 1) 
                 {
                     try {
@@ -126,6 +127,7 @@ public class MainApp {
         String email = "";
         String password = "";
         
+        System.out.println();
         System.out.println("*** CaRMS Reservation Client :: Login ***\n");
         System.out.print("Enter email> ");
         email = scanner.nextLine().trim();
@@ -148,6 +150,7 @@ public class MainApp {
         
         while(true)
         {
+            System.out.println();
             System.out.println("*** CaRMS Reservation Client ***\n");
             System.out.println("You are logged in as " + currentMember.getName() + "\n");
             System.out.println("1: Search Car");
@@ -161,6 +164,7 @@ public class MainApp {
                 System.out.print("> ");
 
                 response = scanner.nextInt();
+                scanner.nextLine();
 
                 if (response == 1)
                 {
@@ -183,11 +187,12 @@ public class MainApp {
                     System.out.println("Invalid option, please try again!\n");                
                 }
                 
-                if(response == 4)
+                
+            }
+            if(response == 4)
                 {
                     break;
                 }
-            }
         }
     }
     
@@ -207,7 +212,7 @@ public class MainApp {
         
         if(name.length() > 0 && email.length() > 0 && password.length() > 0)
         {
-            Member newMember = new Member(name, email, password);
+            OurMember newMember = new OurMember(name, email, password);
             try 
             {
                 Long newMemberId = memberSessionBeanRemote.createMember(newMember);
@@ -255,6 +260,7 @@ public class MainApp {
         
         System.out.print("Enter pickup hour (0-23) : ");
         int time = scanner.nextInt();
+        scanner.nextLine();
         Time startTime = new Time(time, 0, 0);
         
         System.out.print("Enter the start date (yyyy-mm-dd): ");
@@ -275,6 +281,7 @@ public class MainApp {
         
         System.out.print("Enter return hour (0-23) > ");
         time = scanner.nextInt();
+        scanner.nextLine();
         Time endTime = new Time(time,0,0);
         
         List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
@@ -290,9 +297,11 @@ public class MainApp {
         
         System.out.print("Enter pickup outlet no > ");
         int pickupNo = scanner.nextInt();
+        scanner.nextLine();
         Outlet pickupLocation = outlets.get(pickupNo - 1);
         System.out.print("Enter return outlet no > ");
         int returnNo = scanner.nextInt();
+        scanner.nextLine();
         Outlet returnLocation = outlets.get(returnNo - 1);
         boolean success = false;
         String yesNo = "";
@@ -305,6 +314,7 @@ public class MainApp {
             System.out.println("2: Model\n");
             System.out.print("> ");
             response = scanner.nextInt();
+            scanner.nextLine();
             
             if(response >= 1 && response <= 2)
             {
@@ -317,6 +327,7 @@ public class MainApp {
                     }
                     System.out.print("Enter category id: ");
                     categoryId = scanner.nextLong();
+                    scanner.nextLine();
                     
                 } 
                 else if(response == 2) 
@@ -328,6 +339,7 @@ public class MainApp {
                     }
                     System.out.print("Enter model id: ");
                     modelId = scanner.nextLong();
+                    scanner.nextLine();
                 }
                 
                 try
@@ -381,10 +393,13 @@ public class MainApp {
             System.out.print("> ");
             response = scanner.nextInt();
 
+            scanner.nextLine();
+            
             if(response == 1)
             {
                     System.out.print("Enter credit card number: ");
                     Long ccNum = scanner.nextLong();
+                    scanner.nextLine();
                     PaidStatusEnum payStatus = PaidStatusEnum.UNPAID;
                     
                     while(true) {
@@ -393,6 +408,7 @@ public class MainApp {
                         System.out.println("2. Pay Later at pick up time");
                         System.out.print("> ");
                         Integer payRes = scanner.nextInt();
+                        scanner.nextLine();
                         
                         if(payRes >= 1 && payRes <= 2) 
                         {
@@ -417,7 +433,7 @@ public class MainApp {
                     long theId = 0;
                     try
                     {
-                        theId = reservationSessionBeanRemote.createMemberReservation(r, currentMember.getMemberId(), ccNum, pickupNo, returnNo, categoryId, modelId);
+                        theId = reservationSessionBeanRemote.createMemberReservation(r, currentMember.getOurMemberId(), ccNum, pickupNo, returnNo, categoryId, modelId);
                     }
                     catch(OutletNotFoundException ex)
                     {
@@ -441,6 +457,7 @@ public class MainApp {
         System.out.println("*** CaRMS Reservation Client :: View Reservation Details ***\n");
         System.out.print("Enter reservation id> ");
         Long id = scanner.nextLong();
+        scanner.nextLine();
         
         Reservation r = reservationSessionBeanRemote.retrieveReservationById(id);
         
@@ -466,6 +483,7 @@ public class MainApp {
         System.out.println("2: Back\n");
         System.out.print("> ");
         response = scanner.nextInt();
+        scanner.nextLine();
         
         if(response == 1)
         {
@@ -479,6 +497,12 @@ public class MainApp {
         
         System.out.println("*** CaRMS Reservation Client :: View All My Reservations ***\n");
         List<Reservation> res = reservationSessionBeanRemote.retrieveReservations(currentMember.getEmail());
+        
+        if(res == null || res.size()==0){
+            System.out.println("There is no reservaiton right now!");
+            return;
+        }
+        
         System.out.printf("%8s%20s%20s%20s%20s\n", "Res Id", "PickUp Date", "Return Date", "Reservation Status", "Payment Status");
         for(Reservation r : res) {
             Date startDate = r.getPickupDate();
