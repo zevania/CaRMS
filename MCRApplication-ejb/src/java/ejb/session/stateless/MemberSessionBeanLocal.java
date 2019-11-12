@@ -7,10 +7,11 @@ package ejb.session.stateless;
 
 import entity.Member;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.MemberEmailExistException;
 
 public interface MemberSessionBeanLocal {
 
-    public Long createMember(Member m);
+    public Long createMember(Member m) throws MemberEmailExistException;
 
     public Member memberLogin(String email, String password) throws InvalidLoginCredentialException;
     

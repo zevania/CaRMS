@@ -14,6 +14,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.MemberEmailExistException;
 
 /**
  *
@@ -28,8 +29,14 @@ public class MemberSessionBean implements MemberSessionBeanRemote, MemberSession
     private EntityManager em;
     
     @Override
-    public Long createMember(Member m) {
-        em.persist(m);
+    public Long createMember(Member m) throws MemberEmailExistException {
+        Query query = em.createQuery("SELECT m FROM Member m WHERE m.email = :inEmail");
+        query.setParameter("inEmail", m.getEmail());
+        if(query.getSingleResult() == null) {
+            em.persist(m);
+        } else {
+            throw new MemberEmailExistException("Email already exist!");
+        }
         em.flush();
         return m.getMemberId();
     }

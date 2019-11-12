@@ -48,12 +48,11 @@ public class Employee implements Serializable {
     public Employee() {
     }
     
-    public Employee(String name, String email, String password, RoleEnum role, Outlet outlet) {
+    public Employee(String name, String email, String password, RoleEnum role) {
         this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
-        this.outlet = outlet;
     }
 
     public void setOutlet(Outlet outlet) {

@@ -4,6 +4,7 @@ import ejb.session.stateless.CategorySessionBeanRemote;
 import ejb.session.stateless.MemberSessionBeanRemote;
 import ejb.session.stateless.ModelSessionBeanRemote;
 import ejb.session.stateless.OutletSessionBeanRemote;
+import ejb.session.stateless.RateSessionBeanRemote;
 import ejb.session.stateless.ReservationSessionBeanRemote;
 import entity.Category;
 import entity.Customer;
@@ -21,6 +22,7 @@ import util.enumeration.CustomerTypeEnum;
 import util.enumeration.OrderTypeEnum;
 import util.enumeration.PaidStatusEnum;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.MemberEmailExistException;
 import util.exception.OutletNotFoundException;
 
 
@@ -31,18 +33,22 @@ public class MainApp {
     private OutletSessionBeanRemote outletSessionBeanRemote;
     private CategorySessionBeanRemote categorySessionBeanRemote;
     private ModelSessionBeanRemote modelSessionBeanRemote;
+    private RateSessionBeanRemote rateSessionBeanRemote;
     
     private Member currentMember;
 
     public MainApp() {
     }
 
-    public MainApp(ReservationSessionBeanRemote reservationSessionBeanRemote, MemberSessionBeanRemote memberSessionBeanRemote, OutletSessionBeanRemote outletSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote, ModelSessionBeanRemote modelSessionBeanRemote) {
+    public MainApp(ReservationSessionBeanRemote reservationSessionBeanRemote, MemberSessionBeanRemote memberSessionBeanRemote, 
+            OutletSessionBeanRemote outletSessionBeanRemote, CategorySessionBeanRemote categorySessionBeanRemote, 
+            ModelSessionBeanRemote modelSessionBeanRemote, RateSessionBeanRemote rateSessionBeanRemote) {
         this.reservationSessionBeanRemote = reservationSessionBeanRemote;
         this.memberSessionBeanRemote = memberSessionBeanRemote;
         this.outletSessionBeanRemote = outletSessionBeanRemote;
         this.categorySessionBeanRemote = categorySessionBeanRemote;
         this.modelSessionBeanRemote = modelSessionBeanRemote;
+        this.rateSessionBeanRemote = rateSessionBeanRemote;
     }
     
     public void runApp() {
@@ -120,7 +126,14 @@ public class MainApp {
         
         if(email.length() > 0 && password.length() > 0)
         {
-            currentMember = memberSessionBeanRemote.memberLogin(email, password);      
+            try 
+            {
+            currentMember = memberSessionBeanRemote.memberLogin(email, password);
+            } 
+            catch(InvalidLoginCredentialException ex) 
+            {
+                System.out.println("An error has occurred while logging in:" + ex.getMessage()+"\n");
+            }
         }
         else
         {
@@ -194,8 +207,15 @@ public class MainApp {
         if(name.length() > 0 && email.length() > 0 && password.length() > 0)
         {
             Member newMember = new Member(name, email, password);
-            Long newMemberId = memberSessionBeanRemote.createMember(newMember);
-            System.out.println("New member created successfully!: " + newMemberId + "\n");
+            try 
+            {
+                Long newMemberId = memberSessionBeanRemote.createMember(newMember);
+                System.out.println("New member created successfully!: " + newMemberId + "\n");
+            }
+            catch(MemberEmailExistException ex) 
+            {
+                System.out.println("An error occured while creating member: " + ex.getMessage() + "\n");
+            }
         }
         else
         {
@@ -311,8 +331,8 @@ public class MainApp {
 
             if(response == 1)
             {
-                // calculate rental rate
-                double total = 0;
+                double total = rateSessionBeanRemote.retrieveTotalByCategory(categoryId, startDate, endDate);
+                System.out.println("Total rental rate: $" + total);
                 
                 System.out.print("Enter credit card number: ");
                 Long ccNum = scanner.nextLong();
@@ -329,7 +349,7 @@ public class MainApp {
                     return;
                 }
                 
-                System.out.println("Reservation successfu;! The id is "+theId);
+                System.out.println("Reservation successful! The id is "+theId);
                 
             }
         }
@@ -367,8 +387,8 @@ public class MainApp {
         
         if(response == 1)
         {
-            reservationSessionBeanRemote.cancelReservation(id);
-            // print penalty etc.
+            String reply = reservationSessionBeanRemote.cancelReservation(id);
+            System.out.println(reply);
         }
     }
     
