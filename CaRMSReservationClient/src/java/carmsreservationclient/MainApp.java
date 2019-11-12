@@ -28,6 +28,7 @@ import util.exception.InvalidLoginCredentialException;
 import util.exception.MemberEmailExistException;
 import util.exception.OutletNotFoundException;
 import util.exception.RateNotFoundException;
+import util.exception.IncompleteRegistrationDetailsException;
 
 
 public class MainApp {
@@ -194,7 +195,7 @@ public class MainApp {
         }
     }
     
-    private void doCreateMember() throws Exception {
+    private void doCreateMember() throws IncompleteRegistrationDetailsException {
         Scanner scanner = new Scanner(System.in);
         String name = "";
         String email = "";
@@ -223,7 +224,7 @@ public class MainApp {
         }
         else
         {
-            throw new Exception("Missing registration details!");
+            throw new IncompleteRegistrationDetailsException("An error occured while creating member: Incomplete registration details!\n");
         }
 
     }
@@ -271,10 +272,11 @@ public class MainApp {
         Outlet returnLocation = outlets.get(returnNo - 1);
         boolean success = false;
         String yesNo = "";
+        double total = 0;
         
         do
         {
-            System.out.println("Search By: ");
+            System.out.println("Search Car By: ");
             System.out.println("1: Category");
             System.out.println("2: Model\n");
             System.out.print("> ");
@@ -308,14 +310,26 @@ public class MainApp {
                 {
                     success = reservationSessionBeanRemote.searchAvailableCar(searchType.toString(), startDate, 
                             endDate, startTime, endTime, pickupNo, returnNo, categoryId, modelId);
+                    try {
+                        total = rateSessionBeanRemote.retrieveTotalByCategory(categoryId, startDate, endDate);
+                        System.out.println("Total rental rate: $" + total);
+                    } 
+                    catch (CategoryNotFoundException ex) 
+                    {
+                        System.out.println("An error occurred while creating reservation: Car Category Not Found!");
+                        return;
+                    } 
+                    catch (RateNotFoundException ex) 
+                    {
+                        System.out.println("An error occurred while creating reservation: Rental Rate Not Found!");
+                        return;
+                    }
                 }
                 catch(OutletNotFoundException ex)
                 {
                     System.out.println("Invalid input! Outlet not found");
                     return;
                 }
-                
-                
                 
                 if(success) 
                 {
@@ -345,12 +359,6 @@ public class MainApp {
 
             if(response == 1)
             {
-                double total;
-                try 
-                {
-                    total = rateSessionBeanRemote.retrieveTotalByCategory(categoryId, startDate, endDate);
-                    System.out.println("Total rental rate: $" + total);
-                    
                     System.out.print("Enter credit card number: ");
                     Long ccNum = scanner.nextLong();
                     
@@ -370,16 +378,6 @@ public class MainApp {
                         return;
                     }
                     System.out.println("Reservation successful! The id is "+theId);
-                } 
-                catch (CategoryNotFoundException ex) 
-                {
-                    System.out.println("An error occurred while creating reservation: Car Category Not Found!");
-                } 
-                catch (RateNotFoundException ex) 
-                {
-                    System.out.println("An error occurred while creating reservation: Rental Rate Not Found!");
-                }
-                
             }
         }
     }
