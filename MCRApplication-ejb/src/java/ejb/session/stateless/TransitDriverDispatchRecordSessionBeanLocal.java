@@ -8,15 +8,18 @@ package ejb.session.stateless;
 import entity.DriverDispatchRecord;
 import java.time.LocalDate;
 import java.util.List;
+import util.exception.DDRCompletedException;
+import util.exception.DDRNotFoundException;
+import util.exception.EmployeeNotFoundException;
 
 
 public interface TransitDriverDispatchRecordSessionBeanLocal {
 
     public long createDispatchRecord(DriverDispatchRecord d, long resId, long outletId);
 
-    public void assignDriver(long employeeId, long dispatchId);
+    public void assignDriver(long employeeId, long dispatchId)throws EmployeeNotFoundException, DDRNotFoundException;
 
-    public void updateDispatchRecordAsCompleted(long dispatchId);
+    public void updateDispatchRecordAsCompleted(long dispatchId)throws DDRNotFoundException, DDRCompletedException;
 
     public List<DriverDispatchRecord> retrieveDispatchRecords(long outletId, LocalDate date);
     

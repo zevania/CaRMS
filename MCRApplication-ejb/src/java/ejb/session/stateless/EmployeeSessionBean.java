@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.Employee;
 import entity.Outlet;
+import java.util.List;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
@@ -49,6 +50,11 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
         else return e;
     }
     
-    
+    public List<Employee> retrieveEmployees(long outletId){
+        Query query = em.createQuery("SELECT e FROM Employee e WHERE e.outlet.outletId = :inOutlet")
+                .setParameter("inOutlet", outletId);
+        
+        return query.getResultList();
+    }
     
 }

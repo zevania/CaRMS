@@ -19,6 +19,9 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.enumeration.DispatchStatusEnum;
+import util.exception.DDRCompletedException;
+import util.exception.DDRNotFoundException;
+import util.exception.EmployeeNotFoundException;
 
 /**
  *
@@ -49,9 +52,12 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
     }
 
     @Override
-    public void assignDriver(long employeeId, long dispatchId) {
+    public void assignDriver(long employeeId, long dispatchId) throws EmployeeNotFoundException, DDRNotFoundException {
         Employee e = em.find(Employee.class, employeeId);
         DriverDispatchRecord ddr = em.find(DriverDispatchRecord.class, dispatchId);
+        
+        if(e==null) throw new EmployeeNotFoundException();
+        if(ddr==null) throw new DDRNotFoundException();
         
         e.getDispatchRecords().add(ddr);
         ddr.setEmployee(e);
@@ -60,8 +66,11 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
     }
 
     @Override
-    public void updateDispatchRecordAsCompleted(long dispatchId) {
+    public void updateDispatchRecordAsCompleted(long dispatchId) throws DDRNotFoundException, DDRCompletedException {
         DriverDispatchRecord ddr = em.find(DriverDispatchRecord.class, dispatchId);
+        
+        if(ddr==null) throw new DDRNotFoundException();
+        if(ddr.getDispatchStatus()==DispatchStatusEnum.COMPLETED) throw new DDRCompletedException();
         
         Car c = ddr.getReservation().getCar();
         c.setOutlet(ddr.getReservation().getPickupLocation());

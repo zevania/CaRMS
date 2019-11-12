@@ -34,7 +34,7 @@ public class Rate implements Serializable {
     @Column(nullable = false)
     private LocalDate startPeriod;
     @Column(nullable = false)
-    private LocalDate endPriod;
+    private LocalDate endPeriod;
     
     @ManyToOne
     @JoinColumn(nullable = false)
@@ -47,8 +47,15 @@ public class Rate implements Serializable {
         this.name = name;
         this.rate = rate;
         this.startPeriod = startPeriod;
-        this.endPriod = endPriod;
+        this.endPeriod = endPriod;
         this.category = category;
+    }
+
+    public Rate(String name, Double rate, LocalDate startPeriod, LocalDate endPriod) {
+        this.name = name;
+        this.rate = rate;
+        this.startPeriod = startPeriod;
+        this.endPeriod = endPriod;
     }
 
     
@@ -87,12 +94,12 @@ public class Rate implements Serializable {
         this.startPeriod = startPeriod;
     }
 
-    public LocalDate getEndPriod() {
-        return endPriod;
+    public LocalDate getEndPeriod() {
+        return endPeriod;
     }
 
-    public void setEndPriod(LocalDate endPriod) {
-        this.endPriod = endPriod;
+    public void setEndPeriod(LocalDate endPeriod) {
+        this.endPeriod = endPeriod;
     }
     
     

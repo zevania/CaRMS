@@ -11,5 +11,5 @@ package util.enumeration;
  */
 public enum CarStatusEnum {
     OUTLET,
-    INTRANSIT
+    ONRENTAL
 }

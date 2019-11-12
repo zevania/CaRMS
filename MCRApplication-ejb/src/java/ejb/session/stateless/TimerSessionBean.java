@@ -73,7 +73,7 @@ public class TimerSessionBean {
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
                     if(c.getModel().getModelId() == temp.getCarModel().getModelId() &&
-                       c.getReservation()==null){
+                       c.getReservation()==null && c.isActive()){
                         c.setReservation(temp);
                         temp.setCar(c);
                         toRemove.add(temp);
@@ -92,7 +92,7 @@ public class TimerSessionBean {
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.reservation.returnLocation.outletId LIKE :store ")
+            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.active IS TRUE AND c.reservation.returnLocation.outletId = :store")
                     .setParameter("store",theStoreId);
             cars = query.getResultList();
             
@@ -102,7 +102,7 @@ public class TimerSessionBean {
                 temptime = temp.getPickupTime();
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
-                    if(c.getModel().getModelId() == temp.getCarModel().getModelId() &&
+                    if(c.isActive() &&c.getModel().getModelId() == temp.getCarModel().getModelId() &&
                         c.getReservation().getReturnDate().equals(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().isBefore(temptime) || c.getReservation().getReturnTime().equals(temptime))){
                         c.setReservation(temp);
@@ -121,7 +121,7 @@ public class TimerSessionBean {
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NULL");
+            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NULL AND c.active IS TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){
@@ -129,7 +129,7 @@ public class TimerSessionBean {
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
                     if(c.getModel().getModelId() == temp.getCarModel().getModelId() &&
-                        c.getReservation()==null){
+                        c.getReservation()==null && c.isActive()){
                         c.setReservation(temp);
                         temp.setCar(c);
                         toRemove.add(temp);
@@ -148,7 +148,7 @@ public class TimerSessionBean {
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL");
+            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.active IS TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){
@@ -156,7 +156,7 @@ public class TimerSessionBean {
                 temptime = temp.getReturnTime().minusHours(2);
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
-                    if(c.getModel().getModelId() == temp.getCarModel().getModelId() &&
+                    if( c.isActive() && c.getModel().getModelId() == temp.getCarModel().getModelId() &&
                         c.getReservation().getReturnDate().equals(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().isBefore(temptime) || c.getReservation().getReturnTime().equals(temptime))){
                         c.setReservation(temp);
@@ -194,7 +194,7 @@ public class TimerSessionBean {
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
                     if(c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
-                       c.getReservation()==null){
+                       c.getReservation()==null && c.isActive()){
                         c.setReservation(temp);
                         temp.setCar(c);
                         toRemove.add(temp);
@@ -212,7 +212,7 @@ public class TimerSessionBean {
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.reservation.returnLocation.outletId LIKE :store ")
+            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.reservation.returnLocation.outletId LIKE :store AND c.active IS TRUE")
                     .setParameter("store",theStoreId);
             cars = query.getResultList();
             
@@ -222,7 +222,7 @@ public class TimerSessionBean {
                 temptime = temp.getPickupTime();
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
-                    if(c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
+                    if(c.isActive() && c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
                         c.getReservation().getReturnDate().equals(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().isBefore(temptime) || c.getReservation().getReturnTime().equals(temptime))){
                         c.setReservation(temp);
@@ -241,14 +241,14 @@ public class TimerSessionBean {
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NULL");
+            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NULL AND c.active IS TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
-                    if(c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
+                    if(c.isActive() && c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
                         c.getReservation()==null){
                         c.setReservation(temp);
                         temp.setCar(c);
@@ -268,7 +268,7 @@ public class TimerSessionBean {
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL");
+            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.active IS TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){
@@ -276,7 +276,7 @@ public class TimerSessionBean {
                 temptime = temp.getReturnTime().minusHours(2);
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
-                    if(c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
+                    if(c.isActive() && c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
                         c.getReservation().getReturnDate().equals(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().isBefore(temptime) || c.getReservation().getReturnTime().equals(temptime))){
                         c.setReservation(temp);

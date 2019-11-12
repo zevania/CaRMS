@@ -14,6 +14,8 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.enumeration.CategoryNotFoundException;
+import util.exception.RateNotFoundException;
 
 /**
  *
@@ -29,12 +31,15 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
     
     
     @Override
-    public long createRate(Rate r, long categoryId) {
+    public long createRate(Rate r, long categoryId) throws CategoryNotFoundException {
         
-        em.persist(r);
         Category category = em.find(Category.class, categoryId);
+        
+        if(category == null) throw new CategoryNotFoundException();
+        
         r.setCategory(category);
         category.getRate().add(r);
+        em.persist(r);
         em.flush();
         
         return r.getRateId();
@@ -42,7 +47,7 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
 
     @Override
     public List<Rate> retrieveRates() {
-        Query query = em.createQuery("SELECT r FROM Rate r");
+        Query query = em.createQuery("SELECT r FROM Rate r ORDER BY r.category.categoryId ASC, r.startPeriod ASC, r.endPeriod ASC");
         
         return query.getResultList();
     }
@@ -60,6 +65,15 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
         em.remove(r);
         em.flush();
         
+    }
+    
+    @Override
+    public Rate retrieveRateById(long rateId) throws RateNotFoundException{
+        Rate r = em.find(Rate.class, rateId);
+        
+        if(r==null) throw new RateNotFoundException();
+        
+        return r;
     }
      
 }

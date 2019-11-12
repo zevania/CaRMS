@@ -21,6 +21,7 @@ import util.enumeration.CustomerTypeEnum;
 import util.enumeration.OrderTypeEnum;
 import util.enumeration.PaidStatusEnum;
 import util.exception.InvalidLoginCredentialException;
+import util.exception.OutletNotFoundException;
 
 
 public class MainApp {
@@ -276,15 +277,22 @@ public class MainApp {
                     modelId = scanner.nextLong();
                 }
                 
-                success = reservationSessionBeanRemote.searchAvailableCar(searchType.toString(), startDate, endDate, 
+                try{
+                    success = reservationSessionBeanRemote.searchAvailableCar(searchType.toString(), startDate, endDate, 
                         startTime, endTime, pickupNo, returnNo, categoryId, modelId);
+                }catch(OutletNotFoundException ex){
+                    System.out.println("Invalid input! Outlet not found");
+                    return;
+                }
+                
+                
                 
                 if(success) {
                     break;
                 } else {
                     System.out.println("No available car matches the searching criteria");
                     System.out.print("Do you want to search again? Y/N > ");
-                    yesNo = scanner.nextLine().trim();
+                    yesNo = scanner.nextLine().trim().toUpperCase();
                 }
             }
             else
@@ -313,7 +321,16 @@ public class MainApp {
                 r.setPickupLocation(pickupLocation);
                 r.setReturnLocation(returnLocation);
                 
-                reservationSessionBeanRemote.createMemberReservation(r, currentMember.getMemberId(), ccNum, pickupNo, returnNo, categoryId, modelId);
+                long theId = 0;
+                try{
+                    theId = reservationSessionBeanRemote.createMemberReservation(r, currentMember.getMemberId(), ccNum, pickupNo, returnNo, categoryId, modelId);
+                }catch(OutletNotFoundException ex){
+                    System.out.println("Invalid input. Outlet not found!");
+                    return;
+                }
+                
+                System.out.println("Reservation successfu;! The id is "+theId);
+                
             }
         }
     }

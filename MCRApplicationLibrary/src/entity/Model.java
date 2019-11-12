@@ -52,10 +52,9 @@ public class Model implements Serializable {
     public Model() {
     }
 
-    public Model(String modelName, String make, Category category) {
+    public Model(String modelName, String make) {
         this.modelName = modelName;
         this.make = make;
-        this.category = category;
         this.active = true;
     }
 

@@ -30,7 +30,9 @@ import util.enumeration.CustomerTypeEnum;
 import util.enumeration.OrderTypeEnum;
 import util.enumeration.PaidStatusEnum;
 import util.enumeration.ResStatusEnum;
+import util.exception.InvalidReservationException;
 import util.exception.OutletNotFoundException;
+import util.exception.ReservationNotFoundException;
 
 /**
  *
@@ -47,15 +49,19 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     
     
     @Override
-    public void updateRes(long resId, ResStatusEnum status) {
+    public void updateRes(long resId, ResStatusEnum status) throws ReservationNotFoundException, InvalidReservationException{
         Reservation r = em.find(Reservation.class, resId);
+        
+        if(r == null) throw new ReservationNotFoundException();
+        if(r.getResStatus() != ResStatusEnum.ORDERED) throw new InvalidReservationException();
+        
         Car c = r.getCar();
         Outlet o;
         if(status == ResStatusEnum.PICKEDUP){
-            c.setLocation("CUSTOMER");
+            c.setLocation("CUSTOMER " +r.getCustomer().getName() );
             o = c.getOutlet();
             c.setOutlet(null);
-            c.setStatus(CarStatusEnum.INTRANSIT);
+            c.setStatus(CarStatusEnum.ONRENTAL);
             r.setResStatus(status);
             r.setPaymentStatus(PaidStatusEnum.PAID);
             o.getCars().remove(c);
@@ -111,12 +117,14 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     }
 
     @Override
-    public void cancelReservation(long resId) {
+    public String cancelReservation(long resId) {
         Reservation r = em.find(Reservation.class, resId);
         LocalDate pickupdate = r.getPickupDate();
         boolean proceed = false;
         int numdays = 0;
         double penalty = 0.0;
+        String reply = "";
+            
         if(r.getResStatus()==ResStatusEnum.ORDERED ){
             LocalDate today = LocalDate.now();
             
@@ -128,7 +136,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                }
                proceed = true;
             } else {
-                System.out.println("[Action is invalid]");
+                return "[Action is invalid]\n";
             }
             
             if(proceed){
@@ -144,18 +152,20 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             }
             
             if(r.getPaymentStatus()==PaidStatusEnum.PAID && proceed){
-                System.out.println("The penalty charge is $"+penalty);
-                System.out.println("Customer is refunded a total of $"+(r.getTotal()-penalty));
-                System.out.println("The card number is "+r.getCustomer().getCcNum());
+                reply+="The penalty charge is $"+penalty+"\n";
+                reply+="Customer is refunded a total of $"+(r.getTotal()-penalty)+"\n";
+                reply+="The card number is "+r.getCustomer().getCcNum()+"\n";
                 r.setResStatus(ResStatusEnum.CANCELLED);
             } else if(r.getPaymentStatus()==PaidStatusEnum.UNPAID && proceed){
-                System.out.println("The penalty charge is $"+penalty);
-                System.out.println("The card number is "+r.getCustomer().getCcNum());
+                reply+="The penalty charge is $"+penalty+"\n";
+                reply+="The card number is "+r.getCustomer().getCcNum()+"\n";
                 r.setResStatus(ResStatusEnum.CANCELLED);
             }   
         } else {
-            System.out.println("[Action is invalid]");
+            return "[Action is invalid]\n";
         }
+        
+        return reply;
     }
 
     @Override
@@ -195,7 +205,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         int totalCar = 0;
         
         if(searchType.equals("category")){
-            query = em.createQuery("SELECT c FROM Car c WHERE c.model.category.categoryId = :catId")
+            query = em.createQuery("SELECT c FROM Car c WHERE c.model.category.categoryId = :catId AND c.active IS TRUE")
                     .setParameter("catId", categoryId);
             totalCar = query.getResultList().size();
             
@@ -253,7 +263,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             if(leftCar>0) return true;
             else return false;
         }else if(searchType.equals("model")){
-           query = em.createQuery("SELECT c FROM Car c WHERE c.model.modelId = :modId")
+           query = em.createQuery("SELECT c FROM Car c WHERE c.model.modelId = :modId AND c.active IS TRUE")
                     .setParameter("modId", modelId);
             totalCar = query.getResultList().size();
             

@@ -14,12 +14,14 @@ import util.exception.OutletNotFoundException;
 
 public interface CarSessionBeanLocal {
 
-    public long createCar(Car car, long modelId) throws InvalidModelException;
+    public long createCar(Car car, long modelId, long outletId) throws InvalidModelException, OutletNotFoundException;
     
     public List<Car> retrieveCars();
 
     public void updateCar(Car c, long outletId, long modelId) throws InvalidModelException, OutletNotFoundException;
 
     public void deleteCar(long carId) throws CarNotFoundException;
+
+    public Car retrieveCarById(long carId) throws CarNotFoundException;
     
 }

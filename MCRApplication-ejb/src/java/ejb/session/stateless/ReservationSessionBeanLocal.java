@@ -10,16 +10,18 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import util.enumeration.ResStatusEnum;
+import util.exception.InvalidReservationException;
 import util.exception.OutletNotFoundException;
+import util.exception.ReservationNotFoundException;
 
 
 public interface ReservationSessionBeanLocal {
 
-    public void updateRes(long resId, ResStatusEnum status);
+    public void updateRes(long resId, ResStatusEnum status)throws ReservationNotFoundException, InvalidReservationException;
 
     public long createMemberReservation(Reservation r, long memberId, long ccNum, long pickupId, long returnId, long categoryId, long modelId) throws OutletNotFoundException;
 
-    public void cancelReservation(long resId);
+    public String cancelReservation(long resId);
 
     public List<Reservation> retrieveReservations(String email);
 
