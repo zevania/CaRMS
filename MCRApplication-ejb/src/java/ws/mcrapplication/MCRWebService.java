@@ -5,7 +5,11 @@
  */
 package ws.mcrapplication;
 
+import ejb.session.stateless.CategorySessionBeanLocal;
+import ejb.session.stateless.ModelSessionBeanLocal;
+import ejb.session.stateless.OutletSessionBeanLocal;
 import ejb.session.stateless.PartnerSessionBeanLocal;
+import ejb.session.stateless.RateSessionBeanLocal;
 import ejb.session.stateless.ReservationSessionBeanLocal;
 import entity.Category;
 import entity.Customer;
@@ -15,6 +19,8 @@ import entity.Partner;
 import entity.Reservation;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Month;
+import java.util.Date;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.jws.WebService;
@@ -26,6 +32,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.enumeration.CategoryNotFoundException;
 import util.enumeration.CustomerTypeEnum;
 import util.enumeration.OrderTypeEnum;
 import util.enumeration.PaidStatusEnum;
@@ -33,6 +40,7 @@ import util.enumeration.ResStatusEnum;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.OutletNotFoundException;
 import util.exception.PartnerNotFoundException;
+import util.exception.RateNotFoundException;
 import util.exception.ReservationNotFoundException;
 
 /**
@@ -44,10 +52,23 @@ import util.exception.ReservationNotFoundException;
 public class MCRWebService {
 
     @EJB
+    private RateSessionBeanLocal rateSessionBean;
+
+    @EJB
+    private OutletSessionBeanLocal outletSessionBean;
+
+    @EJB
+    private ModelSessionBeanLocal modelSessionBean;
+
+    @EJB
+    private CategorySessionBeanLocal categorySessionBean;
+
+    @EJB
     private ReservationSessionBeanLocal reservationSessionBean;
 
     @EJB
     private PartnerSessionBeanLocal partnerSessionBean;
+    
     
     @PersistenceContext(unitName = "MCRApplication-ejbPU")
     private EntityManager em;
@@ -65,8 +86,9 @@ public class MCRWebService {
     @WebMethod(operationName = "partnerSearchCar")
     public boolean doSeacrhCar(@WebParam(name = "searchType") String searchType,@WebParam(name="startDate") 
             LocalDate startDate,@WebParam(name = "endDate")LocalDate endDate, @WebParam(name = "startTime") LocalTime startTime
-            ,@WebParam(name = "endTime")LocalTime endTime, @WebParam(name = "pickUpId")long pickupid,@WebParam(name = "returnId")long returnid,
-            @WebParam(name = "categoryId")long categoryId, @WebParam(name = "modelId")long modelId) throws OutletNotFoundException {
+            ,@WebParam(name = "endTime")LocalTime endTime, @WebParam(name = "pickUpId")long pickupid,
+            @WebParam(name = "returnId")long returnid, @WebParam(name = "categoryId")long categoryId, 
+            @WebParam(name = "modelId")long modelId) throws OutletNotFoundException {
         
         boolean temp = reservationSessionBean.searchAvailableCar(searchType, startDate, endDate, startTime, endTime, pickupid, returnid, categoryId, modelId);
         
@@ -74,9 +96,25 @@ public class MCRWebService {
     }
     
     @WebMethod(operationName = "partnerCreateReservation")
-    public long doCreateReservation(@WebParam(name = "reservation") Reservation r,@WebParam(name = "ccNum") long ccNum, @WebParam(name = "pickUpId") long pickupId,
-            @WebParam(name = "returnId")long returnId, @WebParam(name = "categoryId") long categoryId, @WebParam(name = "modelId") long modelId, @WebParam(name = "custName") String custName
-            ,@WebParam(name = "custEmail")String custEmail) throws OutletNotFoundException {
+    public long doCreateReservation(@WebParam(name = "payRes") Integer payRes, @WebParam(name = "totalAmt") Double totalAmt,
+            @WebParam(name = "startDate") LocalDate startDate, @WebParam(name = "endDate") LocalDate endDate,
+            @WebParam(name = "startTime") LocalTime startTime, @WebParam(name = "endTime") LocalTime endTime,
+            @WebParam(name = "orderTypeRes") Integer orderTypeRes,
+            @WebParam(name = "pickUpId") long pickupId, @WebParam(name = "returnId")long returnId, 
+            @WebParam(name = "categoryId") long categoryId, @WebParam(name = "modelId") long modelId, 
+            @WebParam(name = "custName") String custName, @WebParam(name = "custEmail")String custEmail, 
+            @WebParam(name = "ccNum") long ccNum) throws OutletNotFoundException {
+        
+        PaidStatusEnum payStatus = PaidStatusEnum.UNPAID;
+        if(payRes == 1) {
+            payStatus = PaidStatusEnum.PAID;
+        }
+        OrderTypeEnum orderType = OrderTypeEnum.CATEGORY;
+        if(orderTypeRes == 2) {
+            orderType = OrderTypeEnum.MODEL;
+        }
+        Customer c = new Customer(custName, ccNum, custEmail, CustomerTypeEnum.PARTNER);
+        Reservation r = new Reservation(payStatus, totalAmt, startDate, endDate, startTime, endTime, orderType, c);
         
         Outlet pickupOutlet = em.find(Outlet.class, pickupId);
         Outlet returnOutlet = em.find(Outlet.class, returnId);
@@ -89,10 +127,14 @@ public class MCRWebService {
         pickupOutlet.getPickReservation().add(r);
         r.setReturnLocation(returnOutlet);
         returnOutlet.getReturnReservation().add(r);
-        if(r.getOrderType()== OrderTypeEnum.CATEGORY){
+        
+        if(r.getOrderType()== OrderTypeEnum.CATEGORY)
+        {
             Category category = em.find(Category.class, categoryId);
             r.setCarCategory(category);
-        } else if(r.getOrderType()== OrderTypeEnum.MODEL){
+        } 
+        else if(r.getOrderType()== OrderTypeEnum.MODEL)
+        {
             Model model = em.find(Model.class, modelId);
             r.setCarModel(model);
             Category cat = em.find(Category.class, model.getCategory().getCategoryId());
@@ -105,7 +147,7 @@ public class MCRWebService {
         try{
             cust = (Customer) query.getSingleResult();
         } catch (NoResultException ex) {
-            cust = new Customer(custEmail, ccNum, custEmail, CustomerTypeEnum.PARTNER); 
+            cust = new Customer(custName, ccNum, custEmail, CustomerTypeEnum.PARTNER); 
             em.persist(cust);
         }
         
@@ -145,7 +187,7 @@ public class MCRWebService {
         return r;
     }
     
-    @WebMethod(operationName = "partnerRetrieveReservationById")
+    @WebMethod(operationName = "partnerDoCancelReservation")
     public String doCancelReservation(@WebParam(name = "partnerId") long partnerId, @WebParam(name = "reservationId") long resId ) throws PartnerNotFoundException, ReservationNotFoundException, InvalidRelationIdException {
         
         Reservation r = em.find(Reservation.class, resId);
@@ -204,4 +246,24 @@ public class MCRWebService {
         return reply;
     }
     
+    @WebMethod(operationName = "partnerRetrieveAllCategories")
+    public List<Category> doRetrieveAllCategories() {
+        return categorySessionBean.retrieveAllCategories();
+    }
+    
+    @WebMethod(operationName = "partnerRetrieveAllModels")
+    public List<Model> doRetrieveAllModels() {
+        return modelSessionBean.retrieveModels();
+    }
+    
+    @WebMethod(operationName = "partnerRetrieveAllOutlets")
+    public List<Outlet> doRetrieveAllOutlets() {
+        return outletSessionBean.retrieveAllOutlets();
+    }
+    
+    @WebMethod(operationName = "partnerRetrieveTotalByCategory")
+    public double doRetrieveTotalByCategory(@WebParam(name = "catId") long catId, 
+            @WebParam(name = "startDate") LocalDate startDate, @WebParam(name = "endDate") LocalDate endDate) throws CategoryNotFoundException, RateNotFoundException {
+        return rateSessionBean.retrieveTotalByCategory(catId, startDate, endDate);
+    }
 }

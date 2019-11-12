@@ -8,15 +8,25 @@ package holidayreservationclient;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.datatype.XMLGregorianCalendar;
+import ws.client.Category;
+import ws.client.CategoryNotFoundException_Exception;
 import ws.client.InvalidLoginCredentialException;
 import ws.client.InvalidLoginCredentialException_Exception;
+import ws.client.InvalidRelationIdException_Exception;
+import ws.client.Model;
+import ws.client.Outlet;
 import ws.client.OutletNotFoundException_Exception;
 import ws.client.Partner;
 import ws.client.PartnerNotFoundException_Exception;
+import ws.client.RateNotFoundException_Exception;
+import ws.client.Reservation;
+import ws.client.ReservationNotFoundException_Exception;
 
 /**
  *
@@ -152,7 +162,8 @@ public class HolidayReservationClient {
 
         System.out.println("*** Holiday Reservation System :: Search Car ***\n");
         
-        OrderTypeEnum searchType = OrderTypeEnum.CATEGORY;
+        String searchType = "";
+        Integer orderRes = 1;
         Long categoryId = 0l;
         Long modelId = 0l;
         
@@ -166,25 +177,21 @@ public class HolidayReservationClient {
         System.out.print("Enter return time (HH:mm) > ");
         LocalTime endTime = LocalTime.parse(scanner.nextLine().trim(), timeFormatter);
         
-        List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
-        System.out.printf("%5s%20s%20s%15s%15s\n", "No", "Name", "Addres", "Open Hrs", "Close Hrs");
+        List<Outlet> outlets = partnerRetrieveAllOutlets();
+        System.out.printf("%10s%20s%20s%15s%15s\n", "Outlet ID", "Name", "Addres", "Open Hrs", "Close Hrs");
         int i = 1;
         for(Outlet o : outlets) {
-            LocalTime open = o.getOpenHrs();
-            String openTime = open.format(timeFormatter);
-            LocalTime close = o.getCloseHrs();
-            String closeTime = close.format(timeFormatter);
-            System.out.printf("%10s%20s%20s%15s%15s\n", i, o.getName(), o.getAddress(), openTime, closeTime);
+            ws.client.LocalTime open = o.getOpenHrs();
+            ws.client.LocalTime close = o.getCloseHrs();
+            System.out.printf("%10s%20s%20s%15s%15s\n", o.getOutletId(), o.getName(), o.getAddress(), open, close);
             i++;
         }
         System.out.println();
         
-        System.out.print("Enter pickup outlet no > ");
-        int pickupNo = scanner.nextInt();
-        Outlet pickupLocation = outlets.get(pickupNo - 1);
-        System.out.print("Enter return outlet no > ");
-        int returnNo = scanner.nextInt();
-        Outlet returnLocation = outlets.get(returnNo - 1);
+        System.out.print("Enter pickup outlet id > ");
+        int pickupId = scanner.nextInt();
+        System.out.print("Enter return outlet id > ");
+        int returnId = scanner.nextInt();
         boolean success = false;
         String yesNo = "";
         double total = 0;
@@ -201,9 +208,9 @@ public class HolidayReservationClient {
             {
                 if(response == 1) 
                 {
-                    searchType = OrderTypeEnum.CATEGORY;
+                    searchType = "category";
                     System.out.printf("%10s%20s\n", "Category Id", "Category Name");
-                    for(Category c : categorySessionBeanRemote.retrieveAllCategories()) {
+                    for(Category c : partnerRetrieveAllCategories()) {
                         System.out.printf("%10s%20s\n", c.getCategoryId(), c.getCategoryName());
                     }
                     System.out.print("Enter category id: ");
@@ -212,9 +219,10 @@ public class HolidayReservationClient {
                 } 
                 else if(response == 2) 
                 {
-                    searchType = OrderTypeEnum.MODEL;
+                    searchType = "model";
+                    orderRes = 2;
                     System.out.printf("%10s%10s%20s\n", "Model Id", "Make", "Model");
-                    for(Model m : modelSessionBeanRemote.retrieveModels()) {
+                    for(Model m : partnerRetrieveAllModels()) {
                         System.out.printf("%10s%10s%20s\n", m.getModelId(), m.getMake(), m.getModelName());
                     }
                     System.out.print("Enter model id: ");
@@ -223,23 +231,24 @@ public class HolidayReservationClient {
                 
                 try
                 {
-                    success = partnerSearchCar(searchType.toString(), startDate, endDate, startTime, endTime, pickupNo, returnNo, categoryId, modelId);
+                    success = partnerSearchCar(searchType, startDate, endDate, 
+                            startTime, endTime, pickupId, returnId, categoryId, modelId);
                     try {
-                        total = rateSessionBeanRemote.retrieveTotalByCategory(categoryId, startDate, endDate);
+                        total = partnerRetrieveTotalByCategory(categoryId, startDate, endDate);
                         System.out.println("Total rental rate: $" + total);
                     } 
-                    catch (CategoryNotFoundException ex) 
+                    catch (CategoryNotFoundException_Exception ex) 
                     {
                         System.out.println("An error occurred while retrieving rental rate: Car Category Not Found!");
                         return;
                     } 
-                    catch (RateNotFoundException ex) 
+                    catch (RateNotFoundException_Exception ex) 
                     {
                         System.out.println("An error occurred while retrieving rental rate: Rental Rate Not Found!");
                         return;
                     }
                 }
-                catch(OutletNotFoundException ex)
+                catch(OutletNotFoundException_Exception ex)
                 {
                     System.out.println("Invalid input! Outlet not found");
                     return;
@@ -272,25 +281,44 @@ public class HolidayReservationClient {
 
             if(response == 1)
             {
+                    System.out.print("Enter customer name: ");
+                    String custName = scanner.nextLine().trim();
+                    System.out.print("Enter customer email: ");
+                    String email = scanner.nextLine().trim();
                     System.out.print("Enter credit card number: ");
                     Long ccNum = scanner.nextLong();
                     
-                    Customer customer = new Customer(currentMember.getName(), ccNum, currentMember.getEmail(), CustomerTypeEnum.MEMBER);
-                    Reservation r = new Reservation(PaidStatusEnum.PAID, total, startDate, endDate, startTime, endTime, OrderTypeEnum.CATEGORY, customer);
-                    r.setPickupLocation(pickupLocation);
-                    r.setReturnLocation(returnLocation);
+                    Integer payRes;
+                    
+                    while(true) {
+                        System.out.println("Select Payment Method:");
+                        System.out.println("1. Pay Now");
+                        System.out.println("2. Pay Later at pick up time");
+                        System.out.print("> ");
+                        payRes = scanner.nextInt();
+                        
+                        if(payRes >= 1 && payRes <= 2) 
+                        {
+                            if(payRes == 1) 
+                            {
+                                System.out.println("Payment Successful!");
+                            }
+                            break;
+                        }
+                        else
+                        {
+                            System.out.println("Invalid option, please try again!\n");
+                        }
+                    }
                 
                     long theId = 0;
                     try
                     {
-                        try {
-                            theId = reservationSessionBeanRemote.createMemberReservation(r, currentMember.getMemberId(), ccNum, pickupNo, returnNo, categoryId, modelId);
-                        } catch (MemberNotFoundException ex) {
-                            System.out.println("Member not found!");
-                            return;
-                        }
+                        theId = partnerCreateReservation(payRes, total, startDate, endDate, startTime, endTime, 
+                                orderRes, pickupNo, returnNo, categoryId, modelId, custName, email, ccNum);
+                        
                     }
-                    catch(OutletNotFoundException ex)
+                    catch(OutletNotFoundException_Exception ex)
                     {
                         System.out.println("Invalid input. Outlet not found!");
                         return;
@@ -320,9 +348,54 @@ public class HolidayReservationClient {
         ws.client.MCRWebService port = service.getMCRWebServicePort();
         return port.partnerSearchCar(searchType, startDate, endDate, startTime, endTime, pickUpId, returnId, categoryId, modelId);
     }
-    
-    
-    
+
+    private static long partnerCreateReservation(java.lang.Integer payRes, java.lang.Double totalAmt, ws.client.LocalDate startDate, ws.client.LocalDate endDate, ws.client.LocalTime startTime, ws.client.LocalTime endTime, java.lang.Integer orderTypeRes, long pickUpId, long returnId, long categoryId, long modelId, java.lang.String custName, java.lang.String custEmail, long ccNum) throws OutletNotFoundException_Exception {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerCreateReservation(payRes, totalAmt, startDate, endDate, startTime, endTime, orderTypeRes, pickUpId, returnId, categoryId, modelId, custName, custEmail, ccNum);
+    }
+
+    private static Reservation partnerRetrieveReservationById(long partnerId, long reservationId) throws PartnerNotFoundException_Exception, ReservationNotFoundException_Exception, InvalidRelationIdException_Exception {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerRetrieveReservationById(partnerId, reservationId);
+    }
+
+    private static java.util.List<ws.client.Reservation> partnerRetrieveAllReservations(long partnerId) throws PartnerNotFoundException_Exception {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerRetrieveAllReservations(partnerId);
+    }
+
+    private static String partnerDoCancelReservation(long partnerId, long reservationId) throws PartnerNotFoundException_Exception, ReservationNotFoundException_Exception, InvalidRelationIdException_Exception {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerDoCancelReservation(partnerId, reservationId);
+    }
+
+    private static java.util.List<ws.client.Category> partnerRetrieveAllCategories() {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerRetrieveAllCategories();
+    }
+
+    private static java.util.List<ws.client.Model> partnerRetrieveAllModels() {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerRetrieveAllModels();
+    }
+
+    private static java.util.List<ws.client.Outlet> partnerRetrieveAllOutlets() {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerRetrieveAllOutlets();
+    }
+
+    private static double partnerRetrieveTotalByCategory(long catId, ws.client.LocalDate startDate, ws.client.LocalDate endDate) throws CategoryNotFoundException_Exception, RateNotFoundException_Exception {
+        ws.client.MCRWebService_Service service = new ws.client.MCRWebService_Service();
+        ws.client.MCRWebService port = service.getMCRWebServicePort();
+        return port.partnerRetrieveTotalByCategory(catId, startDate, endDate);
+    }
     
 }
 

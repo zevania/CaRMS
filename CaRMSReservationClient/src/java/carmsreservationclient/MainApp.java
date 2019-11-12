@@ -355,9 +355,32 @@ public class MainApp {
             {
                     System.out.print("Enter credit card number: ");
                     Long ccNum = scanner.nextLong();
+                    PaidStatusEnum payStatus = PaidStatusEnum.UNPAID;
+                    
+                    while(true) {
+                        System.out.println("Select Payment Method:");
+                        System.out.println("1. Pay Now");
+                        System.out.println("2. Pay Later at pick up time");
+                        System.out.print("> ");
+                        Integer payRes = scanner.nextInt();
+                        
+                        if(payRes >= 1 && payRes <= 2) 
+                        {
+                            if(payRes == 1) 
+                            {
+                                System.out.println("Payment Successful!");
+                                payStatus = PaidStatusEnum.PAID;
+                            }
+                            break;
+                        }
+                        else
+                        {
+                            System.out.println("Invalid option, please try again!\n");
+                        }
+                    }
                     
                     Customer customer = new Customer(currentMember.getName(), ccNum, currentMember.getEmail(), CustomerTypeEnum.MEMBER);
-                    Reservation r = new Reservation(PaidStatusEnum.PAID, total, startDate, endDate, startTime, endTime, OrderTypeEnum.CATEGORY, customer);
+                    Reservation r = new Reservation(payStatus, total, startDate, endDate, startTime, endTime, OrderTypeEnum.CATEGORY, customer);
                     r.setPickupLocation(pickupLocation);
                     r.setReturnLocation(returnLocation);
                 
@@ -374,7 +397,6 @@ public class MainApp {
                     catch(MemberNotFoundException ex) 
                     {
                         System.out.println("Member not found!");
-                        return;
                     }
                     System.out.println("Reservation successful! The id is "+theId);
             }
