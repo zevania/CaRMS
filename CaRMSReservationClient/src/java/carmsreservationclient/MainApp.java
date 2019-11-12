@@ -29,6 +29,7 @@ import util.exception.MemberEmailExistException;
 import util.exception.OutletNotFoundException;
 import util.exception.RateNotFoundException;
 import util.exception.IncompleteRegistrationDetailsException;
+import util.exception.MemberNotFoundException;
 
 
 public class MainApp {
@@ -375,6 +376,11 @@ public class MainApp {
                     catch(OutletNotFoundException ex)
                     {
                         System.out.println("Invalid input. Outlet not found!");
+                        return;
+                    }
+                    catch(MemberNotFoundException ex)
+                    {
+                        System.out.println("Member Not Found!");
                         return;
                     }
                     System.out.println("Reservation successful! The id is "+theId);

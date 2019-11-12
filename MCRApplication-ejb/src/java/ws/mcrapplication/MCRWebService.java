@@ -145,7 +145,7 @@ public class MCRWebService {
         return r;
     }
     
-    @WebMethod(operationName = "partnerRetrieveReservationById")
+    @WebMethod(operationName = "partnerDoCancelReservation")
     public String doCancelReservation(@WebParam(name = "partnerId") long partnerId, @WebParam(name = "reservationId") long resId ) throws PartnerNotFoundException, ReservationNotFoundException, InvalidRelationIdException {
         
         Reservation r = em.find(Reservation.class, resId);
