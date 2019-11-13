@@ -390,12 +390,23 @@ public class MainApp {
                 else if(response == 2) 
                 {
                     searchType = OrderTypeEnum.MODEL;
-                    System.out.printf("%10s%10s%20s\n", "Model Id", "Make", "Model");
-                    for(Model m : partnerRetrieveAllModels()) {
-                        System.out.printf("%10s%10s%20s\n", m.getModelId(), m.getMake(), m.getModelName());
+                    System.out.printf("%10s%20s\n", "Make", "Model");
+                    List<Model> models = partnerRetrieveAllModels();
+                    int counter = 1;
+                    for(Model m : models) {
+                        System.out.print(counter + " ");
+                        System.out.printf("%10s%20s\n", m.getMake(), m.getModelName());
+                        counter++;
                     }
-                    System.out.print("Enter model id: ");
-                    modelId = scanner.nextLong();
+                    System.out.print("Enter your choice: ");
+                    int choice = scanner.nextInt();
+                    
+                    if(choice<1 || choice>=counter){
+                        System.out.println("Invalid choice");
+                        return;
+                    }
+                    modelId = models.get(choice-1).getModelId();
+                    categoryId = models.get(choice-1).getCategory().getCategoryId();
                     scanner.nextLine();
                 }
                 
@@ -480,6 +491,9 @@ public class MainApp {
                                 {
                                     System.out.println("Payment Successful!");
                                     payStatus = PaidStatusEnum.PAID;
+                                } else if(payRes == 2){
+                                    System.out.println("Payment is defferred");
+                                    payStatus = PaidStatusEnum.PAID;
                                 }
                                 break;
                             }
@@ -501,7 +515,8 @@ public class MainApp {
                         res.setTotal(total);
                         res.setPickupLocation(pickupLocation);
                         res.setReturnLocation(returnLocation);
-
+                        res.setResStatus(ResStatusEnum.ORDERED);
+                        
                         long theId = 0;
                         try
                         {
@@ -513,6 +528,7 @@ public class MainApp {
                             return;
                         }
                         System.out.println("Reservation successful! The id is "+theId);
+                        break;
                 }
             }
             }
@@ -600,6 +616,7 @@ public class MainApp {
                     }
                         System.out.println(reply);
                 }
+                break;
             }
             else 
             {
@@ -609,6 +626,8 @@ public class MainApp {
     }
     
     private void doViewAllRes(){
+        Scanner sc = new Scanner(System.in);
+        
         System.out.println("*** Holiday Reservation Client :: View All My Reservations ***\n");
         List<Reservation> res = new ArrayList<>();
         try {
@@ -641,6 +660,8 @@ public class MainApp {
             System.out.printf("%8s%20s%20s%20s%20s\n", r.getReservationId(), startDate, endDate, r.getResStatus(), r.getPaymentStatus());
         }
         System.out.println();
+        System.out.println("Press enter to continue!");
+        sc.nextLine();
     }
     
     private static Partner partnerLogin(java.lang.String email, java.lang.String password) throws InvalidLoginCredentialException_Exception, PartnerNotFoundException_Exception {

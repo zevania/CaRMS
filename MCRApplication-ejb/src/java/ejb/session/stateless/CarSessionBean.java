@@ -100,7 +100,6 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
         Car c = em.find(Car.class, carId);
         
         if(c==null) throw new CarNotFoundException();
-        if(!c.isActive()) throw new CarNotFoundException();
         
         return c;
     }

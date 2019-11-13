@@ -75,8 +75,7 @@ public class Reservation implements Serializable {
     @JoinColumn(nullable = false)
     private Outlet returnLocation;
     
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(nullable = false)
+    @OneToOne
     private Customer customer;
     
     @ManyToOne

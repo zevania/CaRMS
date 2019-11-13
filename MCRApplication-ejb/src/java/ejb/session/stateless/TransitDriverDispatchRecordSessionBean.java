@@ -84,7 +84,7 @@ public class TransitDriverDispatchRecordSessionBean implements TransitDriverDisp
     public List<DriverDispatchRecord> retrieveDispatchRecords(long outletId, Date date) {
         Outlet o = em.find(Outlet.class, outletId);
         
-        Query query = em.createQuery("SELECT ddr FROM DriverDispatchRecord ddr WHERE ddr.outlet.outletId = :theOutlet AND ddr.dispatchDate = :theDate")
+        Query query = em.createQuery("SELECT ddr FROM DriverDispatchRecord ddr WHERE ddr.outlet.outletId = :theOutlet AND ddr.dispatchDate = :theDate AND ddr.dispatchStatus = util.enumeration.DispatchStatusEnum.NOTCOMPLETED")
                     .setParameter("theDate", date)
                     .setParameter("theOutlet",outletId);
         List<DriverDispatchRecord> theList = query.getResultList();

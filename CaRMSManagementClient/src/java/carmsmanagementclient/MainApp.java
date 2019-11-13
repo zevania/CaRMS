@@ -764,9 +764,9 @@ public class MainApp {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Management Client :: View All Models ***\n");
         List<Model> models = modelSessionBean.retrieveModels();
-        System.out.printf("%8s%40s\n", "Model Id", "Name");
+        System.out.printf("%8s%20s%20s%20s\n", "Model Id", "Name", "Make", "Category");
         for(Model m : models) {
-            System.out.printf("%8s%40s\n", m.getModelId(), m.getModelName());
+            System.out.printf("%8s%20s%20s%20s\n", m.getModelId(), m.getModelName(), m.getMake(), m.getCategory().getCategoryName());
         }
         System.out.println();
         
@@ -801,7 +801,7 @@ public class MainApp {
         long catId = model.getCategory().getCategoryId();
         
         if(yesno.equals("y")){
-            System.out.print("Enter the new category id");
+            System.out.print("Enter the new category id: ");
             catId = sc.nextLong();
             sc.nextLine();
         }
@@ -966,9 +966,11 @@ public class MainApp {
             sc.nextLine();
             if(statusNum == 1){
                 carStatus = CarStatusEnum.OUTLET;
+                car.setActive(true);
                 break;
             }else if(statusNum == 2){
                 carStatus = CarStatusEnum.ONRENTAL;
+                car.setActive(true);
                 break;
             } else if(statusNum == 3){
                 carStatus = CarStatusEnum.REPAIR;
@@ -984,7 +986,7 @@ public class MainApp {
         long modelId = car.getModel().getModelId();
         
         while(true){
-            System.out.println("Do you want to update the model? (y/n)");
+            System.out.println("Do you want to update the Model? (y/n)");
             System.out.print("> ");
             yesno = sc.nextLine().trim().toLowerCase();
             
@@ -1005,7 +1007,7 @@ public class MainApp {
         long outletId = car.getOutlet().getOutletId();
         
         while(true){
-            System.out.println("Do you want to update the outlet? (y/n)");
+            System.out.println("Do you want to update the OUTLET? (y/n)");
             System.out.print("> ");
             yesno = sc.nextLine().trim().toLowerCase();
             
@@ -1091,6 +1093,13 @@ public class MainApp {
         Scanner sc = new Scanner(System.in);
         
         System.out.println("*** CaRMS Management Client :: Assign TDR Driver ***\n");
+        
+        List<DriverDispatchRecord> ddrs = transitDriverDispatchRecordSessionBean.retrieveDispatchRecords(currEmployee.getOutlet().getOutletId(), Calendar.getInstance().getTime());
+        
+        if(ddrs.size() == 0){
+            System.out.println("There is no driver dispatch record for today!");
+            return;
+        }
         
         List<Employee> employees = employeeSessionBean.retrieveEmployees(currEmployee.getOutlet().getOutletId());
         

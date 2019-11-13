@@ -356,6 +356,8 @@ public class MainApp {
         String yesNo = "";
         double total = 0;
         
+        OrderTypeEnum otype = OrderTypeEnum.CATEGORY;
+        
         do
         {   
             total = 0;
@@ -383,15 +385,28 @@ public class MainApp {
                 else if(response == 2) 
                 {
                     searchType = OrderTypeEnum.MODEL;
-                    System.out.printf("%10s%10s%20s\n", "Model Id", "Make", "Model");
-                    for(Model m : modelSessionBeanRemote.retrieveModels()) {
-                        System.out.printf("%10s%10s%20s\n", m.getModelId(), m.getMake(), m.getModelName());
+                    System.out.printf("%10s%20s\n", "Make", "Model");
+                    List<Model> models = modelSessionBeanRemote.retrieveModels();
+                    int counter = 1;
+                    for(Model m : models) {
+                        System.out.print(counter+" ");
+                        System.out.printf("%10s%20s\n", m.getMake(), m.getModelName());
+                        counter++;
                     }
-                    System.out.print("Enter model id: ");
-                    modelId = scanner.nextLong();
+                    System.out.print("Enter your choice: ");
+                    int choice = scanner.nextInt();
+                    
+                    if(choice<1 || choice>=counter){
+                        System.out.println("Invalid choice");
+                        return;
+                    }
+                    otype = OrderTypeEnum.MODEL;
+                    modelId = models.get(choice-1).getModelId();
+                    categoryId = models.get(choice-1).getCategory().getCategoryId();
                     scanner.nextLine();
                 }
                 
+               
                 try
                 {
                     success = reservationSessionBeanRemote.searchAvailableCar(searchType.toString(), startDate, 
@@ -480,7 +495,8 @@ public class MainApp {
                         }
 
                         Customer customer = new Customer(currentMember.getName(), ccNum, currentMember.getEmail(), CustomerTypeEnum.MEMBER);
-                        Reservation r = new Reservation(payStatus, total, startDate, endDate, startTime, endTime, OrderTypeEnum.CATEGORY, customer);
+                        
+                        Reservation r = new Reservation(payStatus, total, startDate, endDate, startTime, endTime, otype, customer);
                         r.setPickupLocation(pickupLocation);
                         r.setReturnLocation(returnLocation);
 
@@ -556,6 +572,7 @@ public class MainApp {
                     String reply = reservationSessionBeanRemote.cancelReservation(id);
                     System.out.println(reply);
                 }
+                break;
             }
             else 
             {
@@ -566,6 +583,7 @@ public class MainApp {
     }
     
     private void doViewAllRes() {
+        Scanner sc = new Scanner(System.in);
         
         System.out.println("*** CaRMS Reservation Client :: View All My Reservations ***\n");
         List<Reservation> res = reservationSessionBeanRemote.retrieveReservations(currentMember.getEmail());
@@ -582,5 +600,7 @@ public class MainApp {
             System.out.printf("%8s%20s%20s%20s%20s\n", r.getReservationId(), startDate, endDate, r.getResStatus(), r.getPaymentStatus());
         }
         System.out.println();
+        System.out.println("Press enter to continue");
+        sc.nextLine();
     }
 }

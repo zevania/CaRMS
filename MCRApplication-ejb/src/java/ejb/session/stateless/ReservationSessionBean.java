@@ -108,33 +108,38 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         }
         
         String email = member.getEmail();
-        Query query = em.createQuery("SELECT c FROM Customer c WHERE c.email LIKE :theEmail")
-                .setParameter("theEmail", email);
-        Customer cust;
-        try{
-           // cust = (Customer) query.getSingleResult();
-           throw new NoResultException();
-        } catch (NoResultException ex) {
-            cust = new Customer(member.getName(), ccNum, member.getEmail(), CustomerTypeEnum.MEMBER); 
-            
-        }
+//        System.out.println("asd"+email);
+//        Query query = em.createQuery("SELECT c FROM Customer c WHERE c.email = :theEmail")
+//                .setParameter("theEmail", email);
+
+        Customer cust = new Customer(member.getName(), ccNum, email, CustomerTypeEnum.MEMBER);
+        
+//        List<Customer> abc = query.getResultList();
+//        for(Customer asd:abc){
+//            System.out.println(asd.getEmail()+" "+asd.getCustId());
+//        }
+//        try{
+//           cust = (Customer) query.getSingleResult(); 
+//        } catch (NoResultException ex) {
+//            cust = new Customer(member.getName(), ccNum, member.getEmail(), CustomerTypeEnum.MEMBER); 
+//            em.persist(cust);
+//        }
         
 
         r.setCustomer(cust);
         
-        cust.getReservations().add(r);
+        //cust.getReservations().add(r);
+        //em.persist(cust);
+        em.persist(r);
         em.persist(cust);
         em.flush();
         
         
-        
+        //return 0;
         return r.getReservationId();
     }
     
-    private void createCust(Customer c){
-        em.persist(c);
-        em.flush();
-    }
+    
 
     @Override
     public String cancelReservation(long resId) {
@@ -237,6 +242,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         
         
         System.out.println("the type"+ searchType);
+        System.out.println("the model id"+ modelId);
         if(searchType.equals("category")){
             query = em.createQuery("SELECT c FROM Car c WHERE c.model.category.categoryId = :catId AND c.active = TRUE")
                     .setParameter("catId", categoryId);
@@ -303,7 +309,9 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     .setParameter("modId", modelId);
             totalCar = query.getResultList().size();
             
-            query = em.createQuery("SELECT r FROM Reservation r WHERE r.carModel.modelId = :inMod AND r.pickupDate <= :inStartDate AND r.pickupDate <= :inEndDate")
+            System.out.println("how mana yo"+totalCar);
+            
+            query = em.createQuery("SELECT r FROM Reservation r WHERE r.carModel.modelId = :inMod AND r.pickupDate >= :inStartDate AND r.pickupDate <= :inEndDate")
                     .setParameter("inMod", modelId)
                     .setParameter("inEndDate", endDate)
                     .setParameter("inStartDate", startDate);
@@ -516,7 +524,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation IS NULL AND c.active = TRUE");
+            query = em.createQuery("SELECT c FROM Car c WHERE c.active = TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){
@@ -613,7 +621,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation IS NOT NULL AND c.reservation.returnLocation.outletId LIKE :store AND c.active = TRUE")
+            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation IS NOT NULL AND c.reservation.returnLocation.outletId = :store AND c.active = TRUE")
                     .setParameter("store",theStoreId);
             cars = query.getResultList();
             
@@ -642,9 +650,9 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation IS NULL AND c.active = TRUE");
+            query = em.createQuery("SELECT c FROM Car c WHERE c.active = TRUE");
             cars = query.getResultList();
-            
+            System.out.println("Jumlah mobil sini is "+cars.size());
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
                 for(int k = 0; k < cars.size();k++){

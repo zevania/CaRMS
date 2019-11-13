@@ -107,6 +107,8 @@ public class MCRWebService {
         
         Partner p = em.find(Partner.class, partnerId);
         
+        em.persist(r);
+        
         r.setPickupLocation(pickupOutlet);
         pickupOutlet.getPickReservation().add(r);
         r.setReturnLocation(returnOutlet);
@@ -121,24 +123,25 @@ public class MCRWebService {
             r.setCarCategory(cat);
         }
         
-        Query query = em.createQuery("SELECT c FROM Customer c WHERE c.email LIKE :theEmail")
-                .setParameter("theEmail", custEmail);
-        Customer cust;
-        try{
-            cust = (Customer) query.getSingleResult();
-        } catch (NoResultException ex) {
-            cust = new Customer(custEmail, ccNum, custEmail, CustomerTypeEnum.PARTNER); 
-            em.persist(cust);
-        }
+//        Query query = em.createQuery("SELECT c FROM Customer c WHERE c.email LIKE :theEmail")
+//                .setParameter("theEmail", custEmail);
+        Customer cust = new Customer(custName, ccNum, custEmail, CustomerTypeEnum.PARTNER);
+        em.persist(cust);
+        em.flush();
         
-        r.setCustomer(cust);
-        cust.getReservations().add(r);
-        
+//        try{
+//            cust = (Customer) query.getSingleResult();
+//        } catch (NoResultException ex) {
+//            cust = new Customer(custEmail, ccNum, custEmail, CustomerTypeEnum.PARTNER); 
+//            
+//        }
+//        
+//        r.setCustomer(cust);
+//        cust.getReservations().add(r);
+//        
         p.getReservations().add(r);
         r.setPartner(p);
         
-        em.persist(r);
-        em.flush();
         
         return r.getReservationId();
     }

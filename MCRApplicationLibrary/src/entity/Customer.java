@@ -42,10 +42,9 @@ public class Customer implements Serializable {
     private String email;
     @Enumerated(EnumType.STRING)
     private CustomerTypeEnum customerType;
-    
-    
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.PERSIST)
-    private List<Reservation> reservations = new ArrayList<>();
+        
+    @OneToOne(mappedBy = "customer")
+    private Reservation reservation;
     
     public Customer() {
     }
@@ -57,9 +56,6 @@ public class Customer implements Serializable {
         this.customerType = customerType;
     }
 
-    public List<Reservation> getReservations() {
-        return reservations;
-    }
     
     public void setName(String name) {
         this.name = name;

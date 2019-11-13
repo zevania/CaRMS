@@ -76,8 +76,9 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     }
     
     @Override
-    public Model retrieveModelById(long modelId){
+    public Model retrieveModelById(long modelId) {
         Model m = em.find(Model.class, modelId);
+       
         return m;
     }
     
