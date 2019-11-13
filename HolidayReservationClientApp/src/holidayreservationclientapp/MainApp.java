@@ -272,6 +272,7 @@ public class MainApp {
             c.setTime(endDate);
             xmlReturnDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
             res.setReturnDate(xmlReturnDate);
+           
         } catch (DateTimeParseException ex){
             System.out.println("Invalid return date!");
             return;
@@ -403,7 +404,7 @@ public class MainApp {
                     success = partnerSearchCar(searchType.toString(), xmlStartDate, xmlReturnDate, xmlStartTime, xmlEndTime, pickupId, returnId, categoryId, modelId);
                     try 
                     {
-                        total = partnerRetrieveTotalByCategory(categoryId, xmlStartDate, xmlEndTime);
+                        total = partnerRetrieveTotalByCategory(categoryId, xmlStartDate, xmlReturnDate);
                         System.out.println("Total rental rate: $" + total);
                     } 
                     catch (CategoryNotFoundException_Exception ex) 
