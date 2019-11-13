@@ -88,10 +88,11 @@ public class MainApp {
         {
             System.out.println("*** Welcome to CaRMS Management Client  ***\n");
             System.out.println("1: Log in");
-            System.out.println("2: Exit\n");
+            System.out.println("2: Manual trigger allocate cars");
+            System.out.println("3: Exit\n");
             response = 0;
             
-            while(response < 1 || response > 2)
+            while(response < 1 || response > 3)
             {
                 System.out.print("> ");
 
@@ -119,9 +120,36 @@ public class MainApp {
                         System.out.println("Invalid login credential: " + ex.getMessage() + "\n");
                     }
                 }
-                else if (response == 2)
+                else if (response == 3)
                 {
                     break;
+                } else if (response==2){
+                    System.out.println();
+                    System.out.println("=============================");
+                    System.out.println("Manual Trigger Car Allocation");
+                    System.out.println("=============================\n");
+                    
+                    String inDate;
+                    Date theDate;
+                    System.out.print("Enter the start date (yyyy-mm-dd): ");
+                    inDate = scanner.nextLine().trim();
+                    
+                    try{
+                        theDate = new SimpleDateFormat("yyyy-MM-dd").parse(inDate);
+                        theDate.setHours(2);
+                        theDate.setMinutes(0);
+                        theDate.setSeconds(0);
+                        reservationSessionBean.manualAllocateCars(theDate);
+                    } catch (DateTimeParseException ex){
+                        System.out.println("Invalid start date!");
+                        break;
+                    } catch (ParseException ex) {
+                        System.out.println("Date input is invalid!");
+                        System.out.println("[Access Denied]");
+                        break;
+                    }
+                    
+                    
                 }
                 else
                 {
@@ -129,7 +157,7 @@ public class MainApp {
                 }
             }
             
-            if(response == 2){
+            if(response == 3){
                 break;
             }
         }

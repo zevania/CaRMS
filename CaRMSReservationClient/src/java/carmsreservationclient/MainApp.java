@@ -308,7 +308,8 @@ public class MainApp {
         double total = 0;
         
         do
-        {
+        {   
+            total = 0;
             System.out.println("Search Car By: ");
             System.out.println("1: Category");
             System.out.println("2: Model\n");
@@ -372,7 +373,7 @@ public class MainApp {
                     break;
                 } 
                 else 
-                {
+                {   total = 0;
                     System.out.println("No available car matches the searching criteria");
                     System.out.print("Do you want to search again? Y/N > ");
                     yesNo = scanner.nextLine().trim().toUpperCase();

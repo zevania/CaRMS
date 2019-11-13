@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
+//import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Scanner;
@@ -25,6 +25,7 @@ import ws.client.InvalidLoginCredentialException;
 import ws.client.InvalidLoginCredentialException_Exception;
 import ws.client.InvalidRelationIdException_Exception;
 import ws.client.Model;
+import ws.client.ObjectFactory;
 import ws.client.OrderTypeEnum;
 import ws.client.Outlet;
 import ws.client.OutletNotFoundException_Exception;
@@ -49,9 +50,13 @@ public class MainApp {
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
         
+        
+        
+        
+        
         while(true)
         {
-            System.out.println("*** Welcome to CaRMS Management Client  ***\n");
+            System.out.println("*** Welcome to Holiday Reservation Client  ***\n");
             System.out.println("1: Log in");
             System.out.println("2: Exit\n");
             response = 0;
@@ -197,6 +202,11 @@ public class MainApp {
         System.out.print("Enter the start date (yyyy-mm-dd): ");
         String inStartDate = scanner.nextLine().trim();
         
+        Reservation lolita = new Reservation();
+        Time nitea = new Time();
+        nitea.setTime(0);
+       lolita.setPickupTime(value);
+        
         Date startDate = new Date(0,0,0);
         
         try{
@@ -212,7 +222,8 @@ public class MainApp {
         
         System.out.print("Enter pickup hour (0-23) : ");
         int time = scanner.nextInt();
-        Time startTime = new Time(21, 0, 0);
+        Time a = new Time();
+        Date
         
         System.out.print("Enter the start date (yyyy-mm-dd): ");
         String inEndDate = scanner.nextLine().trim();
@@ -230,17 +241,19 @@ public class MainApp {
             return;
         }
         
+        
+        
         System.out.print("Enter return hour (0-23) > ");
         time = scanner.nextInt();
-        Time endTime = new Time(time,0,0);
+        //Time endTime = new Time(time,0,0);
         
         
         List<Outlet> outlets = partnerRetrieveAllOutlets();
         System.out.printf("%5s%20s%20s%15s%15s\n", "No", "Name", "Addres", "Open Hrs", "Close Hrs");
         int i = 1;
         for(Outlet o : outlets) {
-            ws.client.Time open = o.getOpenHrs();
-            ws.client.Time close = o.getCloseHrs();
+            Time open = o.getOpenHrs();
+            Time close = o.getCloseHrs();
             System.out.printf("%10s%20s%20s%15s%15s\n", i, o.getName(), o.getAddress(), open, close);
             i++;
         }
@@ -296,8 +309,9 @@ public class MainApp {
                     c.setTime(endDate);
                     XMLGregorianCalendar xmlEndDate = DatatypeFactory.newInstance().newXMLGregorianCalendar(c);
                     
+                    Time lol = objfac.createTime();
                     
-                    success = partnerSearchCar(searchType.toString(), xmlStartDate, xmlEndDate, startTime, endTime, pickupNo, returnNo, categoryId, modelId);
+                    success = partnerSearchCar(searchType.toString(), xmlStartDate, xmlEndDate, startTime, lol, pickupNo, returnNo, categoryId, modelId);
                     try {
                         total = rateSessionBeanRemote.retrieveTotalByCategory(categoryId, startDate, endDate);
                         System.out.println("Total rental rate: $" + total);

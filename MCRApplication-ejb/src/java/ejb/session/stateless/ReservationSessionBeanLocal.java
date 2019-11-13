@@ -30,4 +30,6 @@ public interface ReservationSessionBeanLocal {
 
     public Reservation retrieveReservationById(long resId);
 
+    public void manualAllocateCars(Date date);
+
 }
