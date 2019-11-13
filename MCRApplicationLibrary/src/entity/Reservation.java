@@ -39,12 +39,16 @@ public class Reservation implements Serializable {
     @Column(nullable = false)
     private Double total;
     @Column(nullable = false)
+    @Temporal(javax.persistence.TemporalType.DATE)
     private Date pickupDate;
     @Column(nullable = false)
+    @Temporal(javax.persistence.TemporalType.DATE)
     private Date returnDate;
     @Column(nullable = false)
+    @Temporal(javax.persistence.TemporalType.TIME)
     private Date pickupTime;
     @Column(nullable = false)
+    @Temporal(javax.persistence.TemporalType.TIME)
     private Date returnTime;
     @Enumerated(EnumType.STRING)
     private ResStatusEnum resStatus;

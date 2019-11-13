@@ -11,8 +11,10 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import util.exception.OutletNotFoundException;
 
 @Stateless
 @Local(OutletSessionBeanLocal.class)
@@ -33,5 +35,15 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
     public List<Outlet> retrieveAllOutlets() {
         Query query = em.createQuery("SELECT o FROM Outlet o");
         return query.getResultList();
+    }
+    
+    @Override
+    public Outlet retrieveOutletById(Long outletId) throws OutletNotFoundException {
+        try {
+            return em.find(Outlet.class, outletId);
+        }
+        catch(NoResultException ex) {
+            throw new OutletNotFoundException("Outlet not found!");
+        }
     }
 }

@@ -42,6 +42,10 @@
 
 <xs:element name="partnerRetrieveAllReservationsResponse" type="tns:partnerRetrieveAllReservationsResponse"/>
 
+<xs:element name="partnerRetrieveOutletById" type="tns:partnerRetrieveOutletById"/>
+
+<xs:element name="partnerRetrieveOutletByIdResponse" type="tns:partnerRetrieveOutletByIdResponse"/>
+
 <xs:element name="partnerRetrieveReservationById" type="tns:partnerRetrieveReservationById"/>
 
 <xs:element name="partnerRetrieveReservationByIdResponse" type="tns:partnerRetrieveReservationByIdResponse"/>
@@ -79,12 +83,12 @@
 <xs:element name="penalty" type="xs:double"/>
 <xs:element name="pickupDate" type="xs:dateTime" minOccurs="0"/>
 <xs:element name="pickupLocation" type="tns:outlet" minOccurs="0"/>
-<xs:element name="pickupTime" type="tns:time" minOccurs="0"/>
+<xs:element name="pickupTime" type="xs:dateTime" minOccurs="0"/>
 <xs:element name="resStatus" type="tns:resStatusEnum" minOccurs="0"/>
 <xs:element name="reservationId" type="xs:long" minOccurs="0"/>
 <xs:element name="returnDate" type="xs:dateTime" minOccurs="0"/>
 <xs:element name="returnLocation" type="tns:outlet" minOccurs="0"/>
-<xs:element name="returnTime" type="tns:time" minOccurs="0"/>
+<xs:element name="returnTime" type="xs:dateTime" minOccurs="0"/>
 <xs:element name="total" type="xs:double" minOccurs="0"/>
 </xs:sequence>
 </xs:complexType>
@@ -124,15 +128,11 @@
 <xs:complexType name="outlet">
 <xs:sequence>
 <xs:element name="address" type="xs:string" minOccurs="0"/>
-<xs:element name="closeHrs" type="tns:time" minOccurs="0"/>
+<xs:element name="closeHrs" type="xs:dateTime" minOccurs="0"/>
 <xs:element name="name" type="xs:string" minOccurs="0"/>
-<xs:element name="openHrs" type="tns:time" minOccurs="0"/>
+<xs:element name="openHrs" type="xs:dateTime" minOccurs="0"/>
 <xs:element name="outletId" type="xs:long" minOccurs="0"/>
 </xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="time">
-<xs:sequence/>
 </xs:complexType>
 
 <xs:complexType name="customer">
@@ -150,7 +150,7 @@
 <xs:element name="dispatchDate" type="xs:dateTime" minOccurs="0"/>
 <xs:element name="dispatchId" type="xs:long" minOccurs="0"/>
 <xs:element name="dispatchStatus" type="tns:dispatchStatusEnum" minOccurs="0"/>
-<xs:element name="dispatchTime" type="tns:time" minOccurs="0"/>
+<xs:element name="dispatchTime" type="xs:dateTime" minOccurs="0"/>
 <xs:element name="employee" type="tns:employee" minOccurs="0"/>
 <xs:element name="fromOutlet" type="xs:string" minOccurs="0"/>
 <xs:element name="outlet" type="tns:outlet" minOccurs="0"/>
@@ -179,6 +179,24 @@
 </xs:complexType>
 
 <xs:complexType name="PartnerNotFoundException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="partnerRetrieveOutletById">
+<xs:sequence>
+<xs:element name="outletId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="partnerRetrieveOutletByIdResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:outlet" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="OutletNotFoundException">
 <xs:sequence>
 <xs:element name="message" type="xs:string" minOccurs="0"/>
 </xs:sequence>
@@ -240,12 +258,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="OutletNotFoundException">
-<xs:sequence>
-<xs:element name="message" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="partnerRetrieveReservationById">
 <xs:sequence>
 <xs:element name="partnerId" type="xs:long"/>
@@ -289,8 +301,8 @@
 <xs:element name="searchType" type="xs:string" minOccurs="0"/>
 <xs:element name="startDate" type="xs:dateTime" minOccurs="0"/>
 <xs:element name="endDate" type="xs:dateTime" minOccurs="0"/>
-<xs:element name="startTime" type="tns:time" minOccurs="0"/>
-<xs:element name="endTime" type="tns:time" minOccurs="0"/>
+<xs:element name="startTime" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="endTime" type="xs:dateTime" minOccurs="0"/>
 <xs:element name="pickUpId" type="xs:long"/>
 <xs:element name="returnId" type="xs:long"/>
 <xs:element name="categoryId" type="xs:long"/>

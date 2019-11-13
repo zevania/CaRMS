@@ -14,6 +14,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
 
 /**
  *
@@ -34,8 +35,10 @@ public class Rate implements Serializable {
     @Column(nullable = false)
     private Double peakRate;
     @Column(nullable = false)
+    @Temporal(javax.persistence.TemporalType.DATE)
     private Date startPeriod;
     @Column(nullable = false)
+    @Temporal(javax.persistence.TemporalType.DATE)
     private Date endPeriod;
     
     @ManyToOne

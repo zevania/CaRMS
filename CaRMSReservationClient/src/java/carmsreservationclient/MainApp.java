@@ -240,7 +240,7 @@ public class MainApp {
         Long categoryId = 0l;
         Long modelId = 0l;
         
-        System.out.print("Enter the start date (yyyy-mm-dd): ");
+        System.out.print("Enter pickup date (yyyy-mm-dd): ");
         String inStartDate = scanner.nextLine().trim();
         
         Date startDate;
@@ -256,18 +256,35 @@ public class MainApp {
             return;
         }
         
-        System.out.print("Enter pickup hour (0-23) : ");
-        int hour = scanner.nextInt();
-        scanner.nextLine();
-        System.out.print("Enter pickup minute (0-60) : ");
-        int min = scanner.nextInt();
-        scanner.nextLine();
-        Date startTime = new Date(0,0,0, hour, min, 0);
+        Date startTime;
+        int hour;
+        int min;
+        
+        while(true) 
+        {
+            System.out.print("Enter pickup hour (0-23) : ");
+            hour = scanner.nextInt();
+            scanner.nextLine();
+            System.out.print("Enter pickup minute (0-59) : ");
+            min = scanner.nextInt();
+            scanner.nextLine();
+            startTime = new Date(0,0,0, hour, min, 0);
+            
+            if(hour>=0 && hour<=23 && min>=0 && min<=59) 
+            {
+                break;
+            }
+            else 
+            {
+                System.out.println("Invalid hour/minute! Please try again.\n");
+            }
+        }
         
         System.out.print("Enter the return date (yyyy-mm-dd): ");
         String inEndDate = scanner.nextLine().trim();
         
         Date endDate;
+        Date endTime;
         
         try{
             endDate = new SimpleDateFormat("yyyy-MM-dd").parse(inEndDate);
@@ -280,35 +297,60 @@ public class MainApp {
             return;
         }
         
-        System.out.print("Enter return hour (0-23) > ");
-        hour = scanner.nextInt();
-        scanner.nextLine();
-        System.out.print("Enter return minute (0-60) > ");
-        min = scanner.nextInt();
-        scanner.nextLine();
-        Date endTime = new Date(0,0,0, hour, min, 0);
+        while(true) 
+        {
+            System.out.print("Enter return hour (0-23) > ");
+            hour = scanner.nextInt();
+            scanner.nextLine();
+            System.out.print("Enter return minute (0-59) > ");
+            min = scanner.nextInt();
+            scanner.nextLine();
+            endTime = new Date(0,0,0, hour, min, 0);
+            
+            if(hour>=0 && hour<=23 && min>=0 && min<=59) 
+            {
+                break;
+            }
+            else 
+            {
+                System.out.println("Invalid hour/minute! Please try again.\n");
+            }
+        }
         
         DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         
         List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
-        System.out.printf("%5s%20s%20s%15s%15s\n", "No", "Name", "Addres", "Open Hrs", "Close Hrs");
+        System.out.printf("%10s%20s%20s%15s%15s\n", "Outlet Id", "Name", "Addres", "Open Hrs", "Close Hrs");
         int i = 1;
         for(Outlet o : outlets) {
             String open = dateFormat.format(o.getOpenHrs());
             String close = dateFormat.format(o.getCloseHrs());
-            System.out.printf("%10s%20s%20s%15s%15s\n", i, o.getName(), o.getAddress(), open, close);
+            System.out.printf("%10s%20s%20s%15s%15s\n", o.getOutletId(), o.getName(), o.getAddress(), open, close);
             i++;
         }
         System.out.println();
         
-        System.out.print("Enter pickup outlet no > ");
-        int pickupNo = scanner.nextInt();
+        System.out.print("Enter pickup outlet id > ");
+        int pickupId = scanner.nextInt();
         scanner.nextLine();
-        Outlet pickupLocation = outlets.get(pickupNo - 1);
-        System.out.print("Enter return outlet no > ");
-        int returnNo = scanner.nextInt();
+        Outlet pickupLocation;
+        try {
+            pickupLocation = outletSessionBeanRemote.retrieveOutletById((long)pickupId);
+        } catch (OutletNotFoundException ex) {
+            System.out.println(ex.getMessage());
+            return;
+        }
+        System.out.print("Enter return outlet id > ");
+        int returnId = scanner.nextInt();
         scanner.nextLine();
-        Outlet returnLocation = outlets.get(returnNo - 1);
+        Outlet returnLocation;
+        try {
+            returnLocation = outletSessionBeanRemote.retrieveOutletById((long)returnId);
+        } catch (OutletNotFoundException ex) {
+            System.out.println(ex.getMessage());
+            return;
+        }
+        
         boolean success = false;
         String yesNo = "";
         double total = 0;
@@ -316,7 +358,7 @@ public class MainApp {
         do
         {   
             total = 0;
-            System.out.println("Search Car By: ");
+            System.out.println("\n\nSearch Car By: ");
             System.out.println("1: Category");
             System.out.println("2: Model\n");
             System.out.print("> ");
@@ -352,8 +394,9 @@ public class MainApp {
                 try
                 {
                     success = reservationSessionBeanRemote.searchAvailableCar(searchType.toString(), startDate, 
-                            endDate, startTime, endTime, pickupNo, returnNo, categoryId, modelId);
-                    try {
+                            endDate, startTime, endTime, pickupId, returnId, categoryId, modelId);
+                    try 
+                    {
                         total = rateSessionBeanRemote.retrieveTotalByCategory(categoryId, startDate, endDate);
                         System.out.println("Total rental rate: $" + total);
                     } 
@@ -394,65 +437,79 @@ public class MainApp {
         
         if(success && currentMember != null) 
         {
-            System.out.println("------------------------");
-            System.out.println("1: Make Reservation");
-            System.out.println("2: Back\n");
-            System.out.print("> ");
-            response = scanner.nextInt();
+            while(true) {
+                System.out.println("------------------------");
+                System.out.println("1: Make Reservation");
+                System.out.println("2: Back\n");
+                System.out.print("> ");
+                response = scanner.nextInt();
+                scanner.nextLine();
 
-            scanner.nextLine();
-            
-            if(response == 1)
-            {
-                    System.out.print("Enter credit card number: ");
-                    Long ccNum = scanner.nextLong();
-                    scanner.nextLine();
-                    PaidStatusEnum payStatus = PaidStatusEnum.UNPAID;
-                    
-                    while(true) {
-                        System.out.println("Select Payment Method:");
-                        System.out.println("1. Pay Now");
-                        System.out.println("2. Pay Later at pick up time");
-                        System.out.print("> ");
-                        Integer payRes = scanner.nextInt();
+                if(response >= 1 && response <= 2) 
+                {
+                    if(response == 1)
+                    {
+                        System.out.print("Enter credit card number: ");
+                        Long ccNum = scanner.nextLong();
                         scanner.nextLine();
-                        
-                        if(payRes >= 1 && payRes <= 2) 
+                        PaidStatusEnum payStatus = PaidStatusEnum.UNPAID;
+
+                        while(true) 
                         {
-                            if(payRes == 1) 
+                            System.out.println("Select Payment Method:");
+                            System.out.println("1. Pay Now");
+                            System.out.println("2. Pay Later at pick up time");
+                            System.out.print("> ");
+                            Integer payRes = scanner.nextInt();
+                            scanner.nextLine();
+
+                            if(payRes >= 1 && payRes <= 2) 
                             {
-                                System.out.println("Payment Successful!");
-                                payStatus = PaidStatusEnum.PAID;
+                                if(payRes == 1) 
+                                {
+                                    System.out.println("Payment Successful!");
+                                    payStatus = PaidStatusEnum.PAID;
+                                }
+                                break;
                             }
-                            break;
+                            else
+                            {
+                                System.out.println("Invalid option, please try again!\n");
+                            }
                         }
-                        else
+
+                        Customer customer = new Customer(currentMember.getName(), ccNum, currentMember.getEmail(), CustomerTypeEnum.MEMBER);
+                        Reservation r = new Reservation(payStatus, total, startDate, endDate, startTime, endTime, OrderTypeEnum.CATEGORY, customer);
+                        r.setPickupLocation(pickupLocation);
+                        r.setReturnLocation(returnLocation);
+
+                        long theId = 0;
+                        try
                         {
-                            System.out.println("Invalid option, please try again!\n");
+                            theId = reservationSessionBeanRemote.createMemberReservation(r, currentMember.getOurMemberId(), ccNum, pickupId, returnId, categoryId, modelId);
                         }
+                        catch(OutletNotFoundException ex)
+                        {
+                            System.out.println("Invalid input. Outlet not found!");
+                            return;
+                        }
+                        catch(MemberNotFoundException ex) 
+                        {
+                            System.out.println("Member not found!");
+                        }
+                        System.out.println("Reservation successful! The id is "+theId);
                     }
-                    
-                    Customer customer = new Customer(currentMember.getName(), ccNum, currentMember.getEmail(), CustomerTypeEnum.MEMBER);
-                    Reservation r = new Reservation(payStatus, total, startDate, endDate, startTime, endTime, OrderTypeEnum.CATEGORY, customer);
-                    r.setPickupLocation(pickupLocation);
-                    r.setReturnLocation(returnLocation);
-                
-                    long theId = 0;
-                    try
-                    {
-                        theId = reservationSessionBeanRemote.createMemberReservation(r, currentMember.getOurMemberId(), ccNum, pickupNo, returnNo, categoryId, modelId);
-                    }
-                    catch(OutletNotFoundException ex)
-                    {
-                        System.out.println("Invalid input. Outlet not found!");
-                        return;
-                    }
-                    catch(MemberNotFoundException ex) 
-                    {
-                        System.out.println("Member not found!");
-                    }
-                    System.out.println("Reservation successful! The id is "+theId);
+                    break;
+                }
+                else 
+                {
+                    System.out.println("Invalid option, please try again!\n");
+                }
             }
+        }
+        else 
+        {
+            System.out.println("\nLogin to make a reservation!\n");
         }
     }
     
@@ -467,7 +524,7 @@ public class MainApp {
         
         Reservation r = reservationSessionBeanRemote.retrieveReservationById(id);
         
-        if(r==null){
+        if(r == null){
             System.out.println("There is no such reservationr record!");
             System.out.println("[Action Denied]");
             return;
@@ -484,18 +541,27 @@ public class MainApp {
         System.out.println("Payment Status: " + r.getPaymentStatus());
         System.out.println();
         
-        System.out.println("------------------------");
-        System.out.println("1: Cancel Reservation");
-        System.out.println("2: Back\n");
-        System.out.print("> ");
-        response = scanner.nextInt();
-        scanner.nextLine();
-        
-        if(response == 1)
-        {
-            String reply = reservationSessionBeanRemote.cancelReservation(id);
-            System.out.println(reply);
+        while(true) {
+            System.out.println("------------------------");
+            System.out.println("1: Cancel Reservation");
+            System.out.println("2: Back\n");
+            System.out.print("> ");
+            response = scanner.nextInt();
+            scanner.nextLine();
+
+            if(response >= 1 && response <= 2)
+            {
+                if(response == 1) {
+                    String reply = reservationSessionBeanRemote.cancelReservation(id);
+                    System.out.println(reply);
+                }
+            }
+            else 
+            {
+                System.out.println("Invalid option! Please try again.\n");
+            }
         }
+        
     }
     
     private void doViewAllRes() {

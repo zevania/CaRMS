@@ -15,6 +15,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
 
 /**
  *
@@ -29,8 +30,10 @@ public class Outlet implements Serializable {
     private Long outletId;
     
     @Column(nullable = false)
+    @Temporal(javax.persistence.TemporalType.TIME)
     private Date openHrs;
     @Column(nullable = false)
+    @Temporal(javax.persistence.TemporalType.TIME)
     private Date closeHrs;
     @Column(nullable = false, unique = true)
     private String name;

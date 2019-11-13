@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.Outlet;
 import java.util.List;
+import util.exception.OutletNotFoundException;
 
 
 public interface OutletSessionBeanRemote {
@@ -15,4 +16,5 @@ public interface OutletSessionBeanRemote {
     
     public List<Outlet> retrieveAllOutlets();
     
+    public Outlet retrieveOutletById(Long outletId) throws OutletNotFoundException;
 }

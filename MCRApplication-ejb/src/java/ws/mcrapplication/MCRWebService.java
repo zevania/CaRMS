@@ -252,4 +252,9 @@ public class MCRWebService {
             @WebParam(name = "startDate") Date startDate, @WebParam(name = "endDate") Date endDate) throws CategoryNotFoundException, RateNotFoundException {
         return rateSessionBean.retrieveTotalByCategory(catId, startDate, endDate);
     }
+    
+    @WebMethod(operationName = "partnerRetrieveOutletById")
+    public Outlet doRetrieveOutletById(@WebParam(name = "outletId") long outletId) throws OutletNotFoundException {
+        return outletSessionBean.retrieveOutletById(outletId);
+    }
 }

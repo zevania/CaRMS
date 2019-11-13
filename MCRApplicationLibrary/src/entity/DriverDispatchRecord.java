@@ -17,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
 import util.enumeration.DispatchStatusEnum;
 
 /**
@@ -34,8 +35,10 @@ public class DriverDispatchRecord implements Serializable {
     @Enumerated(EnumType.STRING)
     private DispatchStatusEnum dispatchStatus;
     @Column(nullable = false)
+    @Temporal(javax.persistence.TemporalType.DATE)
     private Date dispatchDate;
     @Column(nullable = false)
+    @Temporal(javax.persistence.TemporalType.TIME)
     private Date dispatchTime;
     @Column(nullable = false)
     private String fromOutlet;
