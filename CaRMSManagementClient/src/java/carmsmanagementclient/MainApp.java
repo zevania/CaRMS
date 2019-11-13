@@ -137,7 +137,7 @@ public class MainApp {
                     
                     try{
                         theDate = new SimpleDateFormat("yyyy-MM-dd").parse(inDate);
-                        theDate.setHours(2);
+                        theDate.setHours(0);
                         theDate.setMinutes(0);
                         theDate.setSeconds(0);
                         reservationSessionBean.manualAllocateCars(theDate);
