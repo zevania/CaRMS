@@ -304,7 +304,7 @@ public class MainApp {
                 break;
             } else if(yesno.equals("n")) {
                 startDate = new Date(0L);
-                endDate = new Date(2100,12,12);
+                endDate = new Date(2100,10,12);
                 break;
             }
         }
@@ -458,7 +458,7 @@ public class MainApp {
                 break;
             } else if(yesno.equals("n")) {
                 startDate = new Date(0L);
-                endDate = new Date(2100,12,12);
+                endDate = new Date(2100,11,12);
                 break;
             }
         }
@@ -956,6 +956,7 @@ public class MainApp {
         System.out.println("");
         System.out.println("1. OUTLET");
         System.out.println("2. ON RENTAL");
+        System.out.println("3. REPAIR");
         
         int statusNum = 0;
         
@@ -968,6 +969,10 @@ public class MainApp {
                 break;
             }else if(statusNum == 2){
                 carStatus = CarStatusEnum.ONRENTAL;
+                break;
+            } else if(statusNum == 3){
+                carStatus = CarStatusEnum.REPAIR;
+                car.setActive(false);
                 break;
             } else {
                 System.out.println("Invalid input! Please input again!");

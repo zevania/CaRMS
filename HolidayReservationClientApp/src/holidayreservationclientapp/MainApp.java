@@ -238,7 +238,7 @@ public class MainApp {
             System.out.print("Enter pickup minute (0-59) : ");
             min = scanner.nextInt();
             scanner.nextLine();
-            startTime = new Date(0,0,0, hour, min, 0);
+            startTime = new Date(2000,1,1, hour, min, 0);
             
             if(hour>=0 && hour<=23 && min>=0 && min<=59) 
             {
@@ -296,7 +296,7 @@ public class MainApp {
             System.out.print("Enter return minute (0-59) : ");
             min = scanner.nextInt();
             scanner.nextLine();
-            endTime = new Date(0,0,0, hour, min, 0);
+            endTime = new Date(2000,1,1, hour, min, 0);
             
             if(hour>=0 && hour<=23 && min>=0 && min<=59) 
             {

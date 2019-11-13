@@ -54,7 +54,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
     private EntityManager em;
 
     
-    
     @Override
     public void updateRes(long resId, ResStatusEnum status) throws ReservationNotFoundException, InvalidReservationException{
         Reservation r = em.find(Reservation.class, resId);
@@ -153,6 +152,9 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                 
                if(today.getYear()== pickupdate.getYear() && today.getMonth()<pickupdate.getMonth()){
                    numdays = 30;
+                   if((pickupdate.getMonth()+1)-(today.getMonth()+1)==1){
+                       numdays = 30-today.getDate()+pickupdate.getDate();
+                   }
                } else if(today.getYear()<pickupdate.getYear()){
                    numdays = 30;
                } else {
@@ -209,19 +211,32 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         
         if(pickupLoc==null || returnLoc == null) throw new OutletNotFoundException();
         
-        if(pickupLoc.getOpenHrs().after(startTime)) return false;
-        if(returnLoc.getCloseHrs().before(endTime)) return false;
+//        System.out.println("open hrs "+pickupLoc.getOpenHrs()+" - startTime "+startTime);
+//        System.out.println("close hrs "+returnLoc.getCloseHrs()+" - closeTime "+endTime);
+//        System.out.println("the year is "+startTime.getYear());
+//        System.out.println("the or year is "+pickupLoc.getOpenHrs().getYear());
+//        System.out.println("the start date is "+startDate);
+//        System.out.println("the startDate year is"+startDate.getYear());
+//        System.out.println("TMZ offset openLoc "+pickupLoc.getOpenHrs().getTimezoneOffset());
+//        System.out.println("TMZ offset local "+startTime.getTimezoneOffset());
+//        
+      
+
+        //if(pickupLoc.getOpenHrs().after(startTime)) return false;
+        //if(returnLoc.getCloseHrs().before(endTime)) return false;
         
         Set<Reservation> clashingRes = new HashSet<>();
         List<Reservation> temp = new LinkedList<>();
         List<Reservation> toRemove = new LinkedList<>();
         
-        Date dStartTime = new Date(0,0,0,startTime.getHours()-2,startTime.getMinutes(),startTime.getSeconds());
-        Date dEndTime = new Date(0,0,0,endTime.getHours()-2,endTime.getMinutes(),endTime.getSeconds());
+        Date dStartTime = new Date(2000,1,1,startTime.getHours()-2,startTime.getMinutes(),startTime.getSeconds());
+        Date dEndTime = new Date(2000,1,1,endTime.getHours()-2,endTime.getMinutes(),endTime.getSeconds());
         Query query;
         searchType = searchType.toLowerCase();
         int totalCar = 0;
         
+        
+        System.out.println("the type"+ searchType);
         if(searchType.equals("category")){
             query = em.createQuery("SELECT c FROM Car c WHERE c.model.category.categoryId = :catId AND c.active = TRUE")
                     .setParameter("catId", categoryId);
@@ -514,7 +529,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                         temp.setCar(c);
                         toRemove.add(temp);
                         cars.remove(c);
-                        Date pickTime = new Date(0,0,0,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
+                        Date pickTime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
                         ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , c.getReservation().getReturnLocation().getName());
                         id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
@@ -535,7 +550,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
                 
-                temptime = new Date(0,0,0,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());        
+                temptime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());        
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
                     if( c.isActive() && c.getModel().getModelId() == temp.getCarModel().getModelId() &&
@@ -545,7 +560,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                         temp.setCar(c);
                         cars.remove(c);
                         toRemove.add(temp);
-                        Date pickTime = new Date(0,0,0,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
+                        Date pickTime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
                         ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , c.getReservation().getReturnLocation().getName());
                         id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
@@ -640,7 +655,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                         temp.setCar(c);
                         cars.remove(c);
                         toRemove.add(temp);
-                        Date pickTime = new Date(0,0,0,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
+                        Date pickTime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
                         ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , c.getReservation().getReturnLocation().getName());
                         id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
@@ -660,7 +675,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
-                temptime = new Date(0,0,0,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
+                temptime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
                         
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
@@ -671,7 +686,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                         temp.setCar(c);
                         cars.remove(c);
                         toRemove.add(temp);
-                        Date pickTime = new Date(0,0,0,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
+                        Date pickTime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
                         System.out.print("sampe ini jga");
                         ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , c.getReservation().getReturnLocation().getName());
                         id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
