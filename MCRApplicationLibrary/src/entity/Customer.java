@@ -45,7 +45,6 @@ public class Customer implements Serializable {
     
     
     @OneToMany(mappedBy = "customer", cascade = CascadeType.PERSIST)
-    @JoinColumn(nullable = true)
     private List<Reservation> reservations = new ArrayList<>();
     
     public Customer() {

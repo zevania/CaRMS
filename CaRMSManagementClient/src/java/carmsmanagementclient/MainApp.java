@@ -371,7 +371,7 @@ public class MainApp {
         try{
             rate = rateSessionBean.retrieveRateById(rateId);
             System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", "Rate Id", "Start Date", "End Date", "Name", "Category", "Rate", "Peak Rate");
-            if(rate.getStartPeriod().getYear() == 69  ){
+            if(rate.getEndPeriod().getYear() >= 2099   ){
                 System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", rate.getRateId(), "N.A.", "N.A.", rate.getName(), rate.getCategory().getCategoryName(), rate.getRate(), rate.getPeakRate());
             } else {
                 System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", rate.getRateId(), formatter.format(rate.getStartPeriod()), formatter.format(rate.getEndPeriod()), rate.getName(), rate.getCategory().getCategoryName(), rate.getRate(), rate.getPeakRate());
