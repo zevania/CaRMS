@@ -12,6 +12,7 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
@@ -42,7 +43,13 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
     public Employee employeeLogin(String email, String password) {
         Query query = em.createQuery("SELECT e FROM Employee e WHERE e.email LIKE :empEmail")
                 .setParameter("empEmail", email);
-        Employee e =  (Employee) query.getSingleResult();
+        Employee e;
+        
+        try{
+            e = (Employee) query.getSingleResult();
+        } catch(NoResultException ex){
+            return null;
+        }
         
         if(e==null) return null;
         

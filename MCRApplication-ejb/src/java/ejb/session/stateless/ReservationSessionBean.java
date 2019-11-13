@@ -93,7 +93,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         if(pickupOutlet==null) throw new OutletNotFoundException();
         if(returnOutlet==null) throw new OutletNotFoundException();
         
-        em.persist(r);
         
         r.setPickupLocation(pickupOutlet);
         pickupOutlet.getPickReservation().add(r);
@@ -114,18 +113,28 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                 .setParameter("theEmail", email);
         Customer cust;
         try{
-            cust = (Customer) query.getSingleResult();
+           // cust = (Customer) query.getSingleResult();
+           throw new NoResultException();
         } catch (NoResultException ex) {
             cust = new Customer(member.getName(), ccNum, member.getEmail(), CustomerTypeEnum.MEMBER); 
-            em.persist(cust);
+            
         }
         
+
         r.setCustomer(cust);
-        cust.getReservations().add(r);
         
+        cust.getReservations().add(r);
+        em.persist(cust);
         em.flush();
         
+        
+        
         return r.getReservationId();
+    }
+    
+    private void createCust(Customer c){
+        em.persist(c);
+        em.flush();
     }
 
     @Override
@@ -185,7 +194,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
     @Override
     public List<Reservation> retrieveReservations(String email) {
-        Query query = em.createQuery("SELECT c FROM Customer c WHERE c.email LIKE :theEmail")
+        Query query = em.createQuery("SELECT r FROM Reservation r WHERE r.customer.email LIKE :theEmail")
                 .setParameter("theEmail", email);
         
         
@@ -217,14 +226,16 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             query = em.createQuery("SELECT c FROM Car c WHERE c.model.category.categoryId = :catId AND c.active = TRUE")
                     .setParameter("catId", categoryId);
             totalCar = query.getResultList().size();
-            
-            query = em.createQuery("SELECT r FROM Reservation r WHERE r.carCategory.categoryId = :inCat AND r.pickupDate <= :inStartDate AND r.returnDate >= :inStartDate")
+            System.out.println("theCar total is "+totalCar);
+            query = em.createQuery("SELECT r FROM Reservation r WHERE r.carCategory.categoryId = :inCat AND r.pickupDate >= :inStartDate AND r.pickupDate <= :inEndDate")
                     .setParameter("inCat", categoryId)
-                    .setParameter("inStartDate", startDate);
+                    .setParameter("inStartDate", startDate)
+                    .setParameter("inEndDate", endDate);
             clashingRes = new HashSet<>(query.getResultList());
             
-            query = em.createQuery("SELECT r FROM Reservation r WHERE r.carCategory.categoryId = :inCat AND r.pickupDate <= :inEndDate AND r.returnDate >= :inEndDate")
+            query = em.createQuery("SELECT r FROM Reservation r WHERE r.carCategory.categoryId = :inCat AND r.returnDate <= :inEndDate AND r.returnDate >= :inStartDate")
                     .setParameter("inCat", categoryId)
+                    .setParameter("inStartDate", startDate)
                     .setParameter("inEndDate", endDate);
             temp = query.getResultList();
             
@@ -269,6 +280,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             }
             
             int leftCar = totalCar - clashingRes.size();
+            System.out.println("sini nih pak"+leftCar);
             if(leftCar>0) return true;
             else return false;
         }else if(searchType.equals("model")){
@@ -276,13 +288,15 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     .setParameter("modId", modelId);
             totalCar = query.getResultList().size();
             
-            query = em.createQuery("SELECT r FROM Reservation r WHERE r.carModel.modelId = :inMod AND r.pickupDate <= :inStartDate AND r.returnDate >= :inStartDate")
+            query = em.createQuery("SELECT r FROM Reservation r WHERE r.carModel.modelId = :inMod AND r.pickupDate <= :inStartDate AND r.pickupDate <= :inEndDate")
                     .setParameter("inMod", modelId)
+                    .setParameter("inEndDate", endDate)
                     .setParameter("inStartDate", startDate);
             clashingRes = new HashSet<>(query.getResultList());
             
-            query = em.createQuery("SELECT r FROM Reservation r WHERE r.carModel.modelId = :inMod AND r.pickupDate <= :inEndDate AND r.returnDate >= :inEndDate")
+            query = em.createQuery("SELECT r FROM Reservation r WHERE r.carModel.modelId = :inMod AND r.returnDate <= :inEndDate AND r.returnDate >= :inStartDate")
                     .setParameter("inMod", modelId)
+                    .setParameter("inStartDate",startDate)
                     .setParameter("inEndDate", endDate);
             temp = query.getResultList();
             
@@ -426,8 +440,9 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             toRemove.clear();
             
             query = em.createQuery("SELECT r FROM Reservation r "
-                    + "WHERE r.orderType = OrderTypeEnum.MODEL AND r.pickupLocation.outletId = :store AND r.pickupDate = todayDate")
-                    .setParameter("store", theStoreId);
+                    + "WHERE r.orderType = util.enumeration.OrderTypeEnum.MODEL AND r.pickupLocation.outletId = :store AND r.pickupDate = :inTodayDate")
+                    .setParameter("store", theStoreId)
+                    .setParameter("inTodayDate", todayDate);
             tempReservation = query.getResultList();
             
             if(tempReservation.size()==0) continue;
@@ -457,7 +472,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.active = TRUE AND c.reservation.returnLocation.outletId = :store")
+            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation IS NOT NULL AND c.active = TRUE AND c.reservation.returnLocation.outletId = :store")
                     .setParameter("store",theStoreId);
             cars = query.getResultList();
             
@@ -486,7 +501,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NULL AND c.active = TRUE");
+            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation IS NULL AND c.active = TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){
@@ -514,7 +529,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.active = TRUE");
+            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation IS NOT NULL AND c.active = TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){
@@ -548,13 +563,14 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             o = outlet.get(i);
             theStoreId = o.getOutletId();
             toRemove.clear();
-            
+            System.out.println("hereloo");
             query = em.createQuery("SELECT r FROM Reservation r "
-                    + "WHERE r.pickupLocation.outletId = :store AND r.orderType = OrderTypeEnum.CATEGORY AND r.pickupDate = todayDate")
-                    .setParameter("store", theStoreId);
+                    + "WHERE r.pickupLocation.outletId = :store AND r.orderType = util.enumeration.OrderTypeEnum.CATEGORY  AND r.pickupDate = :inTodayDate ")
+                    .setParameter("store", theStoreId)
+                    .setParameter("inTodayDate",todayDate);
             tempReservation = query.getResultList();
             cars = o.getCars();
-            
+            System.out.println("the total r is "+tempReservation.size()+" "+todayDate);
             if(tempReservation.size()==0) continue;
             
             for(int j = 0; j < tempReservation.size();j++){
@@ -567,6 +583,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                         temp.setCar(c);
                         toRemove.add(temp);
                         cars.remove(c);
+                        System.out.println("masuk pak");
                         break;
                     } 
                 }
@@ -576,11 +593,12 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             for(Reservation r: toRemove){
                 tempReservation.remove(r);
             }
+            System.out.println("got ini");
             if(tempReservation.size()==0) continue;
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.reservation.returnLocation.outletId LIKE :store AND c.active = TRUE")
+            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation IS NOT NULL AND c.reservation.returnLocation.outletId LIKE :store AND c.active = TRUE")
                     .setParameter("store",theStoreId);
             cars = query.getResultList();
             
@@ -609,7 +627,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NULL AND c.active = TRUE");
+            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation IS NULL AND c.active = TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){
@@ -637,7 +655,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Cars c WHERE c.reservation IS NOT NULL AND c.active = TRUE");
+            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation IS NOT NULL AND c.active = TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){
@@ -647,14 +665,14 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
                     if(c.isActive() && c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
-                        c.getReservation().getReturnDate().equals(temp.getPickupDate()) &&
+                        !c.getReservation().getReturnDate().after(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().before(temptime) || c.getReservation().getReturnTime().equals(temptime))){
                         c.setReservation(temp);
                         temp.setCar(c);
                         cars.remove(c);
                         toRemove.add(temp);
                         Date pickTime = new Date(0,0,0,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
-                        
+                        System.out.print("sampe ini jga");
                         ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , c.getReservation().getReturnLocation().getName());
                         id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
@@ -666,6 +684,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                 tempReservation.remove(r);
             }
             if(tempReservation.size()==0) continue;
+            System.out.println("sampe");
             
         }
     }
