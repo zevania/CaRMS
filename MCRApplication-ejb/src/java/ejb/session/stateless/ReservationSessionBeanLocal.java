@@ -26,10 +26,11 @@ public interface ReservationSessionBeanLocal {
 
     public List<Reservation> retrieveReservations(String email);
 
-    public boolean searchAvailableCar(String searchType, Date startDate, Date endDate, Time startTime, Time endTime, long pickupid, long returnid, long categoryId, long modelId) throws OutletNotFoundException;
+    public boolean searchAvailableCar(String searchType, Date startDate, Date endDate, Date startTime, Date endTime, long pickupid, long returnid, long categoryId, long modelId) throws OutletNotFoundException;
 
     public Reservation retrieveReservationById(long resId);
 
     public void manualAllocateCars(Date date);
 
+    
 }

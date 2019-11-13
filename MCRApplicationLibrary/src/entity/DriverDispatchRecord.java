@@ -6,9 +6,6 @@
 package entity;
 
 import java.io.Serializable;
-import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -39,7 +36,7 @@ public class DriverDispatchRecord implements Serializable {
     @Column(nullable = false)
     private Date dispatchDate;
     @Column(nullable = false)
-    private Time dispatchTime;
+    private Date dispatchTime;
     @Column(nullable = false)
     private String fromOutlet;
     @Column(length = 50)
@@ -63,7 +60,7 @@ public class DriverDispatchRecord implements Serializable {
 
 
 
-    public DriverDispatchRecord(DispatchStatusEnum dispatchStatus, Date dispatchDate, Time dispatchTime, String fromOutlet) {
+    public DriverDispatchRecord(DispatchStatusEnum dispatchStatus, Date dispatchDate, Date dispatchTime, String fromOutlet) {
         this.dispatchStatus = dispatchStatus;
         this.dispatchDate = dispatchDate;
         this.dispatchTime = dispatchTime;
@@ -95,11 +92,11 @@ public class DriverDispatchRecord implements Serializable {
         this.dispatchDate = dispatchDate;
     }
 
-    public Time getDispatchTime() {
+    public Date getDispatchTime() {
         return dispatchTime;
     }
 
-    public void setDispatchTime(Time dispatchTime) {
+    public void setDispatchTime(Date dispatchTime) {
         this.dispatchTime = dispatchTime;
     }
 

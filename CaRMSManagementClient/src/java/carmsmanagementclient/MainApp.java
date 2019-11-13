@@ -16,9 +16,9 @@ import entity.Employee;
 import entity.Model;
 import entity.Rate;
 import entity.Reservation;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -98,6 +98,7 @@ public class MainApp {
 
                 response = scanner.nextInt();
                 scanner.nextLine();
+                System.out.println();
                 
                 if(response == 1)
                 {
@@ -213,6 +214,7 @@ public class MainApp {
 
                 response = scanner.nextInt();
                 scanner.nextLine();
+                System.out.println();
                 
                 if (response == 1)
                 {
@@ -1069,9 +1071,10 @@ public class MainApp {
         }
         
         System.out.printf("%8s%40s%20s%30s%40s\n", "DDR id", "Origin Outlet", "Date", "Latest Time", "Status");
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         
         for(DriverDispatchRecord ddr: ddrs){
-            System.out.printf("%8s%40s%20s%30s%40s\n", ddr.getDispatchId(), ddr.getFromOutlet(), dateformatter.format(ddr.getDispatchDate()), ddr.getDispatchTime(), ddr.getDispatchStatus().toString());
+            System.out.printf("%8s%40s%20s%30s%40s\n", ddr.getDispatchId(), ddr.getFromOutlet(), dateformatter.format(ddr.getDispatchDate()), dateFormat.format(ddr.getDispatchTime()), ddr.getDispatchStatus().toString());
         }
         
         System.out.println("");

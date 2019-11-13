@@ -6,7 +6,6 @@
 package entity;
 
 import java.io.Serializable;
-import java.sql.Time;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,6 +17,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
 import util.enumeration.OrderTypeEnum;
 import util.enumeration.PaidStatusEnum;
 import util.enumeration.ResStatusEnum;
@@ -43,9 +43,9 @@ public class Reservation implements Serializable {
     @Column(nullable = false)
     private Date returnDate;
     @Column(nullable = false)
-    private Time pickupTime;
+    private Date pickupTime;
     @Column(nullable = false)
-    private Time returnTime;
+    private Date returnTime;
     @Enumerated(EnumType.STRING)
     private ResStatusEnum resStatus;
     @Enumerated(EnumType.STRING)
@@ -83,7 +83,7 @@ public class Reservation implements Serializable {
     public Reservation() {
     }
 
-    public Reservation(PaidStatusEnum paymentStatus, Double total, Date pickupDate, Date returnDate, Time pickupTime, Time returnTime, ResStatusEnum resStatus, OrderTypeEnum orderType, Category carCategory, Model carModel, Car car, Outlet pickupLocation, Outlet returnLocation, Customer customer) {
+    public Reservation(PaidStatusEnum paymentStatus, Double total, Date pickupDate, Date returnDate, Date pickupTime, Date returnTime, ResStatusEnum resStatus, OrderTypeEnum orderType, Category carCategory, Model carModel, Car car, Outlet pickupLocation, Outlet returnLocation, Customer customer) {
         this.paymentStatus = paymentStatus;
         this.total = total;
         this.pickupDate = pickupDate;
@@ -100,7 +100,7 @@ public class Reservation implements Serializable {
         this.customer = customer;
     }
 
-    public Reservation(PaidStatusEnum paymentStatus, Double total, Date pickupDate, Date returnDate, Time pickupTime, Time returnTime, OrderTypeEnum orderType, Customer customer) {
+    public Reservation(PaidStatusEnum paymentStatus, Double total, Date pickupDate, Date returnDate, Date pickupTime, Date returnTime, OrderTypeEnum orderType, Customer customer) {
         this.paymentStatus = paymentStatus;
         this.total = total;
         this.pickupDate = pickupDate;
@@ -198,8 +198,6 @@ public class Reservation implements Serializable {
         this.carModel = carModel;
     }
     
-    
-    
     public PaidStatusEnum getPaymentStatus() {
         return paymentStatus;
     }
@@ -232,19 +230,19 @@ public class Reservation implements Serializable {
         this.returnDate = returnDate;
     }
 
-    public Time getPickupTime() {
+    public Date getPickupTime() {
         return pickupTime;
     }
 
-    public void setPickupTime(Time pickupTime) {
+    public void setPickupTime(Date pickupTime) {
         this.pickupTime = pickupTime;
     }
 
-    public Time getReturnTime() {
+    public Date getReturnTime() {
         return returnTime;
     }
 
-    public void setReturnTime(Time returnTime) {
+    public void setReturnTime(Date returnTime) {
         this.returnTime = returnTime;
     }
 
@@ -255,9 +253,6 @@ public class Reservation implements Serializable {
     public void setResStatus(ResStatusEnum resStatus) {
         this.resStatus = resStatus;
     }
-    
-    
-    
     
     public Long getReservationId() {
         return reservationId;

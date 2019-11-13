@@ -12,10 +12,9 @@ import entity.OurMember;
 import entity.Model;
 import entity.Outlet;
 import entity.Reservation;
-import java.sql.Time;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.List;
@@ -78,6 +77,7 @@ public class MainApp {
 
                 response = scanner.nextInt();
                 scanner.nextLine();
+                System.out.println();
                 
                 if(response == 1) 
                 {
@@ -233,8 +233,6 @@ public class MainApp {
     private void doSearchCar() {
         Scanner scanner = new Scanner(System.in);
         Integer response;
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("d/MM/yyyy");
-        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
         System.out.println("*** CaRMS Reservation Client :: Search Car ***\n");
         
@@ -259,11 +257,14 @@ public class MainApp {
         }
         
         System.out.print("Enter pickup hour (0-23) : ");
-        int time = scanner.nextInt();
+        int hour = scanner.nextInt();
         scanner.nextLine();
-        Time startTime = new Time(time, 0, 0);
+        System.out.print("Enter pickup minute (0-60) : ");
+        int min = scanner.nextInt();
+        scanner.nextLine();
+        Date startTime = new Date(0,0,0, hour, min, 0);
         
-        System.out.print("Enter the start date (yyyy-mm-dd): ");
+        System.out.print("Enter the return date (yyyy-mm-dd): ");
         String inEndDate = scanner.nextLine().trim();
         
         Date endDate;
@@ -280,16 +281,21 @@ public class MainApp {
         }
         
         System.out.print("Enter return hour (0-23) > ");
-        time = scanner.nextInt();
+        hour = scanner.nextInt();
         scanner.nextLine();
-        Time endTime = new Time(time,0,0);
+        System.out.print("Enter return minute (0-60) > ");
+        min = scanner.nextInt();
+        scanner.nextLine();
+        Date endTime = new Date(0,0,0, hour, min, 0);
+        
+        DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
         
         List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
         System.out.printf("%5s%20s%20s%15s%15s\n", "No", "Name", "Addres", "Open Hrs", "Close Hrs");
         int i = 1;
         for(Outlet o : outlets) {
-            Time open = o.getOpenHrs();
-            Time close = o.getCloseHrs();
+            String open = dateFormat.format(o.getOpenHrs());
+            String close = dateFormat.format(o.getCloseHrs());
             System.out.printf("%10s%20s%20s%15s%15s\n", i, o.getName(), o.getAddress(), open, close);
             i++;
         }
@@ -453,7 +459,6 @@ public class MainApp {
     private void doViewResDetails() {
         Scanner scanner = new Scanner(System.in);
         Integer response;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy HH:mm");
         
         System.out.println("*** CaRMS Reservation Client :: View Reservation Details ***\n");
         System.out.print("Enter reservation id> ");
@@ -494,12 +499,11 @@ public class MainApp {
     }
     
     private void doViewAllRes() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy HH:mm");
         
         System.out.println("*** CaRMS Reservation Client :: View All My Reservations ***\n");
         List<Reservation> res = reservationSessionBeanRemote.retrieveReservations(currentMember.getEmail());
         
-        if(res == null || res.size()==0){
+        if(res == null || res.isEmpty()){
             System.out.println("There is no reservaiton right now!");
             return;
         }

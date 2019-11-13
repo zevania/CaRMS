@@ -17,7 +17,6 @@ import entity.Model;
 import entity.Outlet;
 import entity.Partner;
 import entity.Reservation;
-import java.sql.Time;
 import java.time.Month;
 import java.util.Calendar;
 import java.util.Date;
@@ -85,8 +84,8 @@ public class MCRWebService {
     
     @WebMethod(operationName = "partnerSearchCar")
     public boolean doSeacrhCar(@WebParam(name = "searchType") String searchType,@WebParam(name="startDate") 
-            Date startDate,@WebParam(name = "endDate")Date endDate, @WebParam(name = "startTime") Time startTime
-            ,@WebParam(name = "endTime")Time endTime, @WebParam(name = "pickUpId")long pickupid,
+            Date startDate,@WebParam(name = "endDate")Date endDate, @WebParam(name = "startTime") Date startTime
+            ,@WebParam(name = "endTime")Date endTime, @WebParam(name = "pickUpId")long pickupid,
             @WebParam(name = "returnId")long returnid, @WebParam(name = "categoryId")long categoryId, 
             @WebParam(name = "modelId")long modelId) throws OutletNotFoundException {
         

@@ -6,8 +6,8 @@
 package entity;
 
 import java.io.Serializable;
-import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,7 +15,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 /**
  *
@@ -30,9 +29,9 @@ public class Outlet implements Serializable {
     private Long outletId;
     
     @Column(nullable = false)
-    private Time openHrs;
+    private Date openHrs;
     @Column(nullable = false)
-    private Time closeHrs;
+    private Date closeHrs;
     @Column(nullable = false, unique = true)
     private String name;
     @Column(nullable = false)
@@ -56,15 +55,13 @@ public class Outlet implements Serializable {
     public Outlet() {
     }
 
-    public Outlet(Time openHrs, Time closeHrs, String name, String address) {
+    public Outlet(Date openHrs, Date closeHrs, String name, String address) {
         this.openHrs = openHrs;
         this.closeHrs = closeHrs;
         this.name = name;
         this.address = address;
     }
 
-    
-    
     public List<Car> getCars() {
         return cars;
     }
@@ -85,21 +82,19 @@ public class Outlet implements Serializable {
         return dispatchRecords;
     }
     
-    
-    
-    public Time getOpenHrs() {
+    public Date getOpenHrs() {
         return openHrs;
     }
 
-    public void setOpenHrs(Time openHrs) {
+    public void setOpenHrs(Date openHrs) {
         this.openHrs = openHrs;
     }
 
-    public Time getCloseHrs() {
+    public Date getCloseHrs() {
         return closeHrs;
     }
 
-    public void setCloseHrs(Time closeHrs) {
+    public void setCloseHrs(Date closeHrs) {
         this.closeHrs = closeHrs;
     }
 

@@ -61,9 +61,6 @@ public class Rate implements Serializable {
         this.endPeriod = endPeriod;
     }
 
-    
-
-    
     public Double getPeakRate() {
         return peakRate;
     }
