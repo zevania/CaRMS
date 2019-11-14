@@ -486,6 +486,10 @@ public class MainApp {
                                     System.out.println("Payment Successful!");
                                     payStatus = PaidStatusEnum.PAID;
                                     System.out.println("Please wait for a while!");
+                                } else if(payRes == 2){
+                                    System.out.println("Payment is deffered!");
+                                    payStatus = PaidStatusEnum.UNPAID;
+                                    System.out.println("Please wait for a while!");
                                 }
                                 break;
                             }

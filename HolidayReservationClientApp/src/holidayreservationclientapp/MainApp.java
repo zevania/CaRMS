@@ -49,7 +49,7 @@ public class MainApp {
     
     
     Partner curPartner;
-            
+    DateFormat dateformatter = new SimpleDateFormat("dd/MM/yyyy");
     public void runApp(){
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
