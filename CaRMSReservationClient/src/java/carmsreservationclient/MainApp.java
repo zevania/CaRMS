@@ -485,6 +485,7 @@ public class MainApp {
                                 {
                                     System.out.println("Payment Successful!");
                                     payStatus = PaidStatusEnum.PAID;
+                                    System.out.println("Please wait for a while!");
                                 }
                                 break;
                             }
