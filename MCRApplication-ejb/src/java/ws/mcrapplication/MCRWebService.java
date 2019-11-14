@@ -107,7 +107,6 @@ public class MCRWebService {
         
         Partner p = em.find(Partner.class, partnerId);
         
-        em.persist(r);
         
         r.setPickupLocation(pickupOutlet);
         pickupOutlet.getPickReservation().add(r);
@@ -125,12 +124,11 @@ public class MCRWebService {
         
         Customer cust = new Customer(custName, ccNum, custEmail, CustomerTypeEnum.PARTNER);
         em.persist(cust);
-        em.flush();
-         
         p.getReservations().add(r);
         r.setPartner(p);
         r.setCustomer(cust);
-        
+        em.persist(r);
+        em.flush();
         return r.getReservationId();
     }
     
