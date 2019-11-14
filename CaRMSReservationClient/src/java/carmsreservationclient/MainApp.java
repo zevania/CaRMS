@@ -321,7 +321,7 @@ public class MainApp {
         DateFormat dateFormat = new SimpleDateFormat("HH:mm");
         
         List<Outlet> outlets = outletSessionBeanRemote.retrieveAllOutlets();
-        System.out.printf("%10s%20s%20s%15s%15s\n", "Outlet Id", "Name", "Addres", "Open Hrs", "Close Hrs");
+        System.out.printf("%10s%20s%20s%15s%15s\n", "Outlet Id", "Name", "Address", "Open Hrs", "Close Hrs");
         int i = 1;
         for(Outlet o : outlets) {
             String open = dateFormat.format(o.getOpenHrs());
