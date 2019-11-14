@@ -149,7 +149,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                }
                proceed = true;
             } else {
-                return "[Action is invalid]\n";
+                return "The order date is in the past!\n [Action is invalid]\n";
             }
             
             if(proceed){
@@ -175,7 +175,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                 r.setResStatus(ResStatusEnum.CANCELLED);
             }   
         } else {
-            return "[Action is invalid]\n";
+            return "The reservation status is no longer ordered!\n [Action is invalid]\n";
         }
         r.setPenalty(penalty);
         return reply;
