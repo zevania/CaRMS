@@ -25,17 +25,23 @@
 <message name="OutletNotFoundException">
 <part name="fault" element="tns:OutletNotFoundException"/>
 </message>
-<message name="partnerRetrieveTotalByCategory">
-<part name="parameters" element="tns:partnerRetrieveTotalByCategory"/>
+<message name="partnerRetrieveAllModels">
+<part name="parameters" element="tns:partnerRetrieveAllModels"/>
 </message>
-<message name="partnerRetrieveTotalByCategoryResponse">
-<part name="parameters" element="tns:partnerRetrieveTotalByCategoryResponse"/>
+<message name="partnerRetrieveAllModelsResponse">
+<part name="parameters" element="tns:partnerRetrieveAllModelsResponse"/>
 </message>
-<message name="CategoryNotFoundException">
-<part name="fault" element="tns:CategoryNotFoundException"/>
+<message name="partnerRetrieveAllOutlets">
+<part name="parameters" element="tns:partnerRetrieveAllOutlets"/>
 </message>
-<message name="RateNotFoundException">
-<part name="fault" element="tns:RateNotFoundException"/>
+<message name="partnerRetrieveAllOutletsResponse">
+<part name="parameters" element="tns:partnerRetrieveAllOutletsResponse"/>
+</message>
+<message name="partnerRetrieveOutletById">
+<part name="parameters" element="tns:partnerRetrieveOutletById"/>
+</message>
+<message name="partnerRetrieveOutletByIdResponse">
+<part name="parameters" element="tns:partnerRetrieveOutletByIdResponse"/>
 </message>
 <message name="partnerRetrieveReservationById">
 <part name="parameters" element="tns:partnerRetrieveReservationById"/>
@@ -49,11 +55,23 @@
 <message name="InvalidRelationIdException">
 <part name="fault" element="tns:InvalidRelationIdException"/>
 </message>
-<message name="partnerDoCancelReservation">
-<part name="parameters" element="tns:partnerDoCancelReservation"/>
+<message name="partnerRetrieveTotalByCategory">
+<part name="parameters" element="tns:partnerRetrieveTotalByCategory"/>
 </message>
-<message name="partnerDoCancelReservationResponse">
-<part name="parameters" element="tns:partnerDoCancelReservationResponse"/>
+<message name="partnerRetrieveTotalByCategoryResponse">
+<part name="parameters" element="tns:partnerRetrieveTotalByCategoryResponse"/>
+</message>
+<message name="CategoryNotFoundException">
+<part name="fault" element="tns:CategoryNotFoundException"/>
+</message>
+<message name="RateNotFoundException">
+<part name="fault" element="tns:RateNotFoundException"/>
+</message>
+<message name="partnerCreateReservation">
+<part name="parameters" element="tns:partnerCreateReservation"/>
+</message>
+<message name="partnerCreateReservationResponse">
+<part name="parameters" element="tns:partnerCreateReservationResponse"/>
 </message>
 <message name="partnerRetrieveAllCategories">
 <part name="parameters" element="tns:partnerRetrieveAllCategories"/>
@@ -61,35 +79,17 @@
 <message name="partnerRetrieveAllCategoriesResponse">
 <part name="parameters" element="tns:partnerRetrieveAllCategoriesResponse"/>
 </message>
-<message name="partnerRetrieveAllModels">
-<part name="parameters" element="tns:partnerRetrieveAllModels"/>
-</message>
-<message name="partnerRetrieveAllModelsResponse">
-<part name="parameters" element="tns:partnerRetrieveAllModelsResponse"/>
-</message>
 <message name="partnerRetrieveAllReservations">
 <part name="parameters" element="tns:partnerRetrieveAllReservations"/>
 </message>
 <message name="partnerRetrieveAllReservationsResponse">
 <part name="parameters" element="tns:partnerRetrieveAllReservationsResponse"/>
 </message>
-<message name="partnerRetrieveOutletById">
-<part name="parameters" element="tns:partnerRetrieveOutletById"/>
+<message name="partnerDoCancelReservation">
+<part name="parameters" element="tns:partnerDoCancelReservation"/>
 </message>
-<message name="partnerRetrieveOutletByIdResponse">
-<part name="parameters" element="tns:partnerRetrieveOutletByIdResponse"/>
-</message>
-<message name="partnerRetrieveAllOutlets">
-<part name="parameters" element="tns:partnerRetrieveAllOutlets"/>
-</message>
-<message name="partnerRetrieveAllOutletsResponse">
-<part name="parameters" element="tns:partnerRetrieveAllOutletsResponse"/>
-</message>
-<message name="partnerCreateReservation">
-<part name="parameters" element="tns:partnerCreateReservation"/>
-</message>
-<message name="partnerCreateReservationResponse">
-<part name="parameters" element="tns:partnerCreateReservationResponse"/>
+<message name="partnerDoCancelReservationResponse">
+<part name="parameters" element="tns:partnerDoCancelReservationResponse"/>
 </message>
 <portType name="MCRWebService">
 <operation name="partnerLogin">
@@ -103,11 +103,18 @@
 <output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerSearchCarResponse" message="tns:partnerSearchCarResponse"/>
 <fault message="tns:OutletNotFoundException" name="OutletNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerSearchCar/Fault/OutletNotFoundException"/>
 </operation>
-<operation name="partnerRetrieveTotalByCategory">
-<input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveTotalByCategoryRequest" message="tns:partnerRetrieveTotalByCategory"/>
-<output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveTotalByCategoryResponse" message="tns:partnerRetrieveTotalByCategoryResponse"/>
-<fault message="tns:CategoryNotFoundException" name="CategoryNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveTotalByCategory/Fault/CategoryNotFoundException"/>
-<fault message="tns:RateNotFoundException" name="RateNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveTotalByCategory/Fault/RateNotFoundException"/>
+<operation name="partnerRetrieveAllModels">
+<input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveAllModelsRequest" message="tns:partnerRetrieveAllModels"/>
+<output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveAllModelsResponse" message="tns:partnerRetrieveAllModelsResponse"/>
+</operation>
+<operation name="partnerRetrieveAllOutlets">
+<input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveAllOutletsRequest" message="tns:partnerRetrieveAllOutlets"/>
+<output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveAllOutletsResponse" message="tns:partnerRetrieveAllOutletsResponse"/>
+</operation>
+<operation name="partnerRetrieveOutletById">
+<input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveOutletByIdRequest" message="tns:partnerRetrieveOutletById"/>
+<output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveOutletByIdResponse" message="tns:partnerRetrieveOutletByIdResponse"/>
+<fault message="tns:OutletNotFoundException" name="OutletNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveOutletById/Fault/OutletNotFoundException"/>
 </operation>
 <operation name="partnerRetrieveReservationById">
 <input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveReservationByIdRequest" message="tns:partnerRetrieveReservationById"/>
@@ -116,39 +123,32 @@
 <fault message="tns:ReservationNotFoundException" name="ReservationNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveReservationById/Fault/ReservationNotFoundException"/>
 <fault message="tns:InvalidRelationIdException" name="InvalidRelationIdException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveReservationById/Fault/InvalidRelationIdException"/>
 </operation>
-<operation name="partnerDoCancelReservation">
-<input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerDoCancelReservationRequest" message="tns:partnerDoCancelReservation"/>
-<output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerDoCancelReservationResponse" message="tns:partnerDoCancelReservationResponse"/>
-<fault message="tns:PartnerNotFoundException" name="PartnerNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerDoCancelReservation/Fault/PartnerNotFoundException"/>
-<fault message="tns:ReservationNotFoundException" name="ReservationNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerDoCancelReservation/Fault/ReservationNotFoundException"/>
-<fault message="tns:InvalidRelationIdException" name="InvalidRelationIdException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerDoCancelReservation/Fault/InvalidRelationIdException"/>
+<operation name="partnerRetrieveTotalByCategory">
+<input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveTotalByCategoryRequest" message="tns:partnerRetrieveTotalByCategory"/>
+<output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveTotalByCategoryResponse" message="tns:partnerRetrieveTotalByCategoryResponse"/>
+<fault message="tns:CategoryNotFoundException" name="CategoryNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveTotalByCategory/Fault/CategoryNotFoundException"/>
+<fault message="tns:RateNotFoundException" name="RateNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveTotalByCategory/Fault/RateNotFoundException"/>
+</operation>
+<operation name="partnerCreateReservation">
+<input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerCreateReservationRequest" message="tns:partnerCreateReservation"/>
+<output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerCreateReservationResponse" message="tns:partnerCreateReservationResponse"/>
+<fault message="tns:OutletNotFoundException" name="OutletNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerCreateReservation/Fault/OutletNotFoundException"/>
 </operation>
 <operation name="partnerRetrieveAllCategories">
 <input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveAllCategoriesRequest" message="tns:partnerRetrieveAllCategories"/>
 <output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveAllCategoriesResponse" message="tns:partnerRetrieveAllCategoriesResponse"/>
-</operation>
-<operation name="partnerRetrieveAllModels">
-<input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveAllModelsRequest" message="tns:partnerRetrieveAllModels"/>
-<output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveAllModelsResponse" message="tns:partnerRetrieveAllModelsResponse"/>
 </operation>
 <operation name="partnerRetrieveAllReservations">
 <input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveAllReservationsRequest" message="tns:partnerRetrieveAllReservations"/>
 <output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveAllReservationsResponse" message="tns:partnerRetrieveAllReservationsResponse"/>
 <fault message="tns:PartnerNotFoundException" name="PartnerNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveAllReservations/Fault/PartnerNotFoundException"/>
 </operation>
-<operation name="partnerRetrieveOutletById">
-<input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveOutletByIdRequest" message="tns:partnerRetrieveOutletById"/>
-<output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveOutletByIdResponse" message="tns:partnerRetrieveOutletByIdResponse"/>
-<fault message="tns:OutletNotFoundException" name="OutletNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveOutletById/Fault/OutletNotFoundException"/>
-</operation>
-<operation name="partnerRetrieveAllOutlets">
-<input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveAllOutletsRequest" message="tns:partnerRetrieveAllOutlets"/>
-<output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerRetrieveAllOutletsResponse" message="tns:partnerRetrieveAllOutletsResponse"/>
-</operation>
-<operation name="partnerCreateReservation">
-<input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerCreateReservationRequest" message="tns:partnerCreateReservation"/>
-<output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerCreateReservationResponse" message="tns:partnerCreateReservationResponse"/>
-<fault message="tns:OutletNotFoundException" name="OutletNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerCreateReservation/Fault/OutletNotFoundException"/>
+<operation name="partnerDoCancelReservation">
+<input wsam:Action="http://mcrapplication.ws/MCRWebService/partnerDoCancelReservationRequest" message="tns:partnerDoCancelReservation"/>
+<output wsam:Action="http://mcrapplication.ws/MCRWebService/partnerDoCancelReservationResponse" message="tns:partnerDoCancelReservationResponse"/>
+<fault message="tns:PartnerNotFoundException" name="PartnerNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerDoCancelReservation/Fault/PartnerNotFoundException"/>
+<fault message="tns:ReservationNotFoundException" name="ReservationNotFoundException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerDoCancelReservation/Fault/ReservationNotFoundException"/>
+<fault message="tns:InvalidRelationIdException" name="InvalidRelationIdException" wsam:Action="http://mcrapplication.ws/MCRWebService/partnerDoCancelReservation/Fault/InvalidRelationIdException"/>
 </operation>
 </portType>
 <binding name="MCRWebServicePortBinding" type="tns:MCRWebService">
@@ -180,7 +180,7 @@
 <soap:fault name="OutletNotFoundException" use="literal"/>
 </fault>
 </operation>
-<operation name="partnerRetrieveTotalByCategory">
+<operation name="partnerRetrieveAllModels">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -188,11 +188,26 @@
 <output>
 <soap:body use="literal"/>
 </output>
-<fault name="CategoryNotFoundException">
-<soap:fault name="CategoryNotFoundException" use="literal"/>
-</fault>
-<fault name="RateNotFoundException">
-<soap:fault name="RateNotFoundException" use="literal"/>
+</operation>
+<operation name="partnerRetrieveAllOutlets">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+</operation>
+<operation name="partnerRetrieveOutletById">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="OutletNotFoundException">
+<soap:fault name="OutletNotFoundException" use="literal"/>
 </fault>
 </operation>
 <operation name="partnerRetrieveReservationById">
@@ -213,7 +228,7 @@
 <soap:fault name="InvalidRelationIdException" use="literal"/>
 </fault>
 </operation>
-<operation name="partnerDoCancelReservation">
+<operation name="partnerRetrieveTotalByCategory">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -221,26 +236,26 @@
 <output>
 <soap:body use="literal"/>
 </output>
-<fault name="PartnerNotFoundException">
-<soap:fault name="PartnerNotFoundException" use="literal"/>
+<fault name="CategoryNotFoundException">
+<soap:fault name="CategoryNotFoundException" use="literal"/>
 </fault>
-<fault name="ReservationNotFoundException">
-<soap:fault name="ReservationNotFoundException" use="literal"/>
+<fault name="RateNotFoundException">
+<soap:fault name="RateNotFoundException" use="literal"/>
 </fault>
-<fault name="InvalidRelationIdException">
-<soap:fault name="InvalidRelationIdException" use="literal"/>
+</operation>
+<operation name="partnerCreateReservation">
+<soap:operation soapAction=""/>
+<input>
+<soap:body use="literal"/>
+</input>
+<output>
+<soap:body use="literal"/>
+</output>
+<fault name="OutletNotFoundException">
+<soap:fault name="OutletNotFoundException" use="literal"/>
 </fault>
 </operation>
 <operation name="partnerRetrieveAllCategories">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-</operation>
-<operation name="partnerRetrieveAllModels">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -261,7 +276,7 @@
 <soap:fault name="PartnerNotFoundException" use="literal"/>
 </fault>
 </operation>
-<operation name="partnerRetrieveOutletById">
+<operation name="partnerDoCancelReservation">
 <soap:operation soapAction=""/>
 <input>
 <soap:body use="literal"/>
@@ -269,29 +284,14 @@
 <output>
 <soap:body use="literal"/>
 </output>
-<fault name="OutletNotFoundException">
-<soap:fault name="OutletNotFoundException" use="literal"/>
+<fault name="PartnerNotFoundException">
+<soap:fault name="PartnerNotFoundException" use="literal"/>
 </fault>
-</operation>
-<operation name="partnerRetrieveAllOutlets">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-</operation>
-<operation name="partnerCreateReservation">
-<soap:operation soapAction=""/>
-<input>
-<soap:body use="literal"/>
-</input>
-<output>
-<soap:body use="literal"/>
-</output>
-<fault name="OutletNotFoundException">
-<soap:fault name="OutletNotFoundException" use="literal"/>
+<fault name="ReservationNotFoundException">
+<soap:fault name="ReservationNotFoundException" use="literal"/>
+</fault>
+<fault name="InvalidRelationIdException">
+<soap:fault name="InvalidRelationIdException" use="literal"/>
 </fault>
 </operation>
 </binding>

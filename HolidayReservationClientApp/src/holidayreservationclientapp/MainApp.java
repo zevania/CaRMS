@@ -49,7 +49,8 @@ public class MainApp {
     
     
     Partner curPartner;
-    DateFormat dateformatter = new SimpleDateFormat("dd/MM/yyyy");
+    SimpleDateFormat dateformatter = new SimpleDateFormat("dd/MM/yyyy");
+    SimpleDateFormat timeformatter = new SimpleDateFormat("HH:mm");
     public void runApp(){
         Scanner scanner = new Scanner(System.in);
         Integer response = 0;
@@ -327,17 +328,10 @@ public class MainApp {
             XMLGregorianCalendar open = o.getOpenHrs();
             XMLGregorianCalendar close = o.getCloseHrs();
             
-            open.setTime(DatatypeConstants.FIELD_UNDEFINED,
-            DatatypeConstants.FIELD_UNDEFINED,
-            DatatypeConstants.FIELD_UNDEFINED,
-            DatatypeConstants.FIELD_UNDEFINED);
+            Date openTime = open.toGregorianCalendar().getTime();
+            Date closeTime = close.toGregorianCalendar().getTime();
             
-            close.setTime(DatatypeConstants.FIELD_UNDEFINED,
-            DatatypeConstants.FIELD_UNDEFINED,
-            DatatypeConstants.FIELD_UNDEFINED,
-            DatatypeConstants.FIELD_UNDEFINED);
-            
-            System.out.printf("%10s%20s%20s%15s%15s\n", o.getOutletId(), o.getName(), o.getAddress(), open, close);
+            System.out.printf("%10s%20s%20s%15s%15s\n", o.getOutletId(), o.getName(), o.getAddress(), timeformatter.format(openTime), timeformatter.format(closeTime));
             i++;
         }
         System.out.println();
@@ -574,19 +568,12 @@ public class MainApp {
         XMLGregorianCalendar startDate = r.getPickupDate();
         XMLGregorianCalendar endDate = r.getReturnDate();
         
-        startDate.setTime(DatatypeConstants.FIELD_UNDEFINED,
-        DatatypeConstants.FIELD_UNDEFINED,
-        DatatypeConstants.FIELD_UNDEFINED,
-        DatatypeConstants.FIELD_UNDEFINED);
-        
-        endDate.setTime(DatatypeConstants.FIELD_UNDEFINED,
-        DatatypeConstants.FIELD_UNDEFINED,
-        DatatypeConstants.FIELD_UNDEFINED,
-        DatatypeConstants.FIELD_UNDEFINED);
+        Date aDate = startDate.toGregorianCalendar().getTime();
+        Date bDate = endDate.toGregorianCalendar().getTime();
         
         System.out.printf("%8s%20s%20s%20s%20s\n", "Res Id", "Pick Up Date", "Return Date",
                 "PickUp Location", "Return Location");
-        System.out.printf("%8s%20s%20s%20s%20s\n", id, startDate, endDate, 
+        System.out.printf("%8s%20s%20s%20s%20s\n", id, dateformatter.format(aDate), dateformatter.format(bDate), 
                 r.getPickupLocation().getName(), r.getReturnLocation().getName());
         System.out.println("Reservation Status: " + r.getResStatus());
         System.out.println("Total Amount: " + r.getTotal());
@@ -650,17 +637,12 @@ public class MainApp {
         System.out.printf("%8s%20s%20s%20s%20s\n", "Res Id", "PickUp Date", "Return Date", "Reservation Status", "Payment Status");
         for(Reservation r : res) {
             startDate = r.getPickupDate();
-            startDate.setTime(DatatypeConstants.FIELD_UNDEFINED,
-            DatatypeConstants.FIELD_UNDEFINED,
-            DatatypeConstants.FIELD_UNDEFINED,
-            DatatypeConstants.FIELD_UNDEFINED);
             
             endDate = r.getReturnDate();
-            endDate.setTime(DatatypeConstants.FIELD_UNDEFINED,
-            DatatypeConstants.FIELD_UNDEFINED,
-            DatatypeConstants.FIELD_UNDEFINED,
-            DatatypeConstants.FIELD_UNDEFINED);
-            System.out.printf("%8s%20s%20s%20s%20s\n", r.getReservationId(), startDate, endDate, r.getResStatus(), r.getPaymentStatus());
+            Date aDate = startDate.toGregorianCalendar().getTime();
+            Date bDate = endDate.toGregorianCalendar().getTime();
+                    
+            System.out.printf("%8s%20s%20s%20s%20s\n", r.getReservationId(), dateformatter.format(aDate), dateformatter.format(bDate), r.getResStatus(), r.getPaymentStatus());
         }
         System.out.println();
         System.out.println("Press enter to continue!");
