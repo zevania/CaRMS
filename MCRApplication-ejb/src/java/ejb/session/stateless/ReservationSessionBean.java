@@ -208,8 +208,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         tempEndTime.setYear(pickupLoc.getOpenHrs().getYear());
         tempEndTime.setMonth(pickupLoc.getOpenHrs().getMonth());
         
-        if(pickupLoc.getOpenHrs().after(startTime)) return false;
-        if(returnLoc.getCloseHrs().before(endTime)) return false;
+        if(pickupLoc.getOpenHrs().after(tempStartTime)) return false;
+        if(returnLoc.getCloseHrs().before(tempEndTime)) return false;
         
         Set<Reservation> clashingRes = new HashSet<>();
         List<Reservation> temp = new LinkedList<>();
@@ -217,6 +217,14 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         
         Date dStartTime = new Date(2000,1,1,startTime.getHours()-2,startTime.getMinutes(),startTime.getSeconds());
         Date dEndTime = new Date(2000,1,1,endTime.getHours()-2,endTime.getMinutes(),endTime.getSeconds());
+        
+        dStartTime.setYear(startTime.getYear());
+        dStartTime.setMonth(startTime.getMonth());
+        dStartTime.setDate(startTime.getDate());
+        
+        dEndTime.setYear(startTime.getYear());
+        dEndTime.setMonth(startTime.getMonth());
+        dEndTime.setDate(startTime.getDate());
         
         
         Query query;
@@ -242,11 +250,11 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             for(Reservation theR: temp){
                 clashingRes.add(theR);
             }
-            
+            System.out.println("clash res size is "+clashingRes.size());
             for(Reservation theR: clashingRes){
                 if(theR.getReturnDate().equals(startDate)){
                     if(theR.getReturnLocation().equals(pickupLoc)){
-                        if(theR.getReturnTime().after(tempStartTime)){
+                        if(theR.getReturnTime().after(startTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
@@ -260,10 +268,11 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     }
                 } else if(theR.getPickupDate().equals(endDate)){
                     if(theR.getPickupLocation().equals(returnLoc)){
-                        if(theR.getPickupTime().before(tempEndTime)){
+                        if(theR.getPickupTime().before(endTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
+                            System.out.println("bruhla");
                         }
                     }else{
                         if(theR.getPickupTime().before(dEndTime)){
@@ -306,7 +315,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             for(Reservation theR: clashingRes){
                 if(theR.getReturnDate().equals(startDate)){
                     if(theR.getReturnLocation().equals(pickupLoc)){
-                        if(theR.getReturnTime().after(tempStartTime)){
+                        if(theR.getReturnTime().after(startTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
@@ -320,7 +329,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     }
                 } else if(theR.getPickupDate().equals(endDate)){
                     if(theR.getPickupLocation().equals(returnLoc)){
-                        if(theR.getPickupTime().before(tempEndTime)){
+                        if(theR.getPickupTime().before(endTime)){
                             continue;
                         } else {
                             toRemove.add(theR);

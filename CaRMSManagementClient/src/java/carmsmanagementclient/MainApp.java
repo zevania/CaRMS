@@ -469,7 +469,7 @@ public class MainApp {
                 break;
             } else if(yesno.equals("n")) {
                 startDate = new Date(0L);
-                endDate = new Date(2100,11,12);
+                endDate = new Date(2100,10,12);
                 break;
             }
         }
