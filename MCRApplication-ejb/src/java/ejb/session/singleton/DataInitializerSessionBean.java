@@ -68,11 +68,11 @@ public class DataInitializerSessionBean {
     private void initializeOutletData()
     {
         Outlet o;
-        o = new Outlet(new Date(2000,1,1,9 , 0, 0), new Date(2000,1,1,21,0,0), "Outlet 1", "Ang Mo Kio");
+        o = new Outlet(new Date(2000,1,1,0, 0, 0), new Date(2000,1,1,23,59,0), "Outlet A", "Ang Mo Kio");
         outletSessionBeanLocal.createOutlet(o);
-        o = new Outlet(new Date(2000,1,1,9, 0, 0), new Date(2000,1,1,21,0,0), "Outlet 2", "Orchard");
+        o = new Outlet(new Date(2000,1,1,9, 0, 0), new Date(2000,1,1,23,59,0), "Outlet B", "Orchard");
         outletSessionBeanLocal.createOutlet(o);
-        o = new Outlet(new Date(2000,1,1,9, 0, 0), new Date(2000,1,1,21,0,0), "Outlet 3", "Bugis");
+        o = new Outlet(new Date(2000,1,1,10, 0, 0), new Date(2000,1,1,22,0,0), "Outlet C", "Bugis");
         outletSessionBeanLocal.createOutlet(o);
     }
     

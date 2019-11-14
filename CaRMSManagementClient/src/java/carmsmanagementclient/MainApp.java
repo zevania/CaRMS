@@ -113,6 +113,8 @@ public class MainApp {
                             operationApp();
                         } else if (currEmployee.getRole()==RoleEnum.CUSTOMERSERVICE){
                             custServApp();
+                        } else if(currEmployee.getRole()==RoleEnum.EMPLOYEE) {
+                            
                         }
                         doLogout();
                     }
