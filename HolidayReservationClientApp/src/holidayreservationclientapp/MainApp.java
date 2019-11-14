@@ -12,7 +12,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
-//import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Scanner;
@@ -59,10 +58,11 @@ public class MainApp {
         {
             System.out.println("*** Welcome to Holiday Reservation Client  ***\n");
             System.out.println("1: Login");
-            System.out.println("2: Exit\n");
+            System.out.println("2: Search car");
+            System.out.println("3: Exit\n");
             response = 0;
             
-            while(response < 1 || response > 2)
+            while(response < 1 || response > 3)
             {
                 System.out.print("> ");
 
@@ -81,8 +81,11 @@ public class MainApp {
                         mainApp();
                         doLogout();
                         break;
+                } else if (response == 2){
+                    doSearchCar();
+                    break;
                 }
-                else if (response == 2)
+                else if (response == 3)
                 {
                     break;
                 }
@@ -92,7 +95,7 @@ public class MainApp {
                 }
             }
             
-            if(response == 2){
+            if(response == 3){
                 break;
             }
         }
