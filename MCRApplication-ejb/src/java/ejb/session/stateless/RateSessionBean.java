@@ -92,6 +92,7 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(temp);
         
+        
         Query query;
         
         while(!temp.after(endDate)){
@@ -100,27 +101,26 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
                         .setParameter("inCat", catId)
                         .setParameter("inStart", temp)
                         .setParameter("inEnd", temp);
-                System.out.println("walao sini");
+                
                 List<Rate> peakrates = query.getResultList();
                 if(peakrates.size()==0) throw new RateNotFoundException();
                 total += peakrates.get(0).getPeakRate();
-        
             } else {
                 query = em.createQuery("SELECT r FROM Rate r WHERE r.category.categoryId = :inCat AND r.startPeriod <= :inStart AND r.endPeriod >= :inEnd ORDER BY r.rate ASC")
                         .setParameter("inCat", catId)
                         .setParameter("inStart", temp)
                         .setParameter("inEnd", temp);
-                System.out.println("walao si");
+                
                 List<Rate> rates = query.getResultList();
                 if(rates.size()==0) throw new RateNotFoundException();
                 total+= rates.get(0).getRate();
-                
             }
             calendar.add(Calendar.DATE,1);
             temp = calendar.getTime();
         }
         
         if(temp.before(endDate)) throw new RateNotFoundException();
+        
         
         return total;
     }

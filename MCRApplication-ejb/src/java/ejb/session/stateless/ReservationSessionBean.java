@@ -112,7 +112,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         Customer cust = new Customer(member.getName(), ccNum, email, CustomerTypeEnum.MEMBER);
         
         em.persist(cust);
-        em.flush();
         
         r.setCustomer(cust);
         
