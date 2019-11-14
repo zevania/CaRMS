@@ -114,7 +114,7 @@ public class MainApp {
                         } else if (currEmployee.getRole()==RoleEnum.CUSTOMERSERVICE){
                             custServApp();
                         } else if(currEmployee.getRole()==RoleEnum.EMPLOYEE) {
-                            
+                            empApp();
                         }
                         doLogout();
                     }
@@ -164,6 +164,15 @@ public class MainApp {
                 break;
             }
         }
+    }
+    
+    private void empApp(){
+        Scanner sc = new Scanner(System.in);
+        
+        System.out.println("*** CaRMS Management Client :: EMPLOYEE ***\n");
+        System.out.println("You are just employee. Can only log out, so sad :(");
+        System.out.println("Press enter to log out!");
+        sc.nextLine();
     }
     
     private void doLogin() throws InvalidLoginCredentialException {
