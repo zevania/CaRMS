@@ -1094,12 +1094,7 @@ public class MainApp {
         
         System.out.println("*** CaRMS Management Client :: Assign TDR Driver ***\n");
         
-        List<DriverDispatchRecord> ddrs = transitDriverDispatchRecordSessionBean.retrieveDispatchRecords(currEmployee.getOutlet().getOutletId(), Calendar.getInstance().getTime());
-        
-        if(ddrs.size() == 0){
-            System.out.println("There is no driver dispatch record for today!");
-            return;
-        }
+        System.out.println("For demonstration purposes, the program allow user to assign driver to DDR from another day");
         
         List<Employee> employees = employeeSessionBean.retrieveEmployees(currEmployee.getOutlet().getOutletId());
         

@@ -216,19 +216,31 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         
         if(pickupLoc==null || returnLoc == null) throw new OutletNotFoundException();
         
-//        System.out.println("open hrs "+pickupLoc.getOpenHrs()+" - startTime "+startTime);
-//        System.out.println("close hrs "+returnLoc.getCloseHrs()+" - closeTime "+endTime);
-//        System.out.println("the year is "+startTime.getYear());
-//        System.out.println("the or year is "+pickupLoc.getOpenHrs().getYear());
-//        System.out.println("the start date is "+startDate);
-//        System.out.println("the startDate year is"+startDate.getYear());
-//        System.out.println("TMZ offset openLoc "+pickupLoc.getOpenHrs().getTimezoneOffset());
-//        System.out.println("TMZ offset local "+startTime.getTimezoneOffset());
-//        
-      
+        System.out.println("open hrs "+pickupLoc.getOpenHrs()+" - startTime "+startTime);
+        System.out.println("close hrs "+returnLoc.getCloseHrs()+" - closeTime "+endTime);
+        System.out.println("the year is "+startTime.getYear());
+        System.out.println("the or year is "+pickupLoc.getOpenHrs().getYear());
+        System.out.println("the start date is "+startDate);
+        System.out.println("the startDate year is"+startDate.getYear());
+        System.out.println("TMZ offset openLoc "+pickupLoc.getOpenHrs().getTimezoneOffset());
+        System.out.println("TMZ offset local "+startTime.getTimezoneOffset());
+        
 
-        //if(pickupLoc.getOpenHrs().after(startTime)) return false;
-        //if(returnLoc.getCloseHrs().before(endTime)) return false;
+        Date tempStartTime = startTime;
+        tempStartTime.setDate(pickupLoc.getOpenHrs().getDate());
+        tempStartTime.setYear(pickupLoc.getOpenHrs().getYear());
+        tempStartTime.setMonth(pickupLoc.getOpenHrs().getMonth());
+
+        System.out.println("the tempSTartTime "+tempStartTime);
+        System.out.println("sikat "+pickupLoc.getOpenHrs());
+        
+        Date tempEndTime = endTime;
+        tempEndTime.setDate(pickupLoc.getOpenHrs().getDate());
+        tempEndTime.setYear(pickupLoc.getOpenHrs().getYear());
+        tempEndTime.setMonth(pickupLoc.getOpenHrs().getMonth());
+        
+        if(pickupLoc.getOpenHrs().after(startTime)) return false;
+        if(returnLoc.getCloseHrs().before(endTime)) return false;
         
         Set<Reservation> clashingRes = new HashSet<>();
         List<Reservation> temp = new LinkedList<>();
@@ -236,10 +248,23 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         
         Date dStartTime = new Date(2000,1,1,startTime.getHours()-2,startTime.getMinutes(),startTime.getSeconds());
         Date dEndTime = new Date(2000,1,1,endTime.getHours()-2,endTime.getMinutes(),endTime.getSeconds());
+        
+        System.out.println("ini loo sini pak "+dStartTime.getTimezoneOffset());
+        System.out.println("the input date offset "+startDate.getTimezoneOffset()+" the date "+startDate);
+        
+        
+        
+        
         Query query;
         searchType = searchType.toLowerCase();
         int totalCar = 0;
         
+        
+        query = em.createQuery("SELECT r FROM Reservation r");
+        List<Reservation> ghi = query.getResultList();
+        for(Reservation lis: ghi){
+            System.out.println("the local date "+lis.getPickupDate()+" offset is"+lis.getPickupDate().getTimezoneOffset());
+        }
         
         System.out.println("the type"+ searchType);
         System.out.println("the model id"+ modelId);
@@ -267,7 +292,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             for(Reservation theR: clashingRes){
                 if(theR.getReturnDate().equals(startDate)){
                     if(theR.getReturnLocation().equals(pickupLoc)){
-                        if(theR.getReturnTime().after(startTime)){
+                        if(theR.getReturnTime().after(tempStartTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
@@ -281,7 +306,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     }
                 } else if(theR.getPickupDate().equals(endDate)){
                     if(theR.getPickupLocation().equals(returnLoc)){
-                        if(theR.getPickupTime().before(endTime)){
+                        if(theR.getPickupTime().before(tempEndTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
@@ -330,7 +355,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             for(Reservation theR: clashingRes){
                 if(theR.getReturnDate().equals(startDate)){
                     if(theR.getReturnLocation().equals(pickupLoc)){
-                        if(theR.getReturnTime().after(startTime)){
+                        if(theR.getReturnTime().after(tempStartTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
@@ -344,7 +369,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     }
                 } else if(theR.getPickupDate().equals(endDate)){
                     if(theR.getPickupLocation().equals(returnLoc)){
-                        if(theR.getPickupTime().before(endTime)){
+                        if(theR.getPickupTime().before(tempEndTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
@@ -370,69 +395,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         }
         
         return false;
-//        Outlet pickupLoc = em.find(Outlet.class, pickupid);
-//        Outlet returnLoc = em.find(Outlet.class, returnid);
-//        searchType = searchType.toLowerCase();
-//        Category category;
-//        Model model;
-//        List<Reservation> wholeres;
-//        List<Reservation> pickedres = new LinkedList<>();
-//        Query query;
-//        
-//        startTime = startTime.minusHours(2);
-//        endTime = endTime.plusHours(2);
-//        
-//        if(searchType.equals("category")){
-//            category = em.find(Category.class, categoryId);
-//            query = em.createQuery("SELECT r FROM Reservation r WHERE r.resStatus = ResStatusEnum.ORDERED OR r.resStatus = ResStatusEnum.PICKEDUP");
-//            wholeres = query.getResultList();
-//            int totalCar = 0;
-//            
-//            query = em.createQuery("SELECT c FROM Car c WHERE c.model.category.categoryId = :catId")
-//                    .setParameter("catId", category.getCategoryId());
-//            
-//            List<Car> cars = query.getResultList();
-//            
-//            totalCar = cars.size();
-//            
-//            for(Reservation r: wholeres){
-//                /*
-//                if(r.getPickupDate().before(endDate) && r.getPickupDate().after(startDate) ){
-//                    pickedres.add(r);
-//                } else if (r.getReturnDate().after(startDate)&& r.getReturnDate().before(endDate)) {
-//                    pickedres.add(r);
-//                } else if(r.getReturnDate().equals(startDate) && r.getReturnTime().after(startTime)){
-//                    pickedres.add(r);
-//                } else if (r.getPickupDate().equals(endDate) && r.getPickupTime().before(endTime)) {
-//                    pickedres.add(r);
-//                } else if (r.getReturnDate().after(endDate) && r.getPickupDate().before(startDate)){
-//                    pickedres.add(r);
-//                } else if(r.getPickupDate().equals(startDate) && r.getPickupTime().equals(startTime))
-//                */
-//                
-//                if(r.getReturnDate().before(startDate)){
-//                } else if(r.getPickupDate().after(endDate)){
-//                } else if(r.getReturnDate().equals(startDate) && (r.getReturnTime().before(startTime) || r.getReturnTime().equals(startTime))){        
-//                } else if(r.getPickupDate().equals(endDate) && (r.getPickupTime().after(endTime)||r.getPickupTime().equals(endTime))){
-//                } else {
-//                    if(r.getOrderType() == OrderTypeEnum.CATEGORY && r.getCarCategory().getCategoryId() == category.getCategoryId())
-//                        pickedres.add(r);
-//                    else if(r.getOrderType() == OrderTypeEnum.MODEL && r.getCarModel().getCategory().getCategoryId() == category.getCategoryId())
-//                        pickedres.add(r);
-//                }    
-//            }
-//            
-//            int leftover = totalCar-pickedres.size();
-//            
-//            if(leftover>0){
-//                return true;
-//            }
-//            
-//        } else if (searchType.equals("model")) {
-//            model = em.find(Model.class, modelId);
-//        }
-//        
-//        return false;
     }
     
     @Override
@@ -473,6 +435,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
+                System.out.println("TMZ here is "+temp.getPickupTime().getTimezoneOffset());
+                
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
                     if(c.getModel().getModelId() == temp.getCarModel().getModelId() &&
@@ -495,7 +459,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation IS NOT NULL AND c.active = TRUE AND c.reservation.returnLocation.outletId = :store")
+            query = em.createQuery("SELECT c FROM Car c WHERE c.active = TRUE AND c.reservation.returnLocation.outletId = :store")
                     .setParameter("store",theStoreId);
             cars = query.getResultList();
             
@@ -503,9 +467,10 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
                 temptime = temp.getPickupTime();
+                System.out.println("TMZ here is "+temptime.getTimezoneOffset());
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
-                    if(c.isActive() &&c.getModel().getModelId() == temp.getCarModel().getModelId() &&
+                    if(c.isActive() && c.getReservation()!=null &&c.getModel().getModelId() == temp.getCarModel().getModelId() &&
                         c.getReservation().getReturnDate().equals(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().before(temptime) || c.getReservation().getReturnTime().equals(temptime))){
                         c.setReservation(temp);
@@ -552,7 +517,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation IS NOT NULL AND c.active = TRUE");
+            query = em.createQuery("SELECT c FROM Car c WHERE c.active = TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){
@@ -561,7 +526,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                 temptime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());        
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
-                    if( c.isActive() && c.getModel().getModelId() == temp.getCarModel().getModelId() &&
+                    if( c.isActive() && c.getReservation()!=null &&c.getModel().getModelId() == temp.getCarModel().getModelId() &&
                         c.getReservation().getReturnDate().equals(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().before(temptime) || c.getReservation().getReturnTime().equals(temptime))){
                         c.setReservation(temp);
@@ -598,6 +563,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
+                System.out.println("TMZ here is "+temp.getPickupTime().getTimezoneOffset());
+                
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
                     if(c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
@@ -621,7 +588,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation IS NOT NULL AND c.reservation.returnLocation.outletId = :store AND c.active = TRUE")
+            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation.returnLocation.outletId = :store AND c.active = TRUE")
                     .setParameter("store",theStoreId);
             cars = query.getResultList();
             
@@ -631,7 +598,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                 temptime = temp.getPickupTime();
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
-                    if(c.isActive() && c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
+                    if(c.isActive() && c.getReservation()!=null && c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
                         c.getReservation().getReturnDate().equals(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().before(temptime) || c.getReservation().getReturnTime().equals(temptime))){
                         c.setReservation(temp);
@@ -678,7 +645,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             toRemove.clear();
             
-            query = em.createQuery("SELECT c FROM Car c WHERE c.reservation IS NOT NULL AND c.active = TRUE");
+            query = em.createQuery("SELECT c FROM Car c WHERE c.active = TRUE");
             cars = query.getResultList();
             
             for(int j = 0; j < tempReservation.size();j++){
@@ -687,7 +654,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                         
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
-                    if(c.isActive() && c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
+                    if(c.isActive() && c.getReservation()!=null && c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
                         !c.getReservation().getReturnDate().after(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().before(temptime) || c.getReservation().getReturnTime().equals(temptime))){
                         c.setReservation(temp);
