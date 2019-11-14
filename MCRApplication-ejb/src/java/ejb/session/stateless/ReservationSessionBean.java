@@ -388,8 +388,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             theStoreId = o.getOutletId();
             toRemove.clear();
             
-            query = em.createQuery("SELECT r FROM Reservation r "
-                    + "WHERE r.orderType = util.enumeration.OrderTypeEnum.MODEL AND r.pickupLocation.outletId = :store AND r.pickupDate = :inTodayDate")
+            query = em.createQuery("SELECT r FROM Reservation r WHERE r.orderType = util.enumeration.OrderTypeEnum.MODEL AND r.pickupLocation.outletId = :store AND r.pickupDate = :inTodayDate")
                     .setParameter("store", theStoreId)
                     .setParameter("inTodayDate", todayDate);
             tempReservation = query.getResultList();
