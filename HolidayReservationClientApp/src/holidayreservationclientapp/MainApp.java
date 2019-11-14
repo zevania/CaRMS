@@ -496,7 +496,7 @@ public class MainApp {
                                     payStatus = PaidStatusEnum.PAID;
                                 } else if(payRes == 2){
                                     System.out.println("Payment is defferred");
-                                    payStatus = PaidStatusEnum.PAID;
+                                    payStatus = PaidStatusEnum.UNPAID;
                                 }
                                 break;
                             }
