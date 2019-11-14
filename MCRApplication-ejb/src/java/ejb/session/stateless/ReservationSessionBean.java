@@ -205,10 +205,12 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         tempStartTime.setMonth(pickupLoc.getOpenHrs().getMonth());
         
         Date tempEndTime = endTime;
-        tempEndTime.setDate(pickupLoc.getOpenHrs().getDate());
-        tempEndTime.setYear(pickupLoc.getOpenHrs().getYear());
-        tempEndTime.setMonth(pickupLoc.getOpenHrs().getMonth());
+        tempEndTime.setDate(returnLoc.getCloseHrs().getDate());
+        tempEndTime.setYear(returnLoc.getCloseHrs().getYear());
+        tempEndTime.setMonth(returnLoc.getCloseHrs().getMonth());
         
+//        System.out.println("start: "+pickupLoc.getOpenHrs()+" "+ tempStartTime);
+//        System.out.println("end: "+returnLoc.getCloseHrs()+" "+ tempEndTime);
         if(pickupLoc.getOpenHrs().after(tempStartTime)) return false;
         if(returnLoc.getCloseHrs().before(tempEndTime)) return false;
         
@@ -223,9 +225,9 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         dStartTime.setMonth(startTime.getMonth());
         dStartTime.setDate(startTime.getDate());
         
-        dEndTime.setYear(startTime.getYear());
-        dEndTime.setMonth(startTime.getMonth());
-        dEndTime.setDate(startTime.getDate());
+        dEndTime.setYear(endTime.getYear());
+        dEndTime.setMonth(endTime.getMonth());
+        dEndTime.setDate(endTime.getDate());
         
         
         Query query;
@@ -233,6 +235,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         int totalCar = 0;
         
         if(searchType.equals("category")){
+            System.out.println("kini");
             query = em.createQuery("SELECT c FROM Car c WHERE c.model.category.categoryId = :catId AND c.active = TRUE")
                     .setParameter("catId", categoryId);
             totalCar = query.getResultList().size();
@@ -302,7 +305,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     .setParameter("inEndDate", endDate)
                     .setParameter("inStartDate", startDate);
             clashingRes = new HashSet<>(query.getResultList());
-            
+            System.out.println("nah man "+clashingRes.size());
             query = em.createQuery("SELECT r FROM Reservation r WHERE r.carModel.modelId = :inMod AND r.returnDate <= :inEndDate AND r.returnDate >= :inStartDate")
                     .setParameter("inMod", modelId)
                     .setParameter("inStartDate",startDate)
@@ -354,11 +357,14 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             }
             
             int leftCar = totalCar - clashingRes.size();
+            
+            System.out.println("left cat total bru is "+leftCar);
+            
             if(leftCar>0) return true;
             else return false; 
             
         }
-        
+        System.out.println("sini bruh "+searchType.toString());
         return false;
     }
     
