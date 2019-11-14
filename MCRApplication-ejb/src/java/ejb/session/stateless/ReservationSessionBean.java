@@ -108,28 +108,11 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         }
         
         String email = member.getEmail();
-//        System.out.println("asd"+email);
-//        Query query = em.createQuery("SELECT c FROM Customer c WHERE c.email = :theEmail")
-//                .setParameter("theEmail", email);
 
         Customer cust = new Customer(member.getName(), ccNum, email, CustomerTypeEnum.MEMBER);
         
-//        List<Customer> abc = query.getResultList();
-//        for(Customer asd:abc){
-//            System.out.println(asd.getEmail()+" "+asd.getCustId());
-//        }
-//        try{
-//           cust = (Customer) query.getSingleResult(); 
-//        } catch (NoResultException ex) {
-//            cust = new Customer(member.getName(), ccNum, member.getEmail(), CustomerTypeEnum.MEMBER); 
-//            em.persist(cust);
-//        }
-        
-
         r.setCustomer(cust);
         
-        //cust.getReservations().add(r);
-        //em.persist(cust);
         em.persist(r);
         em.persist(cust);
         em.flush();
@@ -215,24 +198,11 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         Outlet returnLoc = em.find(Outlet.class, returnid);
         
         if(pickupLoc==null || returnLoc == null) throw new OutletNotFoundException();
-        
-        System.out.println("open hrs "+pickupLoc.getOpenHrs()+" - startTime "+startTime);
-        System.out.println("close hrs "+returnLoc.getCloseHrs()+" - closeTime "+endTime);
-        System.out.println("the year is "+startTime.getYear());
-        System.out.println("the or year is "+pickupLoc.getOpenHrs().getYear());
-        System.out.println("the start date is "+startDate);
-        System.out.println("the startDate year is"+startDate.getYear());
-        System.out.println("TMZ offset openLoc "+pickupLoc.getOpenHrs().getTimezoneOffset());
-        System.out.println("TMZ offset local "+startTime.getTimezoneOffset());
-        
 
         Date tempStartTime = startTime;
         tempStartTime.setDate(pickupLoc.getOpenHrs().getDate());
         tempStartTime.setYear(pickupLoc.getOpenHrs().getYear());
         tempStartTime.setMonth(pickupLoc.getOpenHrs().getMonth());
-
-        System.out.println("the tempSTartTime "+tempStartTime);
-        System.out.println("sikat "+pickupLoc.getOpenHrs());
         
         Date tempEndTime = endTime;
         tempEndTime.setDate(pickupLoc.getOpenHrs().getDate());
@@ -249,30 +219,15 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         Date dStartTime = new Date(2000,1,1,startTime.getHours()-2,startTime.getMinutes(),startTime.getSeconds());
         Date dEndTime = new Date(2000,1,1,endTime.getHours()-2,endTime.getMinutes(),endTime.getSeconds());
         
-        System.out.println("ini loo sini pak "+dStartTime.getTimezoneOffset());
-        System.out.println("the input date offset "+startDate.getTimezoneOffset()+" the date "+startDate);
-        
-        
-        
         
         Query query;
         searchType = searchType.toLowerCase();
         int totalCar = 0;
         
-        
-        query = em.createQuery("SELECT r FROM Reservation r");
-        List<Reservation> ghi = query.getResultList();
-        for(Reservation lis: ghi){
-            System.out.println("the local date "+lis.getPickupDate()+" offset is"+lis.getPickupDate().getTimezoneOffset());
-        }
-        
-        System.out.println("the type"+ searchType);
-        System.out.println("the model id"+ modelId);
         if(searchType.equals("category")){
             query = em.createQuery("SELECT c FROM Car c WHERE c.model.category.categoryId = :catId AND c.active = TRUE")
                     .setParameter("catId", categoryId);
             totalCar = query.getResultList().size();
-            System.out.println("theCar total is "+totalCar);
             query = em.createQuery("SELECT r FROM Reservation r WHERE r.carCategory.categoryId = :inCat AND r.pickupDate >= :inStartDate AND r.pickupDate <= :inEndDate")
                     .setParameter("inCat", categoryId)
                     .setParameter("inStartDate", startDate)
@@ -326,15 +281,12 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             }
             
             int leftCar = totalCar - clashingRes.size();
-            System.out.println("sini nih pak"+leftCar);
             if(leftCar>0) return true;
             else return false;
         }else if(searchType.equals("model")){
            query = em.createQuery("SELECT c FROM Car c WHERE c.model.modelId = :modId AND c.active = TRUE")
                     .setParameter("modId", modelId);
             totalCar = query.getResultList().size();
-            
-            System.out.println("how mana yo"+totalCar);
             
             query = em.createQuery("SELECT r FROM Reservation r WHERE r.carModel.modelId = :inMod AND r.pickupDate >= :inStartDate AND r.pickupDate <= :inEndDate")
                     .setParameter("inMod", modelId)
@@ -435,7 +387,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
-                System.out.println("TMZ here is "+temp.getPickupTime().getTimezoneOffset());
                 
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
@@ -467,7 +418,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
                 temptime = temp.getPickupTime();
-                System.out.println("TMZ here is "+temptime.getTimezoneOffset());
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
                     if(c.isActive() && c.getReservation()!=null &&c.getModel().getModelId() == temp.getCarModel().getModelId() &&
@@ -551,19 +501,16 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             o = outlet.get(i);
             theStoreId = o.getOutletId();
             toRemove.clear();
-            System.out.println("hereloo");
             query = em.createQuery("SELECT r FROM Reservation r "
                     + "WHERE r.pickupLocation.outletId = :store AND r.orderType = util.enumeration.OrderTypeEnum.CATEGORY  AND r.pickupDate = :inTodayDate ")
                     .setParameter("store", theStoreId)
                     .setParameter("inTodayDate",todayDate);
             tempReservation = query.getResultList();
             cars = o.getCars();
-            System.out.println("the total r is "+tempReservation.size()+" "+todayDate);
             if(tempReservation.size()==0) continue;
             
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
-                System.out.println("TMZ here is "+temp.getPickupTime().getTimezoneOffset());
                 
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
@@ -573,7 +520,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                         temp.setCar(c);
                         toRemove.add(temp);
                         cars.remove(c);
-                        System.out.println("masuk pak");
                         break;
                     } 
                 }
@@ -583,7 +529,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             for(Reservation r: toRemove){
                 tempReservation.remove(r);
             }
-            System.out.println("got ini");
+            
             if(tempReservation.size()==0) continue;
             
             toRemove.clear();
@@ -619,7 +565,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             query = em.createQuery("SELECT c FROM Car c WHERE c.active = TRUE");
             cars = query.getResultList();
-            System.out.println("Jumlah mobil sini is "+cars.size());
+            
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
                 for(int k = 0; k < cars.size();k++){
@@ -662,7 +608,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                         cars.remove(c);
                         toRemove.add(temp);
                         Date pickTime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
-                        System.out.print("sampe ini jga");
                         ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , c.getReservation().getReturnLocation().getName());
                         id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
@@ -674,7 +619,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                 tempReservation.remove(r);
             }
             if(tempReservation.size()==0) continue;
-            System.out.println("sampe");
             
         }
     }

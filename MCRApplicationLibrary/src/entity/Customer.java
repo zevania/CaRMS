@@ -43,9 +43,7 @@ public class Customer implements Serializable {
     @Enumerated(EnumType.STRING)
     private CustomerTypeEnum customerType;
         
-    @OneToOne(mappedBy = "customer")
-    private Reservation reservation;
-    
+   
     public Customer() {
     }
 
