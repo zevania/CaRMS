@@ -209,8 +209,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         tempEndTime.setYear(pickupLoc.getOpenHrs().getYear());
         tempEndTime.setMonth(pickupLoc.getOpenHrs().getMonth());
         
-        if(pickupLoc.getOpenHrs().after(startTime)) return false;
-        if(returnLoc.getCloseHrs().before(endTime)) return false;
+        if(pickupLoc.getOpenHrs().after(tempStartTime)) return false;
+        if(returnLoc.getCloseHrs().before(tempEndTime)) return false;
         
         Set<Reservation> clashingRes = new HashSet<>();
         List<Reservation> temp = new LinkedList<>();
@@ -218,6 +218,14 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         
         Date dStartTime = new Date(2000,1,1,startTime.getHours()-2,startTime.getMinutes(),startTime.getSeconds());
         Date dEndTime = new Date(2000,1,1,endTime.getHours()-2,endTime.getMinutes(),endTime.getSeconds());
+        
+        dStartTime.setYear(startTime.getYear());
+        dStartTime.setMonth(startTime.getMonth());
+        dStartTime.setDate(startTime.getDate());
+        
+        dEndTime.setYear(startTime.getYear());
+        dEndTime.setMonth(startTime.getMonth());
+        dEndTime.setDate(startTime.getDate());
         
         
         Query query;
@@ -243,11 +251,11 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             for(Reservation theR: temp){
                 clashingRes.add(theR);
             }
-            
+            System.out.println("clash res size is "+clashingRes.size());
             for(Reservation theR: clashingRes){
                 if(theR.getReturnDate().equals(startDate)){
                     if(theR.getReturnLocation().equals(pickupLoc)){
-                        if(theR.getReturnTime().after(tempStartTime)){
+                        if(theR.getReturnTime().after(startTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
@@ -261,10 +269,11 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     }
                 } else if(theR.getPickupDate().equals(endDate)){
                     if(theR.getPickupLocation().equals(returnLoc)){
-                        if(theR.getPickupTime().before(tempEndTime)){
+                        if(theR.getPickupTime().before(endTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
+                            System.out.println("bruhla");
                         }
                     }else{
                         if(theR.getPickupTime().before(dEndTime)){
@@ -307,13 +316,17 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             for(Reservation theR: clashingRes){
                 if(theR.getReturnDate().equals(startDate)){
                     if(theR.getReturnLocation().equals(pickupLoc)){
-                        if(theR.getReturnTime().after(tempStartTime)){
+                        if(theR.getReturnTime().after(startTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
                         }
                     }else{
+                        System.out.println("disni ada");
                         if(theR.getReturnTime().after(dStartTime)){
+                            System.out.println("masukah");
+                            System.out.println("dtsrt "+dStartTime);
+                            System.out.println("theR return time "+theR.getReturnTime());
                             continue;
                         } else {
                             toRemove.add(theR);
@@ -321,7 +334,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     }
                 } else if(theR.getPickupDate().equals(endDate)){
                     if(theR.getPickupLocation().equals(returnLoc)){
-                        if(theR.getPickupTime().before(tempEndTime)){
+                        if(theR.getPickupTime().before(endTime)){
                             continue;
                         } else {
                             toRemove.add(theR);
@@ -376,8 +389,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             theStoreId = o.getOutletId();
             toRemove.clear();
             
-            query = em.createQuery("SELECT r FROM Reservation r "
-                    + "WHERE r.orderType = util.enumeration.OrderTypeEnum.MODEL AND r.pickupLocation.outletId = :store AND r.pickupDate = :inTodayDate")
+            query = em.createQuery("SELECT r FROM Reservation r WHERE r.orderType = util.enumeration.OrderTypeEnum.MODEL AND r.pickupLocation.outletId = :store AND r.pickupDate = :inTodayDate")
                     .setParameter("store", theStoreId)
                     .setParameter("inTodayDate", todayDate);
             tempReservation = query.getResultList();
@@ -448,12 +460,13 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     c = cars.get(k);
                     if(c.getModel().getModelId() == temp.getCarModel().getModelId() &&
                         c.getReservation()==null && c.isActive()){
+                        String fromoutlet = c.getReservation().getReturnLocation().getName();
                         c.setReservation(temp);
                         temp.setCar(c);
                         toRemove.add(temp);
                         cars.remove(c);
                         Date pickTime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
-                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , c.getReservation().getReturnLocation().getName());
+                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , fromoutlet);
                         id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
                     } 
@@ -479,12 +492,13 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     if( c.isActive() && c.getReservation()!=null &&c.getModel().getModelId() == temp.getCarModel().getModelId() &&
                         c.getReservation().getReturnDate().equals(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().before(temptime) || c.getReservation().getReturnTime().equals(temptime))){
+                        String fromoutlet = c.getReservation().getReturnLocation().getName();
                         c.setReservation(temp);
                         temp.setCar(c);
                         cars.remove(c);
                         toRemove.add(temp);
                         Date pickTime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
-                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , c.getReservation().getReturnLocation().getName());
+                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , fromoutlet);
                         id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
                     } 
@@ -572,12 +586,13 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     c = cars.get(k);
                     if(c.isActive() && c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
                         c.getReservation()==null){
+                        String fromoutlet = c.getReservation().getReturnLocation().getName();
                         c.setReservation(temp);
                         temp.setCar(c);
                         cars.remove(c);
                         toRemove.add(temp);
                         Date pickTime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
-                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , c.getReservation().getReturnLocation().getName());
+                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , fromoutlet);
                         id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
                     }
@@ -603,12 +618,13 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     if(c.isActive() && c.getReservation()!=null && c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
                         !c.getReservation().getReturnDate().after(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().before(temptime) || c.getReservation().getReturnTime().equals(temptime))){
+                        String fromoutlet = c.getReservation().getReturnLocation().getName();
                         c.setReservation(temp);
                         temp.setCar(c);
                         cars.remove(c);
                         toRemove.add(temp);
                         Date pickTime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
-                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , c.getReservation().getReturnLocation().getName());
+                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime ,fromoutlet);
                         id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
                     } 

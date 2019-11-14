@@ -60,8 +60,7 @@ public class TimerSessionBean {
             theStoreId = o.getOutletId();
             toRemove.clear();
             
-            query = em.createQuery("SELECT r FROM Reservation r "
-                    + "WHERE r.orderType = util.enumeration.OrderTypeEnum.MODEL AND r.pickupLocation.outletId = :store AND r.pickupDate = :inTodayDate")
+            query = em.createQuery("SELECT r FROM Reservation r WHERE r.orderType = util.enumeration.OrderTypeEnum.MODEL AND r.pickupLocation.outletId = :store AND r.pickupDate = :inTodayDate")
                     .setParameter("store", theStoreId)
                     .setParameter("inTodayDate", todayDate);
             tempReservation = query.getResultList();
@@ -71,6 +70,7 @@ public class TimerSessionBean {
             
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
+                
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
                     if(c.getModel().getModelId() == temp.getCarModel().getModelId() &&
@@ -131,12 +131,13 @@ public class TimerSessionBean {
                     c = cars.get(k);
                     if(c.getModel().getModelId() == temp.getCarModel().getModelId() &&
                         c.getReservation()==null && c.isActive()){
+                        String fromoutlet = c.getReservation().getReturnLocation().getName();
                         c.setReservation(temp);
                         temp.setCar(c);
                         toRemove.add(temp);
                         cars.remove(c);
                         Date pickTime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
-                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , c.getReservation().getReturnLocation().getName());
+                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , fromoutlet);
                         id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
                     } 
@@ -162,12 +163,13 @@ public class TimerSessionBean {
                     if( c.isActive() && c.getReservation()!=null &&c.getModel().getModelId() == temp.getCarModel().getModelId() &&
                         c.getReservation().getReturnDate().equals(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().before(temptime) || c.getReservation().getReturnTime().equals(temptime))){
+                        String fromoutlet = c.getReservation().getReturnLocation().getName();
                         c.setReservation(temp);
                         temp.setCar(c);
                         cars.remove(c);
                         toRemove.add(temp);
                         Date pickTime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
-                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , c.getReservation().getReturnLocation().getName());
+                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , fromoutlet);
                         id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
                     } 
@@ -184,18 +186,17 @@ public class TimerSessionBean {
             o = outlet.get(i);
             theStoreId = o.getOutletId();
             toRemove.clear();
-            System.out.println("hereloo");
             query = em.createQuery("SELECT r FROM Reservation r "
                     + "WHERE r.pickupLocation.outletId = :store AND r.orderType = util.enumeration.OrderTypeEnum.CATEGORY  AND r.pickupDate = :inTodayDate ")
                     .setParameter("store", theStoreId)
                     .setParameter("inTodayDate",todayDate);
             tempReservation = query.getResultList();
             cars = o.getCars();
-            System.out.println("the total r is "+tempReservation.size()+" "+todayDate);
             if(tempReservation.size()==0) continue;
             
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
+                
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
                     if(c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
@@ -204,7 +205,6 @@ public class TimerSessionBean {
                         temp.setCar(c);
                         toRemove.add(temp);
                         cars.remove(c);
-                        System.out.println("masuk pak");
                         break;
                     } 
                 }
@@ -214,7 +214,7 @@ public class TimerSessionBean {
             for(Reservation r: toRemove){
                 tempReservation.remove(r);
             }
-            System.out.println("got ini");
+            
             if(tempReservation.size()==0) continue;
             
             toRemove.clear();
@@ -250,19 +250,20 @@ public class TimerSessionBean {
             
             query = em.createQuery("SELECT c FROM Car c WHERE c.active = TRUE");
             cars = query.getResultList();
-            System.out.println("Jumlah mobil sini is "+cars.size());
+            
             for(int j = 0; j < tempReservation.size();j++){
                 temp = tempReservation.get(j);
                 for(int k = 0; k < cars.size();k++){
                     c = cars.get(k);
                     if(c.isActive() && c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
                         c.getReservation()==null){
+                        String fromoutlet = c.getReservation().getReturnLocation().getName();
                         c.setReservation(temp);
                         temp.setCar(c);
                         cars.remove(c);
                         toRemove.add(temp);
                         Date pickTime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
-                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , c.getReservation().getReturnLocation().getName());
+                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , fromoutlet);
                         id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
                     }
@@ -288,13 +289,13 @@ public class TimerSessionBean {
                     if(c.isActive() && c.getReservation()!=null && c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
                         !c.getReservation().getReturnDate().after(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().before(temptime) || c.getReservation().getReturnTime().equals(temptime))){
+                        String fromoutlet = c.getReservation().getReturnLocation().getName();
                         c.setReservation(temp);
                         temp.setCar(c);
                         cars.remove(c);
                         toRemove.add(temp);
                         Date pickTime = new Date(2000,1,1,temp.getPickupTime().getHours()-2,temp.getPickupTime().getMinutes(),temp.getPickupTime().getSeconds());
-                        System.out.print("sampe ini jga");
-                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime , c.getReservation().getReturnLocation().getName());
+                        ddr = new DriverDispatchRecord(DispatchStatusEnum.NOTCOMPLETED, temp.getPickupDate(), pickTime ,fromoutlet);
                         id = transitDriverDispatchRecordSessionBean.createDispatchRecord(ddr, temp.getReservationId(), theStoreId);
                         break;
                     } 
@@ -305,7 +306,6 @@ public class TimerSessionBean {
                 tempReservation.remove(r);
             }
             if(tempReservation.size()==0) continue;
-            System.out.println("sampe");
             
         }
     }
