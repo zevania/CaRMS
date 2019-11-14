@@ -123,25 +123,13 @@ public class MCRWebService {
             r.setCarCategory(cat);
         }
         
-//        Query query = em.createQuery("SELECT c FROM Customer c WHERE c.email LIKE :theEmail")
-//                .setParameter("theEmail", custEmail);
         Customer cust = new Customer(custName, ccNum, custEmail, CustomerTypeEnum.PARTNER);
         em.persist(cust);
         em.flush();
-        
-//        try{
-//            cust = (Customer) query.getSingleResult();
-//        } catch (NoResultException ex) {
-//            cust = new Customer(custEmail, ccNum, custEmail, CustomerTypeEnum.PARTNER); 
-//            
-//        }
-//        
-//        r.setCustomer(cust);
-//        cust.getReservations().add(r);
-//        
+         
         p.getReservations().add(r);
         r.setPartner(p);
-        
+        r.setCustomer(cust);
         
         return r.getReservationId();
     }
