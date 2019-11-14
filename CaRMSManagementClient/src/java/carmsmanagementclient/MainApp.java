@@ -365,7 +365,7 @@ public class MainApp {
         
         System.out.println("*** CaRMS Management Client :: View Rate Details ***\n");
                
-        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         
         System.out.print("Enter the rate id: ");
         long rateId;
@@ -381,11 +381,11 @@ public class MainApp {
         
         try{
             rate = rateSessionBean.retrieveRateById(rateId);
-            System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", "Rate Id", "Start Date", "End Date", "Name", "Category", "Rate", "Peak Rate");
+            System.out.printf("%8s%25s%25s%20s%20s%20s%20s\n", "Rate Id", "Start Date", "End Date", "Name", "Category", "Rate", "Peak Rate");
             if(rate.getEndPeriod().getYear() >= 2099   ){
-                System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", rate.getRateId(), "N.A.", "N.A.", rate.getName(), rate.getCategory().getCategoryName(), rate.getRate(), rate.getPeakRate());
+                System.out.printf("%8s%25s%25s%20s%20s%20s%20s\n", rate.getRateId(), "N.A.", "N.A.", rate.getName(), rate.getCategory().getCategoryName(), rate.getRate(), rate.getPeakRate());
             } else {
-                System.out.printf("%8s%20s%20s%20s%20s%20s%20s\n", rate.getRateId(), formatter.format(rate.getStartPeriod()), formatter.format(rate.getEndPeriod()), rate.getName(), rate.getCategory().getCategoryName(), rate.getRate(), rate.getPeakRate());
+                System.out.printf("%8s%25s%25s%20s%20s%20s%20s\n", rate.getRateId(), formatter.format(rate.getStartPeriod()), formatter.format(rate.getEndPeriod()), rate.getName(), rate.getCategory().getCategoryName(), rate.getRate(), rate.getPeakRate());
             }
         }catch(RateNotFoundException ex){
             System.out.println();
@@ -443,22 +443,22 @@ public class MainApp {
             yesno = sc.nextLine().toLowerCase();
             if(yesno.equals("y")){
                 
-                System.out.print("Enter the start date (yyyy-mm-dd): ");
+                System.out.print("Enter the start date and time (yyyy-mm-dd HH:mm:ss): ");
                 inStartDate = sc.nextLine().trim();
-                System.out.print("Enter the end date (yyyy-mm-dd): ");
+                System.out.print("Enter the end date and time (yyyy-mm-dd HH:mm:ss): ");
                 inEndDate = sc.nextLine().trim();
                 
                 try{
-                    startDate = new SimpleDateFormat("yyyy-MM-dd").parse(inStartDate);
+                    startDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(inStartDate);
                 } catch (ParseException ex){
-                    System.out.println("Invalid start date!");
+                    System.out.println("Invalid start date and time!");
                     return;
                 } 
                 
                 try{
-                    endDate = new SimpleDateFormat("yyyy-MM-dd").parse(inStartDate);
+                    endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(inEndDate);
                 } catch (ParseException ex){
-                    System.out.println("Invalid end date!");
+                    System.out.println("Invalid end date and time!");
                     return;
                 }
                 
@@ -576,7 +576,7 @@ public class MainApp {
         
         if(r == null){
             System.out.println("There is no such reservation!");
-            System.out.println("[Action Denied]");
+            System.out.println("[Action Denied]\n");
             return;
         }
         
@@ -632,7 +632,7 @@ public class MainApp {
         
         if(r == null){
             System.out.println("There is no such reservation!");
-            System.out.println("[Action Denied]");
+            System.out.println("[Action Denied]\n");
             return;
         }
         
@@ -826,6 +826,7 @@ public class MainApp {
             System.out.println("The category is not valid!");
             System.out.println("Model is not updated");
             System.out.println("");
+            return;
         }
         
         System.out.println("");
@@ -897,9 +898,9 @@ public class MainApp {
         Scanner sc = new Scanner(System.in);
         System.out.println("*** CaRMS Management Client :: View All Cars ***\n");
         List<Car> cars = carSessionBean.retrieveCars();
-        System.out.printf("%8s%30s%20s%30s%40s\n", "Car Id", "Plate Number", "Model", "Category", "Location");
+        System.out.printf("%8s%20s%30s%20s%20s%20s\n", "Car Id", "Plate Number", "Category", "Make", "Model", "Location");
         for(Car c : cars) {
-            System.out.printf("%8s%30s%20s%30s%40s\n", c.getCarId(), c.getPlateNumber(), c.getModel().getModelName(),c.getModel().getCategory().getCategoryName(), c.getLocation());
+            System.out.printf("%8s%20s%30s%20s%20s%20s\n", c.getCarId(), c.getPlateNumber(), c.getModel().getCategory().getCategoryName(), c.getModel().getMake(), c.getModel().getModelName(), c.getLocation());
         }
         System.out.println();
         
@@ -910,7 +911,7 @@ public class MainApp {
     
     private void doViewCarDetails(){
         Scanner sc = new Scanner(System.in);
-        System.out.println("*** CaRMS Management Client :: View All Cars ***\n");
+        System.out.println("*** CaRMS Management Client :: View Car Details ***\n");
         System.out.print("Enter the car id: ");
         long carId = sc.nextLong();
         sc.nextLine();
@@ -922,8 +923,8 @@ public class MainApp {
             return;
         }
         
-        System.out.printf("%8s%30s%20s%30s%40s%30s\n", "Car Id", "Plate Number", "Model", "Category", "Location", "Colour");
-        System.out.printf("%8s%30s%20s%30s%40s%30s\n", car.getCarId(), car.getPlateNumber(), car.getModel().getModelName(), car.getModel().getCategory().getCategoryName(), car.getLocation(), car.getColour());
+        System.out.printf("%8s%20s%20s%20s%30s%20s%20s\n", "Car Id", "Plate Number", "Make", "Model", "Category", "Location", "Colour");
+        System.out.printf("%8s%20s%20s%20s%30s%20s%20s\n", car.getCarId(), car.getPlateNumber(), car.getModel().getMake(), car.getModel().getModelName(), car.getModel().getCategory().getCategoryName(), car.getLocation(), car.getColour());
         System.out.println("");
         System.out.println("============");
         System.out.println("1. Update car");
@@ -1043,11 +1044,11 @@ public class MainApp {
             carSessionBean.updateCar(car, outletId, modelId);
         }catch(InvalidModelException ex){
             System.out.println("Model is invalid!");
-            System.out.println("Update denied!");
+            System.out.println("Update denied!\n");
             return;
         }catch(OutletNotFoundException ex){
             System.out.println("Outlet is invalid!");
-            System.out.println("Update denied");
+            System.out.println("Update denied\n");
             return;
         }
         

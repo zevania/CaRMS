@@ -68,6 +68,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             o = c.getOutlet();
             c.setOutlet(null);
             c.setStatus(CarStatusEnum.ONRENTAL);
+            c.setReservation(r);
             r.setResStatus(status);
             r.setPaymentStatus(PaidStatusEnum.PAID);
             o.getCars().remove(c);

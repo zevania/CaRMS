@@ -35,10 +35,10 @@ public class Rate implements Serializable {
     @Column(nullable = false)
     private Double peakRate;
     @Column(nullable = false)
-    @Temporal(javax.persistence.TemporalType.DATE)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date startPeriod;
     @Column(nullable = false)
-    @Temporal(javax.persistence.TemporalType.DATE)
+    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date endPeriod;
     
     @ManyToOne

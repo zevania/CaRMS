@@ -13,6 +13,7 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import util.exception.CarNotFoundException;
@@ -60,31 +61,30 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
 
     @Override
     public void updateCar(Car c, long outletId, long modelId) throws InvalidModelException, OutletNotFoundException {
-        Model model = em.find(Model.class, modelId);
-        
-        if(!model.isActive() || model == null) throw new InvalidModelException();
-        Outlet newOutlet = em.find(Outlet.class,outletId);
-        if(newOutlet == null) throw new OutletNotFoundException();
-        
-        em.merge(c);
-        em.flush();
-        
-        long carId = c.getCarId();
-        Car car = em.find(Car.class, carId);
-        if(outletId != c.getOutlet().getOutletId()){
-            Outlet old = em.find(Outlet.class,c.getOutlet().getOutletId());
-            old.getCars().remove(c);
-            newOutlet.getCars().add(car);
-            car.setOutlet(newOutlet);
-        }
-        
-        if(modelId!=c.getModel().getModelId()){
-            Model oldModel = em.find(Model.class, c.getModel().getModelId());
-            oldModel.getCar().remove(c);
-            model.getCar().add(car);
-            car.setModel(model);
-        }
-        
+            Model model = em.find(Model.class, modelId);
+            if(model == null) throw new InvalidModelException();
+            if(!model.isActive())
+                throw new InvalidModelException();
+            Outlet newOutlet = em.find(Outlet.class,outletId);
+            if(newOutlet == null) throw new OutletNotFoundException();
+            em.merge(c);
+            em.flush();
+
+            long carId = c.getCarId();
+            Car car = em.find(Car.class, carId);
+            if(outletId != c.getOutlet().getOutletId()){
+                Outlet old = em.find(Outlet.class,c.getOutlet().getOutletId());
+                old.getCars().remove(c);
+                newOutlet.getCars().add(car);
+                car.setOutlet(newOutlet);
+            }
+
+            if(modelId!=c.getModel().getModelId()){
+                Model oldModel = em.find(Model.class, c.getModel().getModelId());
+                oldModel.getCar().remove(c);
+                model.getCar().add(car);
+                car.setModel(model);
+            }
         
     }
 
