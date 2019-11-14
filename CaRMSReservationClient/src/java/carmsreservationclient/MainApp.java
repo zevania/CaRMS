@@ -541,6 +541,7 @@ public class MainApp {
         scanner.nextLine();
         
         Reservation r = reservationSessionBeanRemote.retrieveReservationById(id);
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         
         if(r == null){
             System.out.println("There is no such reservationr record!");
@@ -552,7 +553,7 @@ public class MainApp {
         
         System.out.printf("%8s%20s%20s%20s%20s\n", "Res Id", "Pick Up Date", "Return Date",
                 "PickUp Location", "Return Location");
-        System.out.printf("%8s%20s%20s%20s%20s\n", id, startDate, endDate, 
+        System.out.printf("%8s%20s%20s%20s%20s\n", id, df.format(startDate), df.format(endDate), 
                 r.getPickupLocation().getName(), r.getReturnLocation().getName());
         System.out.println("Reservation Status: " + r.getResStatus());
         System.out.println("Total Amount: " + r.getTotal());
@@ -594,11 +595,12 @@ public class MainApp {
             return;
         }
         
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         System.out.printf("%8s%20s%20s%20s%20s\n", "Res Id", "PickUp Date", "Return Date", "Reservation Status", "Payment Status");
         for(Reservation r : res) {
             Date startDate = r.getPickupDate();
             Date endDate = r.getReturnDate();
-            System.out.printf("%8s%20s%20s%20s%20s\n", r.getReservationId(), startDate, endDate, r.getResStatus(), r.getPaymentStatus());
+            System.out.printf("%8s%20s%20s%20s%20s\n", r.getReservationId(), df.format(startDate), df.format(endDate), r.getResStatus(), r.getPaymentStatus());
         }
         System.out.println();
         System.out.println("Press enter to continue");
