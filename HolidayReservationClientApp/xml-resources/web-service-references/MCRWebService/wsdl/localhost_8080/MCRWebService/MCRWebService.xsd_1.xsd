@@ -202,16 +202,6 @@
 </xs:sequence>
 </xs:complexType>
 
-<xs:complexType name="partnerRetrieveAllCategories">
-<xs:sequence/>
-</xs:complexType>
-
-<xs:complexType name="partnerRetrieveAllCategoriesResponse">
-<xs:sequence>
-<xs:element name="return" type="tns:category" minOccurs="0" maxOccurs="unbounded"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="partnerRetrieveTotalByCategory">
 <xs:sequence>
 <xs:element name="catId" type="xs:long"/>
@@ -235,6 +225,16 @@
 <xs:complexType name="RateNotFoundException">
 <xs:sequence>
 <xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="partnerRetrieveAllCategories">
+<xs:sequence/>
+</xs:complexType>
+
+<xs:complexType name="partnerRetrieveAllCategoriesResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:category" minOccurs="0" maxOccurs="unbounded"/>
 </xs:sequence>
 </xs:complexType>
 

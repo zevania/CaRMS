@@ -95,6 +95,7 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
         if(category == null) throw new CategoryNotFoundException();
         
         Date temp = startDate;
+        Date onedaybefore = startDate;
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(temp);
         calendar.add(Calendar.DATE,1);
@@ -104,28 +105,65 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
         
         while(!temp.after(endDate)){
             if(temp.getDay()==5 || temp.getDay()==6 || temp.getDay()==0){
-                query = em.createQuery("SELECT r FROM Rate r WHERE r.category.categoryId = :inCat AND r.startPeriod <= :inStart AND r.endPeriod >= :inEnd ORDER BY r.peakRate ASC")
+                query = em.createQuery("SELECT r FROM Rate r WHERE r.category.categoryId = :inCat AND r.startPeriod <= :inStart AND r.endPeriod >= :inStart AND r.startPeriod<= :inEnd AND r.endPeriod >= :inEnd ORDER BY r.peakRate ASC")
                         .setParameter("inCat", catId)
                         .setParameter("inStart", temp)
-                        .setParameter("inEnd", temp);
+                        .setParameter("inEnd", onedaybefore);
                 
                 List<Rate> peakrates = query.getResultList();
                 if(peakrates.size()==0) throw new RateNotFoundException();
-                total += peakrates.get(0).getPeakRate();
-                System.out.println("the rate is "+peakrates.get(0).getRateId()+" total is "+total+" size is"+peakrates.size());
+                
+                int idx = 0;
+                boolean found = false;
+                
+                //to check for boundary case, make sure the rate is valid for the reservation endTime also
+                //if the reservation time is later than the rate ending period
+                //means we cannot use
+                for(int i = 0; i < peakrates.size();i++){
+                    Date toCheck = peakrates.get(i).getEndPeriod();
+                    if(!toCheck.before(temp)){
+                        if(toCheck.getDate()==endDate.getDate() && toCheck.getMonth()==endDate.getMonth() && toCheck.getYear()==endDate.getYear()){
+                            if(toCheck.after(endDate)) continue;
+                        }
+                        idx = i;
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found) throw new RateNotFoundException();
+                total += peakrates.get(idx).getPeakRate();
             } else {
-                query = em.createQuery("SELECT r FROM Rate r WHERE r.category.categoryId = :inCat AND r.startPeriod <= :inStart AND r.endPeriod >= :inEnd ORDER BY r.rate ASC")
+                query = em.createQuery("SELECT r FROM Rate r WHERE r.category.categoryId = :inCat AND r.startPeriod <= :inStart AND r.endPeriod >= :inEnd AND r.startPeriod<= :inStart AND r.endPeriod >= :inEnd ORDER BY r.rate ASC")
                         .setParameter("inCat", catId)
                         .setParameter("inStart", temp)
-                        .setParameter("inEnd", temp);
+                        .setParameter("inEnd", onedaybefore);
                 
                 List<Rate> rates = query.getResultList();
                 if(rates.size()==0) throw new RateNotFoundException();
-                total+= rates.get(0).getRate();
-                                System.out.println("the rate is "+rates.get(0).getRateId()+" total is "+total+" size is"+rates.size());
+
+                int idx = 0;
+                boolean found = false;
+                
+                //to check for boundary case, make sure the rate is valid for the reservation endTime also
+                //if the reservation time is later than the rate ending period
+                //means we cannot use
+                for(int i = 0; i < rates.size();i++){
+                    Date toCheck = rates.get(i).getEndPeriod();
+                    if(!toCheck.before(temp)){
+                        if(toCheck.getDate()==endDate.getDate() && toCheck.getMonth()==endDate.getMonth() && toCheck.getYear()==endDate.getYear()){
+                            if(toCheck.after(endDate)) continue;
+                        }    
+                        idx = i;
+                        found = true;
+                        break;
+                    }
+                }
+                if(!found) throw new RateNotFoundException();
+                total += rates.get(idx).getRate();
             }
             calendar.add(Calendar.DATE,1);
-            temp = calendar.getTime();
+            onedaybefore = temp;
+            temp = calendar.getTime();  
         }
         
         if(temp.before(endDate)) throw new RateNotFoundException();
