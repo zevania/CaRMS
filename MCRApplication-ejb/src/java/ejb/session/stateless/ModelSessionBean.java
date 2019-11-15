@@ -57,14 +57,19 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     
     @Override
     public void updateModel(Model m, Long categoryId) throws CategoryNotFoundException {
-        //Model oldModel = em.find(Model.class, m.getModelId());
+        Category oldCategory = em.find(Category.class, m.getCategory().getCategoryId());
         Category newCategory = em.find(Category.class, categoryId);
         
         if(newCategory == null) throw new CategoryNotFoundException();
         
         if(m.getCategory().getCategoryId() != categoryId) {
             m.setCategory(newCategory);
+            oldCategory.getModel().remove(m);
+            newCategory.getModel().add(m);
         }
+        
+        
+        
         em.merge(m);
         em.flush();
     }
@@ -77,7 +82,8 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         
         if(model.isActive()) {
             model.setActive(false);
-        } 
+        }
+        model.getCategory().getModel().remove(model);
         em.flush();
     }
     

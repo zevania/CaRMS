@@ -165,6 +165,8 @@ public class MCRWebService {
         Reservation r = em.find(Reservation.class, resId);
         
         if(r==null) throw new ReservationNotFoundException();
+        
+        //May not cancel someone's else reservation
         if(r.getCustomer().getCustomerType()!=CustomerTypeEnum.PARTNER || r.getPartner().getPartnerId()!=partnerId){
             throw new InvalidRelationIdException();
         }

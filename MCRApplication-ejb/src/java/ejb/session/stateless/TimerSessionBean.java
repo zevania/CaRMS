@@ -131,7 +131,9 @@ public class TimerSessionBean {
                     c = cars.get(k);
                     if(c.getModel().getModelId() == temp.getCarModel().getModelId() &&
                         c.getReservation()==null && c.isActive()){
-                        String fromoutlet = c.getReservation().getReturnLocation().getName();
+                        String fromoutlet="";
+                        if(c.getOutlet()!=null) fromoutlet = c.getOutlet().getName();
+                        else if(c.getReservation()!=null) fromoutlet = c.getReservation().getReturnLocation().getName();
                         c.setReservation(temp);
                         temp.setCar(c);
                         toRemove.add(temp);
@@ -163,7 +165,9 @@ public class TimerSessionBean {
                     if( c.isActive() && c.getReservation()!=null &&c.getModel().getModelId() == temp.getCarModel().getModelId() &&
                         c.getReservation().getReturnDate().equals(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().before(temptime) || c.getReservation().getReturnTime().equals(temptime))){
-                        String fromoutlet = c.getReservation().getReturnLocation().getName();
+                        String fromoutlet="";
+                        if(c.getOutlet()!=null) fromoutlet = c.getOutlet().getName();
+                        else if(c.getReservation()!=null) fromoutlet = c.getReservation().getReturnLocation().getName();
                         c.setReservation(temp);
                         temp.setCar(c);
                         cars.remove(c);
@@ -257,7 +261,9 @@ public class TimerSessionBean {
                     c = cars.get(k);
                     if(c.isActive() && c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
                         c.getReservation()==null){
-                        String fromoutlet = c.getReservation().getReturnLocation().getName();
+                        String fromoutlet="";
+                        if(c.getOutlet()!=null) fromoutlet = c.getOutlet().getName();
+                        else if(c.getReservation()!=null) fromoutlet = c.getReservation().getReturnLocation().getName();
                         c.setReservation(temp);
                         temp.setCar(c);
                         cars.remove(c);
@@ -289,7 +295,9 @@ public class TimerSessionBean {
                     if(c.isActive() && c.getReservation()!=null && c.getModel().getCategory().getCategoryId() == temp.getCarCategory().getCategoryId() &&
                         !c.getReservation().getReturnDate().after(temp.getPickupDate()) &&
                         (c.getReservation().getReturnTime().before(temptime) || c.getReservation().getReturnTime().equals(temptime))){
-                        String fromoutlet = c.getReservation().getReturnLocation().getName();
+                        String fromoutlet="";
+                        if(c.getOutlet()!=null) fromoutlet = c.getOutlet().getName();
+                        else if(c.getReservation()!=null) fromoutlet = c.getReservation().getReturnLocation().getName();
                         c.setReservation(temp);
                         temp.setCar(c);
                         cars.remove(c);

@@ -199,6 +199,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         
         if(pickupLoc==null || returnLoc == null) throw new OutletNotFoundException();
 
+        
+        //to handle the offset
         Date tempStartTime = startTime;
         tempStartTime.setDate(pickupLoc.getOpenHrs().getDate());
         tempStartTime.setYear(pickupLoc.getOpenHrs().getYear());
@@ -221,6 +223,8 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         Date dStartTime = new Date(2000,1,1,startTime.getHours()-2,startTime.getMinutes(),startTime.getSeconds());
         Date dEndTime = new Date(2000,1,1,endTime.getHours()-2,endTime.getMinutes(),endTime.getSeconds());
         
+        
+        //to handle the offset
         dStartTime.setYear(startTime.getYear());
         dStartTime.setMonth(startTime.getMonth());
         dStartTime.setDate(startTime.getDate());
@@ -235,7 +239,6 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
         int totalCar = 0;
         
         if(searchType.equals("category")){
-            System.out.println("kini");
             query = em.createQuery("SELECT c FROM Car c WHERE c.model.category.categoryId = :catId AND c.active = TRUE")
                     .setParameter("catId", categoryId);
             totalCar = query.getResultList().size();
@@ -254,7 +257,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             for(Reservation theR: temp){
                 clashingRes.add(theR);
             }
-            System.out.println("clash res size is "+clashingRes.size());
+            
             for(Reservation theR: clashingRes){
                 if(theR.getReturnDate().equals(startDate)){
                     if(theR.getReturnLocation().equals(pickupLoc)){
@@ -276,7 +279,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                             continue;
                         } else {
                             toRemove.add(theR);
-                            System.out.println("bruhla");
+                            
                         }
                     }else{
                         if(theR.getPickupTime().before(dEndTime)){
@@ -305,7 +308,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     .setParameter("inEndDate", endDate)
                     .setParameter("inStartDate", startDate);
             clashingRes = new HashSet<>(query.getResultList());
-            System.out.println("nah man "+clashingRes.size());
+            
             query = em.createQuery("SELECT r FROM Reservation r WHERE r.carModel.modelId = :inMod AND r.returnDate <= :inEndDate AND r.returnDate >= :inStartDate")
                     .setParameter("inMod", modelId)
                     .setParameter("inStartDate",startDate)
@@ -325,11 +328,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                             toRemove.add(theR);
                         }
                     }else{
-                        System.out.println("disni ada");
                         if(theR.getReturnTime().after(dStartTime)){
-                            System.out.println("masukah");
-                            System.out.println("dtsrt "+dStartTime);
-                            System.out.println("theR return time "+theR.getReturnTime());
                             continue;
                         } else {
                             toRemove.add(theR);
@@ -358,13 +357,11 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
             
             int leftCar = totalCar - clashingRes.size();
             
-            System.out.println("left cat total bru is "+leftCar);
             
             if(leftCar>0) return true;
             else return false; 
             
         }
-        System.out.println("sini bruh "+searchType.toString());
         return false;
     }
     
@@ -399,7 +396,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     .setParameter("store", theStoreId)
                     .setParameter("inTodayDate", todayDate);
             tempReservation = query.getResultList();
-            System.out.println("oId "+theStoreId+" the total"+tempReservation.size());
+            
             if(tempReservation.size()==0) continue;
             cars = o.getCars();
             
