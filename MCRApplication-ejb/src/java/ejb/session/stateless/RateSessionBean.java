@@ -51,8 +51,14 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
     @Override
     public List<Rate> retrieveRates() {
         Query query = em.createQuery("SELECT r FROM Rate r ORDER BY r.category.categoryId ASC, r.startPeriod ASC, r.endPeriod ASC");
+        List<Rate> rates = query.getResultList();
+//        for(Rate r: rates){
+//            System.out.println("start "+r.getStartPeriod());
+//            System.out.println("end "+r.getEndPeriod());
+//            System.out.println();
+//        }
         
-        return query.getResultList();
+        return rates;
     }
 
     @Override

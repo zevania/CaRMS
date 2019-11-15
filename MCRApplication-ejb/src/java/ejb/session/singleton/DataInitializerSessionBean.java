@@ -186,32 +186,32 @@ public class DataInitializerSessionBean {
     private void initializeCarData() throws InvalidModelException, OutletNotFoundException 
     {
         Car c;
-        c = new Car("SS00A1TC", "Black", CarStatusEnum.OUTLET);
+        c = new Car("SS00A1TC", "Black", CarStatusEnum.OUTLET, true);
         carSessionBeanLocal.createCar(c, 1, 1);
-        c = new Car("SS00A2TC", "Black", CarStatusEnum.OUTLET);
+        c = new Car("SS00A2TC", "Black", CarStatusEnum.OUTLET,true);
         carSessionBeanLocal.createCar(c, 1, 1);
-        c = new Car("SS00A3TC", "Black", CarStatusEnum.OUTLET);
+        c = new Car("SS00A3TC", "Black", CarStatusEnum.OUTLET,true);
         carSessionBeanLocal.createCar(c, 1, 1);
         
-        c = new Car("SS00B1HC", "Black", CarStatusEnum.OUTLET);
+        c = new Car("SS00B1HC", "Black", CarStatusEnum.OUTLET,true);
         carSessionBeanLocal.createCar(c, 2, 2);
-        c = new Car("SS00B2HC", "Black", CarStatusEnum.OUTLET);
+        c = new Car("SS00B2HC", "Black", CarStatusEnum.OUTLET,true);
         carSessionBeanLocal.createCar(c, 2, 2);
-        c = new Car("SS00B3HC", "Black", CarStatusEnum.OUTLET);
+        c = new Car("SS00B3HC", "Black", CarStatusEnum.OUTLET,true);
         carSessionBeanLocal.createCar(c, 2, 2);
         
-        c = new Car("SS00C1NS", "Black", CarStatusEnum.OUTLET);
+        c = new Car("SS00C1NS", "Black", CarStatusEnum.OUTLET,true);
         carSessionBeanLocal.createCar(c, 3, 3);
-        c = new Car("SS00C2NS", "Black", CarStatusEnum.OUTLET);
+        c = new Car("SS00C2NS", "Black", CarStatusEnum.OUTLET,true);
         carSessionBeanLocal.createCar(c, 3, 3);
-        c = new Car("SS00C3NS", "Black", CarStatusEnum.REPAIR);
+        c = new Car("SS00C3NS", "Black", CarStatusEnum.REPAIR,false);
         carSessionBeanLocal.createCar(c, 3, 3);
         
-        c = new Car("LS00A4ME", "Black", CarStatusEnum.OUTLET);
+        c = new Car("LS00A4ME", "Black", CarStatusEnum.OUTLET,true);
         carSessionBeanLocal.createCar(c, 4, 1);
-        c = new Car("LS00B4B5", "Black", CarStatusEnum.OUTLET);
+        c = new Car("LS00B4B5", "Black", CarStatusEnum.OUTLET,true);
         carSessionBeanLocal.createCar(c, 5, 2);
-        c = new Car("LS00C4A6", "Black", CarStatusEnum.OUTLET);
+        c = new Car("LS00C4A6", "Black", CarStatusEnum.OUTLET,true);
         carSessionBeanLocal.createCar(c, 6, 3);
     }
     

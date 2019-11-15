@@ -58,34 +58,6 @@
 
 <xs:element name="partnerSearchCarResponse" type="tns:partnerSearchCarResponse"/>
 
-<xs:complexType name="partnerRetrieveOutletById">
-<xs:sequence>
-<xs:element name="outletId" type="xs:long"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="partnerRetrieveOutletByIdResponse">
-<xs:sequence>
-<xs:element name="return" type="tns:outlet" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="outlet">
-<xs:sequence>
-<xs:element name="address" type="xs:string" minOccurs="0"/>
-<xs:element name="closeHrs" type="xs:dateTime" minOccurs="0"/>
-<xs:element name="name" type="xs:string" minOccurs="0"/>
-<xs:element name="openHrs" type="xs:dateTime" minOccurs="0"/>
-<xs:element name="outletId" type="xs:long" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
-<xs:complexType name="OutletNotFoundException">
-<xs:sequence>
-<xs:element name="message" type="xs:string" minOccurs="0"/>
-</xs:sequence>
-</xs:complexType>
-
 <xs:complexType name="partnerRetrieveAllReservations">
 <xs:sequence>
 <xs:element name="partnerId" type="xs:long"/>
@@ -153,6 +125,16 @@
 </xs:sequence>
 </xs:complexType>
 
+<xs:complexType name="outlet">
+<xs:sequence>
+<xs:element name="address" type="xs:string" minOccurs="0"/>
+<xs:element name="closeHrs" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="name" type="xs:string" minOccurs="0"/>
+<xs:element name="openHrs" type="xs:dateTime" minOccurs="0"/>
+<xs:element name="outletId" type="xs:long" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
 <xs:complexType name="customer">
 <xs:sequence>
 <xs:element name="ccNum" type="xs:long" minOccurs="0"/>
@@ -197,6 +179,24 @@
 </xs:complexType>
 
 <xs:complexType name="PartnerNotFoundException">
+<xs:sequence>
+<xs:element name="message" type="xs:string" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="partnerRetrieveOutletById">
+<xs:sequence>
+<xs:element name="outletId" type="xs:long"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="partnerRetrieveOutletByIdResponse">
+<xs:sequence>
+<xs:element name="return" type="tns:outlet" minOccurs="0"/>
+</xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="OutletNotFoundException">
 <xs:sequence>
 <xs:element name="message" type="xs:string" minOccurs="0"/>
 </xs:sequence>

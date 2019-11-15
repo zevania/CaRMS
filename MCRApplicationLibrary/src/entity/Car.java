@@ -65,12 +65,19 @@ public class Car implements Serializable {
         this.active = true;
     }
 
+    public Car(String plateNumber, String colour, CarStatusEnum status, boolean active) {
+        this.plateNumber = plateNumber;
+        this.colour = colour;
+        this.status = status;
+        this.active = active;
+    }    
+    
     public Car(String plateNumber, String colour, CarStatusEnum status) {
         this.plateNumber = plateNumber;
         this.colour = colour;
         this.status = status;
         this.active = true;
-    }    
+    }
     
     public boolean isActive() {
         return active;
