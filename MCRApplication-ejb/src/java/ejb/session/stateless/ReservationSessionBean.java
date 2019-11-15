@@ -399,7 +399,7 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     .setParameter("store", theStoreId)
                     .setParameter("inTodayDate", todayDate);
             tempReservation = query.getResultList();
-            
+            System.out.println("oId "+theStoreId+" the total"+tempReservation.size());
             if(tempReservation.size()==0) continue;
             cars = o.getCars();
             
@@ -466,7 +466,9 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
                     c = cars.get(k);
                     if(c.getModel().getModelId() == temp.getCarModel().getModelId() &&
                         c.getReservation()==null && c.isActive()){
-                        String fromoutlet = c.getReservation().getReturnLocation().getName();
+                        String fromoutlet = "";
+                        if(c.getOutlet()!=null) fromoutlet = c.getOutlet().getName();
+                        else if(c.getReservation()!=null) fromoutlet = c.
                         c.setReservation(temp);
                         temp.setCar(c);
                         toRemove.add(temp);
