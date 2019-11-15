@@ -30,7 +30,7 @@ public class Model implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long modelId;
     
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String modelName;
     
     @Column(nullable = false)

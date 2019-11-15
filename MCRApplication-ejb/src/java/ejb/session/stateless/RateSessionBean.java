@@ -140,7 +140,7 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
                 
                 List<Rate> rates = query.getResultList();
                 if(rates.size()==0) throw new RateNotFoundException();
-                
+
                 int idx = 0;
                 boolean found = false;
                 
