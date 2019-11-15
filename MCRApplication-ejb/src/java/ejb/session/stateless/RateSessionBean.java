@@ -97,7 +97,8 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
         Date temp = startDate;
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(temp);
-        
+        calendar.add(Calendar.DATE,1);
+        temp = calendar.getTime();
         
         Query query;
         
