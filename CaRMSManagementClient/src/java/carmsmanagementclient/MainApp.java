@@ -304,40 +304,6 @@ public class MainApp {
                     return;
                 }
                 break;
-                
-//                System.out.print("Enter the start date (yyyy-mm-dd): ");
-//                inStartDate = scanner.nextLine().trim();
-//                System.out.print("Enter the end date (yyyy-mm-dd): ");
-//                inEndDate = scanner.nextLine().trim();
-//                
-//                
-//                try{
-//                    startDate = new SimpleDateFormat("yyyy-MM-dd").parse(inStartDate);
-//                } catch (DateTimeParseException ex){
-//                    System.out.println("Invalid start date!");
-//                    return;
-//                } catch (ParseException ex) {
-//                    System.out.println("Date input is invalid!");
-//                    System.out.println("[Access Denied]");
-//                    return;
-//                }
-//                
-//                try{
-//                    endDate = new SimpleDateFormat("yyyy-MM-dd").parse(inEndDate);
-//                } catch (ParseException ex) {
-//                    System.out.println("Date input is invalid!");
-//                    System.out.println("[Access Denied]");
-//                    return;
-//                } catch (DateTimeParseException ex){
-//                    System.out.println("Invalid end date!");
-//                    return;
-//                }
-//                
-//                if(startDate.after(endDate)){
-//                    System.out.println("Invalid start date: start date is after end date!");
-//                    return;
-//                }
-//                break;
             } else if(yesno.equals("n")) {
                 startDate = new Date(0L);
                 endDate = new Date(2100,10,12);

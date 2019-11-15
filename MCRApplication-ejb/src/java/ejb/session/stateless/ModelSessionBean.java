@@ -13,6 +13,7 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.enumeration.CategoryNotFoundException;
 import util.exception.ModelNotFoundException;
@@ -37,9 +38,14 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         
         m.setCategory(c);
         c.getModel().add(m);
-        em.persist(m);
-        em.flush();
-        return m.getModelId();
+        try {
+            em.persist(m);
+            em.flush();
+            return m.getModelId();
+        } catch (PersistenceException ex) {
+            System.out.println("Model name too long!");
+            return -1;
+        }
     }
     
     @Override
