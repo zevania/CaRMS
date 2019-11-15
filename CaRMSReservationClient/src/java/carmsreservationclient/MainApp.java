@@ -529,7 +529,7 @@ public class MainApp {
                 }
             }
         }
-        else 
+        else if(currentMember == null)
         {
             System.out.println("\nLogin to make a reservation!\n");
         }

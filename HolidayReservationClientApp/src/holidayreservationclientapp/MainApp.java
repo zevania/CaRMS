@@ -364,7 +364,7 @@ public class MainApp {
         do
         {
             total = 0;
-            System.out.println("\n\nSearch Car By: ");
+            System.out.println("\nSearch Car By: ");
             System.out.println("1: Category");
             System.out.println("2: Model\n");
             System.out.print("> ");
@@ -447,6 +447,7 @@ public class MainApp {
             {
                 System.out.println("Invalid option, please try again!\n");
             }
+            System.out.println();
         } while(!yesNo.equals("N"));
         
         
@@ -526,13 +527,14 @@ public class MainApp {
                         }
                         System.out.println("Reservation successful! The id is "+theId);
                         break;
+                    }
+                    break;
                 }
             }
-            }
         }
-        else 
+        else if(curPartner == null)
         {
-            System.out.println("\n Login to make a reservation!\n");
+            System.out.println("Login to make a reservation!\n");
         }
     }
     
