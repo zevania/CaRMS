@@ -556,6 +556,7 @@ public class MainApp {
         
         Reservation r = reservationSessionBeanRemote.retrieveReservationById(id);
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        DateFormat tf = new SimpleDateFormat("HH:mm:ss");
         
         if(r == null){
             System.out.println("There is no such reservation record!");
@@ -569,11 +570,13 @@ public class MainApp {
         }
         Date startDate = r.getPickupDate();
         Date endDate = r.getReturnDate();
+        Date startTime = r.getPickupTime();
+        Date endTime = r.getReturnTime();
         
-        System.out.printf("%8s%20s%20s%20s%20s\n", "Res Id", "Pick Up Date", "Return Date",
+        System.out.printf("%6s%20s%20s%20s%20s%20s%20s\n", "Res Id", "Pick Up Date", "Pick Up Time", "Return Date", "Return Time",
                 "PickUp Location", "Return Location");
-        System.out.printf("%8s%20s%20s%20s%20s\n", id, df.format(startDate), df.format(endDate), 
-                r.getPickupLocation().getName(), r.getReturnLocation().getName());
+        System.out.printf("%6s%20s%20s%20s%20s%20s%20s\n", id, df.format(startDate), tf.format(startTime), 
+                df.format(endDate), tf.format(endTime), r.getPickupLocation().getName(), r.getReturnLocation().getName());
         System.out.println("Reservation Status: " + r.getResStatus());
         System.out.println("Total Amount: " + r.getTotal());
         System.out.println("Payment Status: " + r.getPaymentStatus());

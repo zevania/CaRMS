@@ -540,7 +540,6 @@ public class MainApp {
     private void doViewResDetails(){
         Scanner scanner = new Scanner(System.in);
         Integer response;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("d/MM/yyyy HH:mm");
         
         System.out.println("*** Holiday Reservation Client :: View Reservation Details ***\n");
         System.out.print("Enter reservation id> ");
@@ -568,14 +567,18 @@ public class MainApp {
         
         XMLGregorianCalendar startDate = r.getPickupDate();
         XMLGregorianCalendar endDate = r.getReturnDate();
+        XMLGregorianCalendar startTime = r.getPickupTime();
+        XMLGregorianCalendar endTime = r.getReturnTime();
         
         Date aDate = startDate.toGregorianCalendar().getTime();
         Date bDate = endDate.toGregorianCalendar().getTime();
+        Date aTime = startTime.toGregorianCalendar().getTime();
+        Date bTime = endTime.toGregorianCalendar().getTime();
         
-        System.out.printf("%8s%20s%20s%20s%20s\n", "Res Id", "Pick Up Date", "Return Date",
-                "PickUp Location", "Return Location");
-        System.out.printf("%8s%20s%20s%20s%20s\n", id, dateformatter.format(aDate), dateformatter.format(bDate), 
-                r.getPickupLocation().getName(), r.getReturnLocation().getName());
+        System.out.printf("%6s%20s%20s%20s%20s%20s%20s\n", "Res Id", "Pick Up Date", "Pick Up Time", "Return Date",
+                "Return Time", "PickUp Location", "Return Location");
+        System.out.printf("%6s%20s%20s%20s%20s%20s%20s\n", id, dateformatter.format(aDate), timeformatter.format(aTime)
+                ,dateformatter.format(bDate), timeformatter.format(bTime), r.getPickupLocation().getName(), r.getReturnLocation().getName());
         System.out.println("Reservation Status: " + r.getResStatus());
         System.out.println("Total Amount: " + r.getTotal());
         System.out.println("Payment Status: " + r.getPaymentStatus());
