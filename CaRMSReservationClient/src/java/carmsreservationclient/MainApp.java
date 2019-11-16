@@ -216,6 +216,11 @@ public class MainApp {
             try 
             {
                 Long newMemberId = memberSessionBeanRemote.createMember(newMember);
+                if(newMemberId == -1) {
+                    System.out.println("An error occurred while creating member!");
+                    System.out.println("Name too long!\n");
+                    return;
+                }
                 System.out.println("New member created successfully!: " + newMemberId + "\n");
             }
             catch(MemberEmailExistException ex) 
@@ -509,6 +514,11 @@ public class MainApp {
                         try
                         {
                             theId = reservationSessionBeanRemote.createMemberReservation(r, currentMember.getOurMemberId(), ccNum, pickupId, returnId, categoryId, modelId);
+                            if(theId == -1) {
+                                System.out.println("An error occured while creating the reservation");
+                                System.out.println("Name/CCNum/Email is too long. Customer cannot be created\n");
+                                return;
+                            }
                         }
                         catch(OutletNotFoundException ex)
                         {
@@ -548,7 +558,12 @@ public class MainApp {
         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
         
         if(r == null){
-            System.out.println("There is no such reservationr record!");
+            System.out.println("There is no such reservation record!");
+            System.out.println("[Action Denied]");
+            return;
+        }
+        if(!r.getCustomer().getEmail().equals(currentMember.getEmail())) {
+            System.out.println("Reservation is not under this account!");
             System.out.println("[Action Denied]");
             return;
         }

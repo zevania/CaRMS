@@ -12,6 +12,7 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
 /**
@@ -28,9 +29,16 @@ public class CategorySessionBean implements CategorySessionBeanRemote, CategoryS
 
     @Override
     public long createCategory(Category c) {
-        em.persist(c);
-        em.flush();
-        return c.getCategoryId();
+        try 
+        {
+            em.persist(c);
+            em.flush();
+            return c.getCategoryId();
+        }
+        catch (PersistenceException ex) 
+        {
+            return -1;
+        }
     }
 
     public List<Category> retrieveAllCategories(){

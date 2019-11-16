@@ -38,12 +38,14 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
         
         m.setCategory(c);
         c.getModel().add(m);
-        try {
+        try 
+        {
             em.persist(m);
             em.flush();
             return m.getModelId();
-        } catch (PersistenceException ex) {
-            System.out.println("Model name too long!");
+        } 
+        catch (PersistenceException ex) 
+        {
             return -1;
         }
     }
@@ -56,22 +58,25 @@ public class ModelSessionBean implements ModelSessionBeanRemote, ModelSessionBea
     }
     
     @Override
-    public void updateModel(Model m, Long categoryId) throws CategoryNotFoundException {
+    public long updateModel(Model m, Long categoryId) throws CategoryNotFoundException {
         Category oldCategory = em.find(Category.class, m.getCategory().getCategoryId());
         Category newCategory = em.find(Category.class, categoryId);
         
         if(newCategory == null) throw new CategoryNotFoundException();
         
-        if(m.getCategory().getCategoryId() != categoryId) {
-            m.setCategory(newCategory);
-            oldCategory.getModel().remove(m);
-            newCategory.getModel().add(m);
+        try {
+            em.merge(m);
+            em.flush();
+            if(m.getCategory().getCategoryId() != categoryId) {
+                m.setCategory(newCategory);
+                oldCategory.getModel().remove(m);
+                newCategory.getModel().add(m);
+            }
+            return m.getModelId();
         }
-        
-        
-        
-        em.merge(m);
-        em.flush();
+        catch (PersistenceException ex) {
+            return -1;
+        }
     }
     
     @Override

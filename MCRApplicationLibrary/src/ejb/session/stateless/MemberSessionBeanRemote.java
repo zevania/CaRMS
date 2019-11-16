@@ -12,7 +12,7 @@ import util.exception.MemberEmailExistException;
 
 public interface MemberSessionBeanRemote {
     
-    public Long createMember(OurMember m) throws MemberEmailExistException;
+    public long createMember(OurMember m) throws MemberEmailExistException;
 
     public OurMember memberLogin(String email, String password) throws InvalidLoginCredentialException;
     

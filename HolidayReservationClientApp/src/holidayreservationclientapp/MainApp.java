@@ -5,7 +5,6 @@
  */
 package holidayreservationclientapp;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
@@ -15,21 +14,16 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import ws.client.Category;
 import ws.client.CategoryNotFoundException_Exception;
 import ws.client.Customer;
 import ws.client.CustomerTypeEnum;
-import ws.client.InvalidLoginCredentialException;
 import ws.client.InvalidLoginCredentialException_Exception;
 import ws.client.InvalidRelationIdException_Exception;
 import ws.client.Model;
-import ws.client.ObjectFactory;
 import ws.client.OrderTypeEnum;
 import ws.client.Outlet;
 import ws.client.OutletNotFoundException_Exception;
@@ -519,6 +513,11 @@ public class MainApp {
                         try
                         {
                             theId = partnerCreateReservation(res, ccNum, pickupId, returnId, categoryId, modelId, name, email, curPartner.getPartnerId());
+                            if(theId == -1) {
+                                System.out.println("An error occured while creating the reservation");
+                                System.out.println("Name/CCNum/Email is too long. Customer cannot be created\n");
+                                return;
+                            }
                         }
                         catch(OutletNotFoundException_Exception ex)
                         {

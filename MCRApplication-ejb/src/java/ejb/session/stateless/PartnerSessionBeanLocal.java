@@ -12,7 +12,7 @@ import util.exception.PartnerNotFoundException;
 
 public interface PartnerSessionBeanLocal {
 
-    public Long createPartner(Partner p);
+    public long createPartner(Partner p);
 
     public Partner doPartnerLogin(String email, String password) throws PartnerNotFoundException, InvalidLoginCredentialException;
 

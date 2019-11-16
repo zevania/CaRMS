@@ -13,8 +13,8 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.exception.CarNotFoundException;
 import util.exception.InvalidModelException;
@@ -34,23 +34,30 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     
     
     @Override
-    public long createCar(Car car, long modelId, long outletId) throws InvalidModelException, OutletNotFoundException {
+    public long createCar(Car car, long modelId, long outletId) throws InvalidModelException, 
+            OutletNotFoundException {
         Model model = em.find(Model.class, modelId);
         Outlet outlet = em.find(Outlet.class, outletId);
         
         if(outlet == null) throw new OutletNotFoundException();
         
-        if(!model.isActive() || model == null) throw new InvalidModelException();
-        em.persist(car);
-        
-        car.setModel(model);
-        model.getCar().add(car);
-        outlet.getCars().add(car);
-        car.setOutlet(outlet);
-        car.setLocation(outlet.getName());
-        em.flush();
-        
-        return car.getCarId();
+        try 
+        {
+            if(!model.isActive() || model == null) throw new InvalidModelException();
+            em.persist(car);
+
+            car.setModel(model);
+            model.getCar().add(car);
+            outlet.getCars().add(car);
+            car.setOutlet(outlet);
+            car.setLocation(outlet.getName());
+            em.flush();
+            return car.getCarId();
+        } 
+        catch(PersistenceException ex) 
+        {
+            return -1;
+        }
     }
 
     @Override
@@ -60,32 +67,40 @@ public class CarSessionBean implements CarSessionBeanRemote, CarSessionBeanLocal
     }
 
     @Override
-    public void updateCar(Car c, long outletId, long modelId) throws InvalidModelException, OutletNotFoundException {
+    public long updateCar(Car c, long outletId, long modelId) throws InvalidModelException, OutletNotFoundException {
             Model model = em.find(Model.class, modelId);
             if(model == null) throw new InvalidModelException();
             if(!model.isActive())
                 throw new InvalidModelException();
             Outlet newOutlet = em.find(Outlet.class,outletId);
             if(newOutlet == null) throw new OutletNotFoundException();
-            em.merge(c);
-            em.flush();
+            
+            try 
+            {
+                em.merge(c);
+                em.flush();
 
-            long carId = c.getCarId();
-            Car car = em.find(Car.class, carId);
-            if(outletId != c.getOutlet().getOutletId()){
-                Outlet old = em.find(Outlet.class,c.getOutlet().getOutletId());
-                old.getCars().remove(c);
-                newOutlet.getCars().add(car);
-                car.setOutlet(newOutlet);
-            }
+                long carId = c.getCarId();
+                Car car = em.find(Car.class, carId);
+                if(outletId != c.getOutlet().getOutletId()){
+                    Outlet old = em.find(Outlet.class,c.getOutlet().getOutletId());
+                    old.getCars().remove(c);
+                    newOutlet.getCars().add(car);
+                    car.setOutlet(newOutlet);
+                }
 
-            if(modelId!=c.getModel().getModelId()){
-                Model oldModel = em.find(Model.class, c.getModel().getModelId());
-                oldModel.getCar().remove(c);
-                model.getCar().add(car);
-                car.setModel(model);
+                if(modelId!=c.getModel().getModelId()){
+                    Model oldModel = em.find(Model.class, c.getModel().getModelId());
+                    oldModel.getCar().remove(c);
+                    model.getCar().add(car);
+                    car.setModel(model);
+                }
+                return c.getCarId();
             }
-        
+            catch (PersistenceException ex) 
+            {
+                return -1;
+            }
     }
 
     @Override

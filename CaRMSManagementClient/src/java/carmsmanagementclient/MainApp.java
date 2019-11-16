@@ -24,8 +24,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.persistence.PersistenceException;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.CategoryNotFoundException;
 import util.enumeration.PaidStatusEnum;
@@ -288,19 +287,19 @@ public class MainApp {
                 try{
                     startDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(inStartDate);
                 } catch (ParseException ex){
-                    System.out.println("Invalid start date and time!");
+                    System.out.println("Invalid start date and time!\n");
                     return;
                 } 
                 
                 try{
                     endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(inEndDate);
                 } catch (ParseException ex){
-                    System.out.println("Invalid end date and time!");
+                    System.out.println("Invalid end date and time!\n");
                     return;
                 }
                 
                 if(startDate.after(endDate)){
-                    System.out.println("Invalid start date: start date is after end date!");
+                    System.out.println("Invalid start date: start date is after end date!\n");
                     return;
                 }
                 break;
@@ -323,6 +322,11 @@ public class MainApp {
         long id = 0;
         try{
             id = rateSessionBean.createRate(r,catId);
+            if(id == -1) {
+                System.out.println("An error occurred while creating rate!");
+                System.out.println("Rate name too long!\n");
+                return;
+            }
             System.out.println("Successfully created a rate.");
             System.out.println("The rate id is "+id+". \n");
         }catch(CategoryNotFoundException ex){
@@ -442,19 +446,19 @@ public class MainApp {
                 try{
                     startDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(inStartDate);
                 } catch (ParseException ex){
-                    System.out.println("Invalid start date and time!");
+                    System.out.println("Invalid start date and time!\n");
                     return;
                 } 
                 
                 try{
                     endDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(inEndDate);
                 } catch (ParseException ex){
-                    System.out.println("Invalid end date and time!");
+                    System.out.println("Invalid end date and time!\n");
                     return;
                 }
                 
                 if(startDate.after(endDate)){
-                    System.out.println("Invalid start date: start date is after end date!");
+                    System.out.println("Invalid start date: start date is after end date!\n");
                     return;
                 }
                 break;
@@ -749,9 +753,18 @@ public class MainApp {
         
         try{
             id = modelSessionBean.createModel(m, categoryId);
+            if(id == -1) {
+                System.out.println("An error occurred while creating the model!");
+                System.out.println("Make/Model name too long!\n");
+                return;
+            }
         }catch(CategoryNotFoundException ex){
             System.out.println("Invalid Category Id");
             System.out.println("");
+            return;
+        } catch (PersistenceException ex) {
+            System.out.println("An error occured while creating a new model");
+            System.out.println(ex.getMessage()+"\n");
             return;
         }
         
@@ -779,7 +792,7 @@ public class MainApp {
     
     private void doUpdateModel(){
         Scanner sc = new Scanner(System.in);
-        System.out.println("*** CaRMS Management Client :: View All Models ***\n");
+        System.out.println("*** CaRMS Management Client :: Update Model ***\n");
         
         System.out.print("Enter the model id: ");
         long modelId = sc.nextLong();
@@ -810,9 +823,15 @@ public class MainApp {
         
         model.setMake(make);
         model.setModelName(modelName);
+        long newId;
         
         try{
-            modelSessionBean.updateModel(model, catId);
+            newId = modelSessionBean.updateModel(model, catId);
+            if(newId == -1) {
+                System.out.println("An error occurred while updating model!");
+                System.out.println("Make/Model name too long!\n");
+                return;
+            }
         }catch(CategoryNotFoundException ex){
             System.out.println("The category is not valid!");
             System.out.println("Model is not updated");
@@ -870,6 +889,11 @@ public class MainApp {
         
         try{
             carId = carSessionBean.createCar(car, modelId, outletId);
+            if(carId == -1) {
+                System.out.println("An error occurred while creating the car");
+                System.out.println("Plate number/Color name too long!\n");
+                return;
+            }
         }catch(InvalidModelException ex){
             System.out.println("The model is invalid!");
             return;
@@ -1010,7 +1034,7 @@ public class MainApp {
         long outletId = car.getOutlet().getOutletId();
         
         while(true){
-            System.out.println("Do you want to update the OUTLET? (y/n)");
+            System.out.println("Do you want to update the outlet? (y/n)");
             System.out.print("> ");
             yesno = sc.nextLine().trim().toLowerCase();
             
@@ -1030,9 +1054,15 @@ public class MainApp {
         car.setLocation(location);
         car.setPlateNumber(newPlateNumber);
         car.setStatus(carStatus);
+        long newId;
         
         try{
-            carSessionBean.updateCar(car, outletId, modelId);
+            newId = carSessionBean.updateCar(car, outletId, modelId);
+            if(newId == -1) {
+                System.out.println("An error occurred while updating car!");
+                System.out.println("Plate Number/Color too long!\n");
+                return;
+            }
         }catch(InvalidModelException ex){
             System.out.println("Model is invalid!");
             System.out.println("Update denied!\n");
@@ -1076,7 +1106,7 @@ public class MainApp {
         List<DriverDispatchRecord> ddrs = transitDriverDispatchRecordSessionBean.retrieveDispatchRecords(currEmployee.getOutlet().getOutletId(), Calendar.getInstance().getTime());
         
         if(ddrs.size() == 0){
-            System.out.println("There is no driver dispatch record for today!");
+            System.out.println("There is no driver dispatch record for today!\n");
             return;
         }
         

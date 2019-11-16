@@ -6,9 +6,6 @@
 package entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -16,10 +13,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import util.enumeration.CustomerTypeEnum;
 
 /**
@@ -34,11 +27,11 @@ public class Customer implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long custId;
     
-    @Column(nullable = false)
+    @Column(nullable = false, length = 40)
     private String name;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private Long ccNum;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 254)
     private String email;
     @Enumerated(EnumType.STRING)
     private CustomerTypeEnum customerType;

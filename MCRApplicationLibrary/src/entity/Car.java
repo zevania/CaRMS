@@ -32,9 +32,9 @@ public class Car implements Serializable {
     
     // don't need unique because plateNumber might be reused for different cars
     // after a certain period of time
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String plateNumber;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String colour;
     @Enumerated(EnumType.STRING)
     private CarStatusEnum status;

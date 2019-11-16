@@ -18,7 +18,7 @@ public class Category implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long categoryId;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String categoryName;
     @Transient
     private Double currFee;

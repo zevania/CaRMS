@@ -10,6 +10,6 @@ import entity.Partner;
 
 public interface PartnerSessionBeanRemote {
     
-    public Long createPartner(Partner p);
+    public long createPartner(Partner p);
     
 }

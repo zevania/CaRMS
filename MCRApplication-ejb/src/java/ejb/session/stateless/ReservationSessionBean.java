@@ -26,6 +26,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.enumeration.CarStatusEnum;
 import util.enumeration.CustomerTypeEnum;
@@ -112,18 +113,21 @@ public class ReservationSessionBean implements ReservationSessionBeanRemote, Res
 
         Customer cust = new Customer(member.getName(), ccNum, email, CustomerTypeEnum.MEMBER);
         
-        em.persist(cust);
-        
-        r.setCustomer(cust);
-        
-        
-        em.persist(r);
-        em.flush();       
-        return r.getReservationId();
+        try 
+        {
+            em.persist(cust);
+            r.setCustomer(cust);
+            
+            em.persist(r);
+            em.flush();       
+            return r.getReservationId();
+        }
+        catch (PersistenceException ex) 
+        {
+            return -1;
+        }
     }
     
-    
-
     @Override
     public String cancelReservation(long resId) {
         Reservation r = em.find(Reservation.class, resId);

@@ -27,9 +27,9 @@ public class Partner implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long partnerId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String companyName;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
     @Column(nullable = false)
     private String password;

@@ -17,7 +17,6 @@ import entity.Model;
 import entity.Outlet;
 import entity.Partner;
 import entity.Reservation;
-import java.time.Month;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -28,8 +27,8 @@ import javax.jws.WebParam;
 import javax.ejb.Stateless;
 import javax.management.relation.InvalidRelationIdException;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.enumeration.CategoryNotFoundException;
 import util.enumeration.CustomerTypeEnum;
@@ -123,13 +122,19 @@ public class MCRWebService {
         }
         
         Customer cust = new Customer(custName, ccNum, custEmail, CustomerTypeEnum.PARTNER);
-        em.persist(cust);
-        p.getReservations().add(r);
-        r.setPartner(p);
-        r.setCustomer(cust);
-        em.persist(r);
-        em.flush();
-        return r.getReservationId();
+        try 
+        {
+            em.persist(cust);
+            p.getReservations().add(r);
+            r.setPartner(p);
+            r.setCustomer(cust);
+            em.persist(r);
+            em.flush();
+            return r.getReservationId();
+        }
+        catch (PersistenceException ex) {
+            return -1;
+        }
     }
     
     @WebMethod(operationName = "partnerRetrieveAllReservations")

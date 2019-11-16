@@ -32,9 +32,9 @@ public class Employee implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long employeeId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 40)
     private String name;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, length = 254)
     private String email;
     @Column(nullable = false)
     private String password;

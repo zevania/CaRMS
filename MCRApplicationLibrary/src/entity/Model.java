@@ -33,7 +33,7 @@ public class Model implements Serializable {
     @Column(nullable = false, length = 20)
     private String modelName;
     
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String make;
     
     @Column(nullable = false)

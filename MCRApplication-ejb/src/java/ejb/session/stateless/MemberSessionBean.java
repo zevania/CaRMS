@@ -12,6 +12,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.MemberEmailExistException;
@@ -29,22 +30,27 @@ public class MemberSessionBean implements MemberSessionBeanRemote, MemberSession
     private EntityManager em;
     
     @Override
-    public Long createMember(OurMember m) throws MemberEmailExistException {
+    public long createMember(OurMember m) throws MemberEmailExistException {
+        
         Query query = em.createQuery("SELECT m FROM OurMember m WHERE m.email = :inEmail");
         query.setParameter("inEmail", m.getEmail());
         
         OurMember member;
-            
-        try{
-            member = (OurMember) query.getSingleResult();
-        }catch(NoResultException ex){
-            em.persist(m);
-            em.flush();
-            return m.getOurMemberId();
-        }
-            
+        try {
+            member = (OurMember)query.getSingleResult();
             throw new MemberEmailExistException("Email already exist!");
-        
+        }
+        catch(NoResultException ex) {
+            try 
+            {
+                em.persist(m);
+                em.flush();
+                return m.getOurMemberId();
+            }
+            catch(PersistenceException ex1) {
+                return -1;
+            }
+        }
     }
     
     @Override

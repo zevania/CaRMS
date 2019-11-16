@@ -13,6 +13,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.exception.OutletNotFoundException;
 
@@ -26,9 +27,16 @@ public class OutletSessionBean implements OutletSessionBeanRemote, OutletSession
 
     @Override
     public long createOutlet(Outlet o) {
-        em.persist(o);
-        em.flush();
-        return o.getOutletId();
+        try 
+        {
+            em.persist(o);
+            em.flush();
+            return o.getOutletId();
+        }
+        catch (PersistenceException ex) 
+        {
+            return -1;
+        }
     }
     
     @Override

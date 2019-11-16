@@ -14,6 +14,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
 /**
@@ -30,13 +31,20 @@ public class EmployeeSessionBean implements EmployeeSessionBeanRemote, EmployeeS
 
     @Override
     public long createEmployee(Employee e, long outletId) {
-        em.persist(e);
-        Outlet o = em.find(Outlet.class, outletId);
-        o.getEmployees().add(e);
-        e.setOutlet(o);
-        em.flush();
-        
-        return e.getEmployeeId();
+        try 
+        {
+            em.persist(e);
+            Outlet o = em.find(Outlet.class, outletId);
+            o.getEmployees().add(e);
+            e.setOutlet(o);
+            em.flush();
+
+            return e.getEmployeeId();
+        }
+        catch(PersistenceException ex) 
+        {
+            return -1;
+        }
     }
 
     @Override

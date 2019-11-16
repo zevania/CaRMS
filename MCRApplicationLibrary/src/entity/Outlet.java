@@ -35,9 +35,9 @@ public class Outlet implements Serializable {
     @Column(nullable = false)
     @Temporal(javax.persistence.TemporalType.TIME)
     private Date closeHrs;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, length = 20)
     private String name;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 35)
     private String address;
     
     @OneToMany(mappedBy = "outlet")

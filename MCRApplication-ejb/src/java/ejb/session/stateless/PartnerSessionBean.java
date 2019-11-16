@@ -12,6 +12,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.exception.InvalidLoginCredentialException;
 import util.exception.PartnerNotFoundException;
@@ -29,10 +30,17 @@ public class PartnerSessionBean implements PartnerSessionBeanRemote, PartnerSess
     private EntityManager em;
     
     @Override
-    public Long createPartner(Partner p) {
-        em.persist(p);
-        em.flush();
-        return p.getPartnerId();
+    public long createPartner(Partner p) {
+        try 
+        {
+            em.persist(p);
+            em.flush();
+            return p.getPartnerId();
+        }
+        catch (PersistenceException ex) 
+        {
+            return -1;
+        }
     }
     
     public Partner doPartnerLogin(String email, String password) throws PartnerNotFoundException, InvalidLoginCredentialException{

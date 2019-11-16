@@ -28,7 +28,7 @@ public class Rate implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long rateId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String name;
     @Column(nullable = false)
     private Double rate;

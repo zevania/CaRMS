@@ -7,6 +7,7 @@ package ejb.session.stateless;
 
 import entity.Car;
 import java.util.List;
+import javax.persistence.PersistenceException;
 import util.exception.CarNotFoundException;
 import util.exception.InvalidModelException;
 import util.exception.OutletNotFoundException;
@@ -18,7 +19,7 @@ public interface CarSessionBeanLocal {
     
     public List<Car> retrieveCars();
 
-    public void updateCar(Car c, long outletId, long modelId) throws InvalidModelException, OutletNotFoundException;
+    public long updateCar(Car c, long outletId, long modelId) throws InvalidModelException, OutletNotFoundException;
 
     public void deleteCar(long carId) throws CarNotFoundException;
 

@@ -17,7 +17,7 @@ public interface ModelSessionBeanRemote {
     
     public List<Model> retrieveModels();
 
-    public void updateModel(Model m, Long categoryId) throws CategoryNotFoundException;
+    public long updateModel(Model m, Long categoryId) throws CategoryNotFoundException;
 
     public void deleteModel(Long modelId) throws ModelNotFoundException;
     

@@ -7,7 +7,6 @@ package ejb.session.stateless;
 
 import entity.Category;
 import entity.Rate;
-import java.time.DayOfWeek;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -16,6 +15,7 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 import util.enumeration.CategoryNotFoundException;
 import util.exception.RateNotFoundException;
@@ -42,10 +42,17 @@ public class RateSessionBean implements RateSessionBeanRemote, RateSessionBeanLo
         
         r.setCategory(category);
         category.getRate().add(r);
-        em.persist(r);
-        em.flush();
-        
-        return r.getRateId();
+        try 
+        {
+            em.persist(r);
+            em.flush();
+
+            return r.getRateId();
+        }
+        catch (PersistenceException ex) 
+        {
+            return -1;
+        }
     }
 
     @Override
